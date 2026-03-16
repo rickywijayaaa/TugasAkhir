@@ -1,0 +1,112 @@
+# =========================
+
+# OS FILES
+
+# =========================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+
+# PYTHON
+
+# =========================
+
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+*.pyc.*
+*.pkl
+
+# virtual environment
+
+venv/
+env/
+.venv/
+
+# =========================
+
+# JUPYTER NOTEBOOK
+
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+
+# DATA FILES (optional)
+
+# =========================
+
+# uncomment if dataset besar
+
+# data/
+
+# *.csv
+
+# *.tsv
+
+# =========================
+
+# LATEX BUILD FILES
+
+# =========================
+
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.loa
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.equ
+
+# =========================
+
+# LATEX TEMP FILES
+
+# =========================
+
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+
+# =========================
+
+# EDITOR
+
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+
+# CLAUDE / AI SETTINGS
+
+# =========================
+
+.claude/
+
+# =========================
+
+# PDF OUTPUT (optional)
+
+# =========================
+
+# comment jika ingin commit hasil PDF
+
+# *.pdf
