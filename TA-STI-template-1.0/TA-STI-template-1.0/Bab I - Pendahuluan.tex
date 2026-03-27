@@ -1,100 +1,97 @@
 \cleardoublepage % memastikan bab baru dimulai di halaman ganjil (kanan)
 \chapter{PENDAHULUAN}
 \label{chap:pendahuluan}
-% --- Latar Belakang ---
+
+% --- 1.1 Latar Belakang ---
 \section{Latar Belakang}
-Subbab ini menjelaskan dasar pemikiran, motivasi, kebutuhan, alasan, atau urgensi pemilihan masalah tugas akhir. Subbab ini berisi penjelasan ringkas tentang kondisi atau situasi yang ada saat ini terkait dengan topik yang dibahas. Tujuan utamanya adalah untuk memberikan informasi secukupnya kepada pembaca agar memahami topik yang akan dibahas. Dalam subbab ini, jelaskan hal-hal berikut ini:
-\begin{enumerate}
-\item	Kondisi atau situasi topik yang dibahas beserta permasalahannya, misalnya tentang pengelolaan informasi di fasilitas kesehatan daerah pedesaan saat ini dan masalah yang dihadapi, berdasarkan hasil survei atau wawancara dengan pihak terkait.
-\item	Urgensi atau pentingnya penyelesaian masalah tersebut, misalnya dampak negatif yang ditimbulkan jika masalah tersebut tidak diselesaikan.
-\item	Berbagai solusi yang telah diterapkan maupun solusi yang memungkinkan untuk diterapkan untuk menyelesaikan masalah tersebut, berdasarkan hasil studi literatur, wawancara dengan pihak terkait, atau kunjungan lapangan.
-\item   Kelemahan atau kekurangan dari solusi yang telah diterapkan atau yang memungkinkan untuk diterapkan tersebut, yang menjadi dasar pemikiran dalam merumuskan masalah tugas akhir.
-\end{enumerate}
-Latar belakang dapat ditulis dalam 2-3 halaman. Penulisan latar belakang masalah yang baik akan mengantarkan pembaca kepada pemahaman yang jelas tentang topik yang akan dibahas, 
-sehingga pembaca dapat mengikuti pembahasan pada subbab-subbab berikutnya dengan baik. Oleh karena itu, 
-penulis diharapkan melakukan investigasi yang mendalam untuk mengumpulkan fakta-fakta yang relevan dengan topik yang dibahas, 
-baik melalui studi literatur, wawancara dengan pihak terkait, maupun kunjungan lapangan. Hasil studi ini dijelaskan secara \emph{ringkas} di dalam subbab ini.
-Penjelasan hasil studi literatur yang komprehensif dapat dijabarkan di Bab II Studi Literatur secara sistematis.
 
-Dalam menulis latar belakang, hindari penulisan yang bersifat terlalu umum atau terlalu luas cakupannya sehingga sulit untuk dihubungkan dengan topik yang dibahas dalam tugas akhir,
-seperti:
-\begin{enumerate}
-    \item "Pentingnya teknologi informasi dalam kehidupan manusia."
-    \item "Perkembangan pesat teknologi \emph{artificial intelligence} di era digital."
-    \item "Tantangan dalam pengelolaan data besar (\emph{big data}) di berbagai sektor industri."
-    \item "Peran teknologi informasi dalam meningkatkan kualitas layanan kesehatan."
-\end{enumerate}
-Penulisan yang terlalu umum atau luas cakupannya akan menyulitkan penulis dalam merumuskan masalah, tujuan, metodologi, dan evaluasi tugas akhir.
+Kemajuan \textit{Large Language Models (LLM)} seperti \textit{GPT}, \textit{LLaMA}, dan \textit{PaLM} telah menghadirkan perubahan fundamental dalam berbagai aspek kehidupan modern. Model-model ini mampu menghasilkan teks yang koheren, mengikuti instruksi, serta membantu proses analisis informasi secara cepat dan efisien. Hal tersebut membuat LLM semakin banyak digunakan dalam layanan publik, pendidikan, kesehatan, bisnis, hingga penyediaan informasi sehari-hari \parencite{math2024hallucination}.
 
-Jika ada referensi yang digunakan dalam penulisan latar belakang, cantumkan referensi tersebut dengan benar menggunakan \texttt{biblatex} sesuai dengan contoh penulisan kutipan dan daftar pustaka yang telah disediakan dalam template ini.
-Sebagai contoh, pada paragraf berikut ini terdapat kutipan dari dua referensi yang berbeda \autocite{laudon2020, pressman2019}. 
-Ada dua format penulisan sitasi yang dapat digunakan, yaitu format naratif dan format parentetik.
-Contoh penulisan kutipan dengan format naratif adalah sebagai berikut:
-\begin{displayquote}
-Menurut \textcite{laudon2020}, sistem informasi adalah kombinasi dari teknologi informasi dan aktivitas orang yang menggunakan teknologi tersebut untuk mendukung operasi dan manajemen organisasi.
-\end{displayquote}
-Contoh penulisan kutipan dengan format parentetik adalah sebagai berikut:
-\begin{displayquote}
-    Sistem informasi merupakan kombinasi dari teknologi informasi dan aktivitas orang yang menggunakan teknologi tersebut untuk mendukung operasi dan manajemen organisasi \autocite{laudon2020}.
-\end{displayquote}
-% --- Rumusan Masalah ---
+Namun, di balik kemajuan tersebut, terdapat tantangan serius berupa fenomena \textit{hallucination}. \textit{Hallucination} terjadi ketika model menghasilkan informasi yang tampak meyakinkan tetapi sebenarnya tidak benar, tidak berdasar, atau sepenuhnya fiktif \parencite{lettucedetect2024}. Risiko tersebut bukan sekadar isu teknis karena dampaknya telah terlihat nyata dalam berbagai kasus yang merugikan masyarakat.
+
+Pada tahun 2023, seorang pengacara di New York mengajukan enam rujukan kasus hukum palsu yang sepenuhnya dihasilkan oleh \textit{ChatGPT}, sehingga ia dikenai sanksi pengadilan dan menanggung kerugian reputasi \parencite{schwartz2023chatgptlawcase}. Dalam bidang kesehatan, studi MedPaLM oleh Singhal dkk.\ menunjukkan bahwa LLM kerap menghasilkan rekomendasi medis yang tidak akurat dan berpotensi membahayakan pasien jika digunakan tanpa verifikasi profesional \parencite{singhal2023medpalm}. Laporan UNESCO (2023) juga menyoroti kemampuan model generatif dalam mempercepat penyebaran misinformasi sehingga berpotensi mengganggu stabilitas informasi publik \parencite{unesco2023misinformation}. Bahkan pada tahun 2024, maskapai Air Canada dinyatakan bertanggung jawab oleh pengadilan karena \textit{chatbot} resminya memberikan informasi pengembalian dana yang keliru, menunjukkan bahwa \textit{hallucination} memiliki konsekuensi hukum dan finansial yang nyata \parencite{aircanada2024refundcase}.
+
+Berbagai insiden tersebut menggambarkan bahwa \textit{hallucination} bukan hanya sekadar kesalahan keluaran model, melainkan isu kritis yang memengaruhi kepercayaan, keamanan, dan reliabilitas teknologi berbasis LLM. Oleh karena itu, perlu dilakukan upaya sistematis untuk memahami dan memitigasi \textit{hallucination}, khususnya pada pendekatan \textit{Retrieval-Augmented Generation} (RAG) yang menggabungkan kemampuan generatif dengan sumber informasi eksternal.
+
+Secara teoretis, RAG dapat mengurangi \textit{hallucination} karena model menjawab berdasarkan dokumen yang dapat diverifikasi. Namun dalam praktiknya, RAG tetap dapat menghasilkan informasi keliru apabila dokumen yang diperoleh tidak relevan, ambigu, atau tidak sesuai dengan maksud pertanyaan. Dengan demikian, kualitas jawaban tidak hanya bergantung pada kemampuan model generatif, tetapi juga pada proses pencarian dan pemilihan konteks yang tepat.
+
+Tinjauan terbaru oleh Zhang (2025) berjudul \textit{"Hallucination Mitigation for Retrieval-Augmented Large Language Models: A Review"} memetakan berbagai penyebab \textit{hallucination} dalam RAG serta merangkum strategi mitigasinya \parencite{math2024hallucination}. Meskipun memberikan gambaran yang komprehensif, tinjauan tersebut menunjukkan bahwa solusi yang ada saat ini masih berdiri sendiri dan belum digabungkan dalam satu sistem terpadu.
+
+Sebagian besar studi hanya menerapkan satu jenis mitigasi pada satu tahap tertentu. Akibatnya, belum terdapat implementasi yang mengintegrasikan beberapa teknik mitigasi dalam satu alur menyeluruh untuk menekan \textit{hallucination} secara lebih efektif. Kesenjangan ini menjadi penting untuk diatasi, terutama pada bidang yang membutuhkan tingkat kebenaran informasi yang tinggi, seperti layanan publik, kesehatan, dan penegakan hukum.
+
+% --- 1.2 Rumusan Masalah ---
 \section{Rumusan Masalah}
-Rumusan Masalah berisi masalah utama yang dibahas dalam tugas akhir. Rumusan masalah yang baik memiliki struktur sebagai berikut:
-\begin{enumerate}
-\item	Pokok persoalan dari kondisi atau situasi yang ada saat ini. Dengan kata lain, jelaskan kelemahan atau kekurangan dari kondisi, situasi, atau solusi yang dijelaskan pada latar belakang. Ini merupakan pokok rumusan masalah.
-\item	Elaborasi lebih lanjut urgensi penyelesaian masalah tersebut (mengapa penting untuk diselesaikan dan akibat yang dapat terjadi jika tidak diselesaikan).
-\item	Usulan singkat terkait dengan solusi yang ditawarkan untuk menyelesaikan persoalan.
-Penting untuk diperhatikan bahwa persoalan yang dideskripsikan pada subbab ini akan dipertanggungjawabkan di bab Evaluasi (apakah terselesaikan atau tidak).
-\end{enumerate}
-Hindari penulisan rumusan masalah yang terlalu umum atau terlalu luas cakupannya sehingga sulit untuk diselesaikan dalam jangka waktu pelaksanaan tugas akhir, 
-seperti:
-\begin{enumerate}
-    \item "Bagaimana cara meningkatkan kualitas layanan kesehatan di Indonesia?"
-    \item "Bagaimana cara mengoptimalkan penggunaan energi di perkotaan?"
-    \item "Bagaimana cara mengurangi kemacetan lalu lintas di kota besar?"
-    \item "Bagaimana cara membangun sistem irigasi sawah menggunakan \emph{AI}?"
-\end{enumerate}
-Rumusan masalah yang baik dan spesifik akan memudahkan penulis dalam menentukan tujuan, metodologi, dan evaluasi tugas akhir.
 
-Selain itu, hindari menuliskan pertanyaan yang merupakan sebuah keniscayaan yang harus dijawab atau dikerjakan 
-dalam pelaksanaan tugas akhir, seperti:
+Berdasarkan latar belakang tersebut, tugas akhir ini berfokus untuk menjawab beberapa pertanyaan utama sebagai berikut:
 \begin{enumerate}
-    \item "Bagaimana cara melakukan analisis kebutuhan sistem informasi rumah sakit?"
-    \item "Bagaimana cara merancang basis data untuk aplikasi X?"
-    \item "Bagaimana cara mengimplementasikan \textit{large language model} untuk deteksi penyakit Y?"
-    \item "Bagaimana cara menguji sistem penyiraman tanaman berbasis IoT yang akan dibuat?"
+    \item Bagaimana kinerja sistem RAG standar dibandingkan dengan RAG yang dilengkapi \textit{query rewriting}, \textit{context reranking}, serta \textit{active hallucination detection}?
+    \item Sejauh mana setiap teknik mitigasi mampu menurunkan tingkat \textit{hallucination}, khususnya untuk kategori \textit{intrinsic hallucination} dan \textit{factual hallucination}?
+    \item Bagaimana evaluasi kuantitatif dapat digunakan untuk mengukur efektivitas mitigasi menggunakan metrik seperti \textit{hallucination rate}, \textit{accuracy}, \textit{precision}, \textit{recall}, \textit{F1-score}, serta tingkat penurunan \textit{hallucination}?
 \end{enumerate}
-Kegiatan analisis, perancangan, implementasi, dan pengujian merupakan tahapan yang harus dilakukan dalam pelaksanaan tugas akhir,
-sehingga pertanyaan-pertanyaan tersebut tidak perlu dimasukkan ke dalam rumusan masalah.
 
-% --- Tujuan ---
+% --- 1.3 Tujuan ---
 \section{Tujuan}
-Tuliskan \textbf{tujuan utama} dan/atau tujuan detail yang akan dicapai dalam pelaksanaan tugas akhir. 
-Fokuskan isi subbab ini pada hasil akhir yang ingin diperoleh setelah tugas akhir diselesaikan 
-terkait dengan penyelesaian persoalan pada rumusan masalah. 
-Penting untuk diperhatikan bahwa tujuan yang dideskripsikan pada subbab ini akan dipertanggungjawabkan 
-di akhir pelaksanaan tugas akhir. Oleh karena itu, tuliskan juga \emph{kriteria keberhasilan} tugas akhir ini.
 
-% --- Batasan Masalah ---
-\section{Batasan Masalah}
-Tuliskan batasan-batasan yang diambil dalam pelaksanaan tugas akhir. Batasan ini dapat dihindari (bersifat opsional, tidak perlu ada) jika topik atau judul tugas akhir dibuat cukup spesifik.
-
-% --- Metodologi Pengerjaan TA ---
-\section{Metodologi}
-Tuliskan semua tahapan yang akan dilalui selama pelaksanaan tugas akhir. 
-Tahapan ini spesifik untuk menyelesaikan persoalan tugas akhir. 
-Berikut adalah contoh metodologi pengerjaan tugas akhir yang dapat diikuti, yaitu meliputi tahapan, langkah-langkah, 
-atau tata cara melakukan:
+Tujuan dari tugas akhir ini adalah sebagai berikut:
 \begin{enumerate}
-\item	Investigasi pengumpulan fakta di latar belakang untuk merumuskan masalah.
-\item	Pencarian, pengelompokan, dan penapisan literatur atau sumber informasi untuk mengumpulkan informasi yang relevan tentang topik yang diangkat, termasuk teori (konsep atau teori apa saja yang perlu dicari), hal-hal yang telah dicapai oleh orang lain (cara mencari dan kata kuncinya), dan berbagai informasi pendukung, untuk mencari solusi terhadap masalah yang dibahas. Gunakan metodologi yang tepat dalam menggali informasi dan dokumentasikan prosesnya (termasuk rekaman wawancara atau survei) di dalam Lampiran, termasuk tautan ke video atau foto. Hasil penggalian informasi ini akan dijelaskan secara sistematis di Bab II Studi Literatur.
-\item   Analisis kebutuhan pengguna dan sistem berdasarkan hasil investigasi dan studi literatur. Jelaskan metode yang digunakan untuk melakukan analisis kebutuhan, misalnya wawancara, survei, observasi, atau studi kasus. Hasil analisis kebutuhan ini akan dijelaskan secara rinci di Bab III Analisis.
-\item   Perancangan solusi berdasarkan hasil analisis kebutuhan. Jelaskan metode yang digunakan untuk melakukan perancangan, misalnya menggunakan diagram UML, ERD, atau prototyping. Hasil perancangan ini akan dijelaskan secara rinci di Bab IV Perancangan.
-\item   Implementasi solusi berdasarkan hasil perancangan. Jelaskan teknologi, bahasa pemrograman, atau alat yang digunakan untuk mengimplementasikan solusi. Hasil implementasi ini akan dijelaskan secara rinci di Bab V Implementasi.
-\item   Evaluasi terhadap solusi yang telah diimplementasikan. Jelaskan metode pengujian, metrik evaluasi, atau studi kasus yang digunakan untuk menilai keberhasilan solusi. Hasil evaluasi ini akan dijelaskan secara rinci di Bab VI Evaluasi.
-\item   Penarikan kesimpulan dan saran berdasarkan hasil pelaksanaan tugas akhir. Hasil kesimpulan dan saran ini akan dijelaskan secara rinci di Bab VII Kesimpulan dan Saran. 
-\vfill % memaksa konten di atas untuk berada di bagian atas halaman dan menyisakan ruang kosong di bawah konten ini akibat berakhirnya section ini
+    \item Menerapkan tiga pendekatan mitigasi yaitu \textit{query rewriting}, \textit{context reranking}, dan \textit{active hallucination detection} pada sistem RAG.
+    \item Membandingkan kinerja beberapa konfigurasi sistem: RAG standar, \textit{RAG + Query Rewriting}, \textit{RAG + Context Reranking}, \textit{RAG + Active Detection}, serta gabungan seluruh teknik mitigasi.
+    \item Mengevaluasi dampak mitigasi berdasarkan penurunan tingkat \textit{hallucination} serta skor kinerja model menggunakan metrik kuantitatif seperti \textit{accuracy}, \textit{precision}, \textit{recall}, dan \textit{F1-score}.
 \end{enumerate}
+
+% --- 1.4 Batasan Masalah ---
+\section{Batasan Masalah}
+
+Untuk menjaga fokus dan kejelasan ruang lingkup, tugas akhir ini dibatasi pada analisis dan pengembangan \textit{Large Language Models (LLM)} yang diperkaya dengan mekanisme \textit{Retrieval-Augmented Generation (RAG)}. Tugas akhir ini hanya menyoroti dua jenis \textit{hallucination} yang paling relevan dengan proses \textit{retrieval} dan \textit{generation}, yaitu \textit{halusinasi intrinsik} dan \textit{halusinasi faktual}. \textit{Halusinasi intrinsik} merujuk pada keluaran model yang bertentangan dengan informasi yang terdapat dalam \textit{prompt} atau konteks yang diberikan, sedangkan \textit{halusinasi faktual} berkaitan dengan keluaran yang mengandung informasi keliru atau tidak akurat meskipun tampak meyakinkan. Jenis \textit{hallucination} lain seperti \textit{reasoning hallucination}, \textit{linguistic hallucination}, dan \textit{bias-related hallucination} berada di luar cakupan studi ini.
+
+Dari sisi teknik mitigasi, tugas akhir ini terbatas pada penerapan tiga pendekatan utama, yaitu \textit{query rewriting} untuk memperbaiki kualitas kueri pada tahap \textit{retrieval}, \textit{context reranking} untuk memilih dan menata ulang konteks yang paling relevan, serta \textit{active hallucination detection} untuk mendeteksi keluaran dengan risiko halusinatif pada tahap generasi. Metode mitigasi lain seperti \textit{prompt engineering} lanjutan, \textit{knowledge editing}, atau \textit{model fine-tuning} tidak dibahas dalam tugas akhir ini.
+
+Untuk menjaga konsistensi evaluasi, tugas akhir ini hanya menggunakan metrik kuantitatif yang umum dipakai dalam tugas klasifikasi teks, yaitu \textit{accuracy}, \textit{precision}, \textit{recall}, \textit{F1-score}, evaluasi \textit{RAGAS}, serta tingkat pengurangan \textit{hallucination}.
+
+Selain itu, tugas akhir ini juga dibatasi pada penggunaan data berbahasa Inggris. Seluruh proses \textit{retrieval}, pembentukan konteks, dan evaluasi keluaran model dilakukan menggunakan korpus teks dalam bahasa Inggris. Penelitian tidak mencakup analisis pada bahasa lain di luar ruang lingkup tersebut.
+
+Dari sisi sumber data, penelitian ini hanya menggunakan dataset \textit{PubMedQA} sebagai himpunan data uji. \textit{PubMedQA} dipilih karena menyediakan pasangan pertanyaan, abstrak ilmiah, serta jawaban faktual yang berkaitan langsung dengan konteks penelitian dalam lingkungan medis. Dataset pada domain lain tidak termasuk dalam cakupan studi ini.
+
+Secara keseluruhan, batasan-batasan tersebut ditetapkan untuk menjaga ruang lingkup penelitian tetap fokus, terukur, dan relevan terhadap tujuan tugas akhir.
+
+% ==========================================
+% 1.5 Metodologi Tugas Akhir
+% ==========================================
+\section{Metodologi Tugas Akhir}
+
+Tugas akhir ini menggunakan pendekatan metodologi \textit{Cross-Industry Standard Process for Data Mining} atau disingkat \textbf{CRISP-DM}. Metodologi ini merupakan kerangka kerja industri yang banyak digunakan dalam proyek berbasis \textit{data mining} dan \textit{machine learning} karena bersifat fleksibel, iteratif, serta berorientasi pada kebutuhan bisnis dan teknis \parencite{crispdm_datasciencepm}.
+
+CRISP-DM menyediakan tahapan sistematis untuk memahami permasalahan, menyiapkan data, membangun model, hingga mengevaluasi serta mengimplementasikannya. Metodologi ini terdiri atas enam fase utama, yaitu: \textit{business understanding}, \textit{data understanding}, \textit{data preparation}, \textit{modeling}, \textit{evaluation}, serta \textit{deployment}.
+
+Visualisasi tahapan metodologi \textit{CRISP-DM} dapat dilihat pada Gambar~\ref{gambar:crispdm}.
+
+\begin{figure}[H]
+  \centering
+  \captionsetup{justification=centering}
+  \includegraphics[width=0.85\textwidth]{image/crispdm.png}
+  \caption{Tahapan Metodologi CRISP-DM \parencite{crispdm_datasciencepm}}
+  \label{gambar:crispdm}
+\end{figure}
+
+\subsection{\textit{Business Understanding}}
+Tahap pertama bertujuan memahami kebutuhan dan tujuan sistem dari sudut pandang pengguna atau masalah operasional. Kegiatan dilakukan untuk menentukan ruang lingkup, sasaran, serta kriteria keberhasilan model yang akan dibangun. Pemahaman konteks pada fase ini menjadi fondasi dalam pemilihan strategi analisis dan pendekatan pemodelan.
+
+\subsection{\textit{Data Understanding}}
+Tahap ini berfokus pada eksplorasi data awal, termasuk identifikasi sumber data, penilaian kualitas, serta analisis karakteristik yang relevan dengan permasalahan. Tujuannya adalah memperoleh wawasan mengenai struktur, konten, serta permasalahan yang mungkin muncul pada tahap pemrosesan.
+
+\subsection{\textit{Data Preparation}}
+Tahap ini mencakup pembersihan data, seleksi variabel, penggabungan data, transformasi format, serta penanganan \textit{missing values}. Hasil akhir tahap ini adalah dataset terstruktur dengan kualitas memadai untuk digunakan pada proses pemodelan.
+
+\subsection{\textit{Modeling}}
+Pada tahap ini ditentukan teknik pemodelan, pemilihan algoritma, serta konfigurasi parameter (\textit{hyperparameter}) yang sesuai. Data yang telah dipersiapkan kemudian digunakan untuk membangun model, termasuk pengujian alternatif parameter untuk mendapatkan kinerja yang optimal.
+
+\subsection{\textit{Evaluation}}
+Tahap ini mengevaluasi kinerja model berdasarkan metrik evaluasi kuantitatif. Selain itu, dilakukan pula pengecekan kesesuaian model dengan tujuan tugas akhir. Apabila model belum memenuhi kriteria keberhasilan, diperlukan iterasi kembali pada tahap pemahaman data atau pemodelan.
+
+\subsection{\textit{Deployment}}
+Tahap terakhir adalah penerapan model ke dalam lingkungan operasional atau simulasi implementasi. Pada tahap ini dilakukan pemantauan performa, dokumentasi, serta pengelolaan perubahan data dan model agar solusi tetap andal dalam jangka panjang.
+
+Metodologi CRISP-DM menyediakan kerangka terstruktur yang menyeimbangkan kebutuhan teknis dan praktis sehingga tugas akhir berbasis data dapat dijalankan secara sistematis, transparan, dan dapat direproduksi dengan baik.
 
 % --- Sistematika Penulisan ---
 \section{Sistematika Penulisan}
@@ -105,8 +102,8 @@ Tuliskan gambaran umum isi dari setiap bab yang ada dalam laporan tugas akhir. S
 \item	Bab III Analisis: Berisi penjelasan tentang analisis masalah dan kebutuhan pengguna serta berbagai alternatif solusinya.
 \item   Bab IV Perancangan: Berisi penjelasan tentang perancangan solusi yang diusulkan, misalnya arsitektur sistem, desain basis data, antarmuka pengguna, dan sebagainya.
 \item	Bab V Implementasi: Berisi penjelasan tentang proses implementasi solusi yang diusulkan, termasuk langkah-langkah yang diambil, teknologi yang digunakan, dan hasil yang diperoleh.
-\item	Bab VI Evaluasi: Berisi analisis dan evaluasi terhadap solusi yang diimplementasikan, termasuk metode pengujian, hal-hal yang disiapkan sebelum pengujian, hasil pengujian, dan penilaian kinerja.                  
+\item	Bab VI Evaluasi: Berisi analisis dan evaluasi terhadap solusi yang diimplementasikan, termasuk metode pengujian, hal-hal yang disiapkan sebelum pengujian, hasil pengujian, dan penilaian kinerja.
 \item   Bab VII Kesimpulan dan Saran: Berisi kesimpulan dari hasil pelaksanaan tugas akhir dan saran untuk pengembangan lebih lanjut.
 \item   Daftar Pustaka: Berisi daftar referensi yang digunakan dalam penyusunan laporan tugas akhir.
-\item   Lampiran: Berisi dokumen-dokumen pendukung seperti kode program, data lengkap hasil pengujian, rekaman wawancara, dan lain-lain. 
+\item   Lampiran: Berisi dokumen-dokumen pendukung seperti kode program, data lengkap hasil pengujian, rekaman wawancara, dan lain-lain.
 \end{enumerate}
