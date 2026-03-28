@@ -1,80 +1,455 @@
-% ==========================================
+% ============================================================================================
 % BAB VI EVALUASI
-% ==========================================
+% MITIGASI HALUSINASI PADA RAG LLM MENGGUNAKAN
+% QUERY REWRITING, CONTEXT RERANKING, DAN ACTIVE HALLUCINATION DETECTION
+%
+% TODO: Ganti semua placeholder [TODO: ...] dengan hasil eksperimen yang sebenarnya.
+% ============================================================================================
+
 \cleardoublepage
 \chapter{EVALUASI}
 \label{chap:evaluasi}
-asdfasdf
-\section{Metode Evaluasi}
-asdfasdf
+
+Bab ini menyajikan metodologi, hasil, dan pembahasan evaluasi terhadap lima konfigurasi
+sistem RAG yang telah diimplementasikan pada Bab~\ref{chap:implementasi}. Evaluasi
+dilakukan untuk mengukur sejauh mana setiap teknik mitigasi halusinasi berkontribusi
+terhadap peningkatan kualitas jawaban yang dihasilkan sistem. Penilaian mencakup dua
+dimensi utama, yakni kualitas jawaban berbasis metrik RAGAS dan ketepatan klasifikasi
+label menggunakan label referensi dari dataset PubMedQA.
+
+
+% ============================================================================================
+\section{Metodologi Evaluasi}
+\label{sec:metodologi-evaluasi}
+% ============================================================================================
+
+\subsection{Metrik Evaluasi RAGAS}
+\label{subsec:metrik-ragas}
+
+Evaluasi kualitas sistem RAG dilakukan menggunakan empat metrik dari \textit{framework}
+\textit{Retrieval Augmented Generation Assessment} (RAGAS) \parencite{es2023ragas}.
+Keempat metrik ini mengukur aspek yang berbeda dari kualitas \textit{retrieval} dan
+\textit{generation}, sehingga memberikan gambaran yang komprehensif terhadap kinerja sistem.
+
+\begin{enumerate}[1.]
+
+  \item \textit{Faithfulness}
+
+  \textit{Faithfulness} mengukur konsistensi faktual antara jawaban yang dihasilkan LLM
+  dan konteks yang diberikan. Metrik ini menilai sejauh mana setiap pernyataan dalam
+  jawaban dapat didukung oleh bukti dalam konteks. Semakin tinggi nilai \textit{faithfulness},
+  semakin kecil peluang jawaban mengandung informasi yang tidak ada dalam konteks atau
+  bertentangan dengan konteks. Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    F = \frac{|\text{pernyataan dalam jawaban yang didukung konteks}|}{|\text{jumlah total pernyataan dalam jawaban}|}
+    \label{eq:faithfulness}
+  \end{equation}
+  \eqcaption{Formula \textit{faithfulness}}
+
+
+  \item \textit{Answer Relevancy}
+
+  \textit{Answer relevancy} mengukur seberapa relevan jawaban yang dihasilkan terhadap
+  pertanyaan masukan. RAGAS menghitung metrik ini dengan cara meminta LLM menghasilkan
+  beberapa pertanyaan hipotetis berdasarkan jawaban yang ada, kemudian mengukur kesamaan
+  semantik antara pertanyaan hipotetis tersebut dengan pertanyaan asli menggunakan
+  \textit{cosine similarity}. Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    AR = \frac{1}{n} \sum_{i=1}^{n} \text{sim}(q, q_i)
+    \label{eq:answer-relevancy}
+  \end{equation}
+  \eqcaption{Formula \textit{answer relevancy}}
+
+  Keterangan:
+
+  $q$ = pertanyaan asli
+
+  $q_i$ = pertanyaan hipotetis yang dihasilkan LLM berdasarkan jawaban
+
+  $n$ = jumlah pertanyaan hipotetis yang dihasilkan
+
+
+  \item \textit{Context Precision}
+
+  \textit{Context precision} mengukur proporsi dokumen yang relevan di antara seluruh
+  dokumen yang diambil oleh \textit{retriever}. Metrik ini menilai kemampuan sistem
+  dalam menghindari pengambilan dokumen yang tidak relevan (\textit{false positive}).
+  Relevansi setiap dokumen ditentukan oleh LLM berdasarkan perbandingannya dengan
+  jawaban referensi (\textit{ground truth}). Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    \text{Context Precision@K} = \frac{\sum_{k=1}^{K} (\text{Precision@}k \times v_k)}{\text{jumlah item relevan dalam K teratas}}
+    \label{eq:context-precision}
+  \end{equation}
+  \eqcaption{Formula \textit{context precision}}
+
+  Keterangan:
+
+  $K$ = jumlah dokumen yang diambil
+
+  $v_k \in \{0, 1\}$ = indikator relevansi pada dokumen ke-$k$
+
+
+  \item \textit{Context Recall}
+
+  \textit{Context recall} mengukur seberapa banyak informasi dari jawaban referensi yang
+  berhasil ditemukan dalam konteks yang diambil. LLM menguraikan jawaban referensi menjadi
+  sejumlah klaim faktual, kemudian menghitung proporsi klaim yang dapat dikaitkan dengan
+  salah satu dokumen dalam konteks. Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    \text{Context Recall} = \frac{|\text{klaim dalam referensi yang didukung konteks}|}{|\text{jumlah total klaim dalam referensi}|}
+    \label{eq:context-recall}
+  \end{equation}
+  \eqcaption{Formula \textit{context recall}}
+
+\end{enumerate}
+
+
+\subsection{Metrik Evaluasi Tambahan}
+\label{subsec:metrik-tambahan}
+
+Selain metrik RAGAS, digunakan dua metrik tambahan yang memanfaatkan label referensi
+\textit{final\_decision} dari dataset PubMedQA.
+
+\begin{enumerate}[1.]
+
+  \item \textit{Label Accuracy}
+
+  \textit{Label accuracy} mengukur proporsi jawaban LLM yang label prediksinya
+  (\textit{yes}, \textit{no}, atau \textit{maybe}) sesuai dengan label referensi dalam
+  dataset. Metrik ini mengukur kemampuan sistem secara keseluruhan dalam menjawab
+  pertanyaan biomedis secara tepat. Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    \text{Accuracy} = \frac{|\text{prediksi yang sesuai label referensi}|}{|\text{jumlah total sampel}|}
+    \label{eq:accuracy}
+  \end{equation}
+  \eqcaption{Formula \textit{label accuracy}}
+
+
+  \item \textit{Hallucination Rate}
+
+  \textit{Hallucination rate} didefinisikan sebagai proporsi sampel di mana jawaban LLM
+  tidak dapat dicocokkan dengan label mana pun (\textit{unknown}), baik karena format
+  keluaran tidak sesuai instruksi maupun karena LLM menghasilkan respons di luar tiga
+  pilihan yang ditetapkan. Metrik ini dihitung dengan persamaan berikut.
+
+  \begin{equation}
+    \text{Hallucination Rate} = \frac{|\text{prediksi bernilai \textit{unknown}}|}{|\text{jumlah total sampel}|}
+    \label{eq:hallucination-rate}
+  \end{equation}
+  \eqcaption{Formula \textit{hallucination rate}}
+
+\end{enumerate}
+
+
+\subsection{Prosedur Evaluasi}
+\label{subsec:prosedur-evaluasi}
+
+Evaluasi dilakukan terhadap 1.000 entri dari subset \textit{pqa\_labeled} PubMedQA secara
+berurutan. Setiap konfigurasi dijalankan secara independen dengan parameter LLM yang identik,
+yakni \textit{temperature} bernilai nol untuk memastikan keluaran yang deterministik dan
+dapat direproduksi. Untuk setiap entri, dicatat enam nilai, yaitu \textit{faithfulness},
+\textit{answer relevancy}, \textit{context precision}, \textit{context recall}, label
+prediksi, dan label referensi. Agregasi akhir dihitung sebagai rata-rata aritmetika dari
+masing-masing metrik di seluruh sampel yang berhasil dievaluasi.
+
+
+% ============================================================================================
 \section{Hasil Evaluasi}
-asdfasdf
-\section{Pembahasan Hasil Evaluasi}
-\section{Evaluasi Kesalahan Penulisan yang Sering Terjadi}
-\subsection{Penggunaan Kata "di mana" atau "dimana"}
-Banyak yang menuliskan kata "di mana" atau "dimana" sebagai pengganti kata "which" dalam bahasa Inggris. 
-Padahal, penggunaan kata "di mana" atau "dimana" tidak tepat dalam konteks tersebut. Demikian juga untuk kata serupa, misalnya "yang mana".
-Kata "di mana" atau "dimana" ini harus diganti dengan kata lain, seperti "dengan", "tempat", "yang", dan sebagainya tergantung kalimatnya.
-Penjelasan lengkap dapat dilihat pada \autocite{BPBI}.
+\label{sec:hasil-evaluasi}
+% ============================================================================================
 
-\subsection{Penggunaan Kata "sedangkan" dan "sehingga"}
+\subsection{Hasil Konfigurasi \textit{Baseline}}
+\label{subsec:hasil-baseline}
 
-\begin{table}[t]
-  \begin{tabular}{|c|l|l|}
-  \hline
-  Kata & Salah & Benar \\ \hline
-  sedangkan & \begin{tabular}[c]{@{}c@{}}Sedangkan sistem lama masih\\ digunakan oleh banyak pengguna.\end{tabular} & \begin{tabular}[c]{@{}c@{}}Sistem lama masih digunakan\\ oleh banyak pengguna,\\ sedangkan sistem baru belum siap.\end{tabular} \\ \hline
-  sehingga & \begin{tabular}[c]{@{}c@{}}Sehingga sistem lama masih\\ digunakan oleh banyak pengguna.\end{tabular} & \begin{tabular}[c]{@{}c@{}}Sistem lama masih digunakan\\ oleh banyak pengguna sehingga\\ sistem baru belum siap.\end{tabular} \\ \hline
+% TODO: Isi dengan hasil evaluasi konfigurasi baseline.
+%       Sertakan: tabel ringkasan metrik, distribusi label prediksi,
+%       dan satu atau dua contoh jawaban yang menarik untuk dibahas.
+
+Konfigurasi \textit{baseline} dijalankan menggunakan BM25 sebagai \textit{retriever} tanpa
+teknik mitigasi apa pun. Ringkasan hasil evaluasi konfigurasi \textit{baseline} disajikan
+pada Tabel~\ref{tbl:hasil-baseline}.
+
+\begin{table}[H]
+  \centering
+  \caption{Ringkasan Hasil Evaluasi Konfigurasi \textit{Baseline}}
+  \label{tbl:hasil-baseline}
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metrik} & \textbf{Nilai} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] \\
+    \hline
   \end{tabular}
-  \caption{Contoh penggunaan kata "sedangkan" dan "sehingga"}
-  \label{tbl:sedangkan_sehingga}
 \end{table}
 
-Kata "sedangkan" dan "sehingga" adalah kata hubung atau konjungsi. 
-Konjungsi adalah kata atau ungkapan yang menghubungkan satuan bahasa 
-(kata, frasa, klausa, dan kalimat). 
-Konjungsi dapat dibagi menjadi konjungsi intrakalimat dan antarkalimat.  
-Kata "sedangkan" menghubungkan dua klausa yang bersifat kontrasif, 
-sedangkan "sehingga" menghubungkan dua klausa yang bersifat kausal. 
-Dalam ragam formal, kata hubung “sedangkan” dan “sehingga” hanya dapat digunakan 
-sebagai konjungsi intrakalimat sehingga kedua konjungsi itu \textbf{tidak dapat diletakkan pada awal kalimat}.
-Selain itu, penggunaan kata "sedangkan" harus didahului oleh koma (,), sedangkan kata "sehingga" tidak perlu didahului oleh koma (,).
-Contoh penggunaan yang benar dan salah dapat dilihat pada Tabel \ref{tbl:sedangkan_sehingga}.
+
+\subsection{Hasil Konfigurasi \textit{Baseline} + \textit{Query Rewriting}}
+\label{subsec:hasil-qr}
+
+% TODO: Isi dengan hasil evaluasi konfigurasi +QR.
+
+Konfigurasi ini menambahkan komponen \textit{query rewriting} pada konfigurasi
+\textit{baseline}. Ringkasan hasil evaluasi disajikan pada Tabel~\ref{tbl:hasil-qr}.
+
+\begin{table}[H]
+  \centering
+  \caption{Ringkasan Hasil Evaluasi Konfigurasi \textit{Baseline} + \textit{Query Rewriting}}
+  \label{tbl:hasil-qr}
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metrik} & \textbf{Nilai} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] \\
+    \hline
+  \end{tabular}
+\end{table}
 
 
-\subsection{Penggunaan Istilah yang Tidak Baku}
-Ada beberapa istilah yang sering digunakan dalam pembicaraan sehari-hari, tetapi tidak baku dalam penulisan ilmiah.
-Beberapa istilah tersebut antara lain:
-\begin{enumerate}
-  \item analisa $\rightarrow$ analisis
-  \item eksisting atau existing $\rightarrow$ yang ada atau saat ini
-  \item bisnis proses $\rightarrow$ proses bisnis
-  \item user $\rightarrow$ pengguna
-  \item system $\rightarrow$ sistem
-  \item database $\rightarrow$ basis data
-  \item aktifitas $\rightarrow$ aktivitas
-  \item efektifitas $\rightarrow$ efektivitas
-  \item sosial media $\rightarrow$ media sosial
-\end{enumerate}
+\subsection{Hasil Konfigurasi \textit{Baseline} + \textit{Context Reranking}}
+\label{subsec:hasil-cr}
 
-\subsection{Pemisah Desimal dan Ribuan}
-Tanda pemisah desimal dalam bahasa Indonesia adalah tanda koma, contoh:
-\begin{enumerate}
-  \item (Salah) Akurasi naik menjadi 50.6\% 
-  \item (Benar) Akurasi naik menjadi 50,6\% 
-\end{enumerate}
+% TODO: Isi dengan hasil evaluasi konfigurasi +CR.
 
-\subsection{Daftar atau \textit{List}}
-Ada beberapa aturan penulisan daftar atau \textit{list} yang perlu diperhatikan, antara lain:
-\begin{enumerate}[a)]
-\item Jika memungkinkan, hindari penggunaan “bullet points” atau sejenisnya. Sebaiknya, gunakan angka (1, 2, 3, ...) atau huruf (a, b, c, …). Dengan demikian, pembaca dapat dengan mudah melihat jumlah \textit{item} atau \textit{list}. 
-\item Jika dalam daftar hanya ada satu item, tidak perlu menggunakan nomor urut.
-\item Penjelasan atau deskripsi suatu item sebaiknya menyatu dengan judul item tersebut, tidak berbeda halaman. Contoh yang salah: judul item ada di halaman 10, namun deskripsinya di halaman 11. Sebaiknya pindahkan judul tersebut ke halaman 11.
-\item Jika penjelasan atau deskripsi suatu item cukup panjang, misalnya lebih dari 1 halaman atau terdiri atas beberapa paragraf, sebaiknya setiap item tersebut dijadikan judul subbab, kecuali jika level subbab sudah mencapai level 4. 
-\end{enumerate}
+Konfigurasi ini menambahkan komponen \textit{context reranking} menggunakan model
+\textit{cross-encoder} pada konfigurasi \textit{baseline}. Ringkasan hasil evaluasi
+disajikan pada Tabel~\ref{tbl:hasil-cr}.
 
-\subsection{Penggunaan Kata "masing-masing" dan "setiap"}
-Kata “masing-masing” digunakan di belakang kata yang diterangkan, misalnya 
-"Setiap proses menggunakan algoritma masing-masing". Kata “tiap-tiap” atau “setiap”
-ditempatkan di depan kata yang diterangkan, misalnya
-"Setiap proses menggunakan algoritma tertentu".
+\begin{table}[H]
+  \centering
+  \caption{Ringkasan Hasil Evaluasi Konfigurasi \textit{Baseline} + \textit{Context Reranking}}
+  \label{tbl:hasil-cr}
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metrik} & \textbf{Nilai} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+\subsection{Hasil Konfigurasi \textit{Baseline} + \textit{Active Hallucination Detection}}
+\label{subsec:hasil-ad}
+
+% TODO: Isi dengan hasil evaluasi konfigurasi +AD.
+
+Konfigurasi ini menambahkan komponen \textit{active hallucination detection} pada konfigurasi
+\textit{baseline}. Ringkasan hasil evaluasi disajikan pada Tabel~\ref{tbl:hasil-ad}.
+
+\begin{table}[H]
+  \centering
+  \caption{Ringkasan Hasil Evaluasi Konfigurasi \textit{Baseline} + \textit{Active Hallucination Detection}}
+  \label{tbl:hasil-ad}
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metrik} & \textbf{Nilai} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+\subsection{Hasil Konfigurasi \textit{Combined}}
+\label{subsec:hasil-combined}
+
+% TODO: Isi dengan hasil evaluasi konfigurasi Combined.
+
+Konfigurasi \textit{combined} mengaktifkan ketiga teknik mitigasi halusinasi secara
+bersamaan. Ringkasan hasil evaluasi disajikan pada Tabel~\ref{tbl:hasil-combined}.
+
+\begin{table}[H]
+  \centering
+  \caption{Ringkasan Hasil Evaluasi Konfigurasi \textit{Combined}}
+  \label{tbl:hasil-combined}
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metrik} & \textbf{Nilai} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+% ============================================================================================
+\section{Perbandingan Antar Konfigurasi}
+\label{sec:perbandingan}
+% ============================================================================================
+
+Tabel~\ref{tbl:perbandingan-semua} merangkum hasil evaluasi kelima konfigurasi secara
+berdampingan untuk memudahkan pembandingan kontribusi setiap teknik mitigasi.
+
+% TODO: Isi kolom nilai dengan hasil eksperimen.
+\begin{table}[H]
+  \centering
+  \caption{Perbandingan Hasil Evaluasi Seluruh Konfigurasi}
+  \label{tbl:perbandingan-semua}
+  \begin{tabular}{|l|c|c|c|c|c|}
+    \hline
+    \textbf{Metrik} &
+    \textbf{Baseline} &
+    \textbf{+QR} &
+    \textbf{+CR} &
+    \textbf{+AD} &
+    \textbf{Combined} \\
+    \hline
+    \textit{Faithfulness}       & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+    \textit{Answer Relevancy}   & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+    \textit{Context Precision}  & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+    \textit{Context Recall}     & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+    \textit{Label Accuracy}     & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+    \textit{Hallucination Rate} & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+    \hline
+  \end{tabular}
+\end{table}
+
+% TODO: Tambahkan grafik batang atau radar chart untuk visualisasi perbandingan.
+%       Simpan di image/bab6/perbandingan_konfigurasi.png
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{image/bab6/perbandingan_konfigurasi.png}
+  \caption{Perbandingan Nilai Metrik Evaluasi Seluruh Konfigurasi}
+  \label{fig:perbandingan-konfigurasi}
+\end{figure}
+
+
+% ============================================================================================
+\section{Analisis dan Pembahasan}
+\label{sec:pembahasan}
+% ============================================================================================
+
+\subsection{Dampak \textit{Query Rewriting}}
+\label{subsec:pembahasan-qr}
+
+% TODO: Analisis perbandingan Baseline vs +QR.
+%       Pertanyaan panduan:
+%       - Apakah context precision meningkat? (indikasi retrieval lebih akurat)
+%       - Apakah faithfulness berubah?
+%       - Pada jenis pertanyaan apa QR paling efektif?
+%       - Apakah ada kasus di mana QR justru memperburuk retrieval?
+
+[TODO: Isi setelah hasil evaluasi tersedia.]
+
+Perbandingan hasil antara konfigurasi \textit{baseline} dan konfigurasi
+\textit{baseline} + \textit{query rewriting} menunjukkan bahwa [TODO: ringkasan temuan].
+Peningkatan atau penurunan yang terjadi pada metrik \textit{context precision} dan
+\textit{context recall} mencerminkan dampak langsung dari perubahan kueri terhadap
+kualitas \textit{retrieval}. [TODO: analisis lebih lanjut].
+
+
+\subsection{Dampak \textit{Context Reranking}}
+\label{subsec:pembahasan-cr}
+
+% TODO: Analisis perbandingan Baseline vs +CR.
+%       Pertanyaan panduan:
+%       - Apakah faithfulness meningkat setelah reranking?
+%       - Apakah perubahan urutan dokumen berdampak signifikan pada generasi?
+%       - Seberapa sering dokumen yang relevan memiliki skor BM25 rendah
+%         tetapi skor cross-encoder tinggi?
+
+[TODO: Isi setelah hasil evaluasi tersedia.]
+
+Konfigurasi \textit{context reranking} mengubah urutan dokumen yang diberikan kepada LLM
+berdasarkan skor relevansi \textit{cross-encoder}. Perubahan ini berdampak pada
+[TODO: metrik mana yang berubah dan dalam arah apa]. [TODO: analisis lebih lanjut].
+
+
+\subsection{Dampak \textit{Active Hallucination Detection}}
+\label{subsec:pembahasan-ad}
+
+% TODO: Analisis perbandingan Baseline vs +AD.
+%       Pertanyaan panduan:
+%       - Berapa persen jawaban yang terdeteksi berpotensi halusinatif?
+%       - Bagaimana penanganan terhadap jawaban terdeteksi mempengaruhi akurasi?
+%       - Apakah faithfulness meningkat?
+
+[TODO: Isi setelah implementasi dan evaluasi Active Hallucination Detection selesai.]
+
+
+\subsection{Analisis Konfigurasi \textit{Combined}}
+\label{subsec:pembahasan-combined}
+
+% TODO: Analisis apakah Combined memberikan hasil terbaik di semua metrik,
+%       atau ada trade-off tertentu. Bandingkan dengan masing-masing teknik
+%       secara terpisah. Diskusikan apakah interaksi antar teknik bersifat
+%       aditif atau saling mengganggu.
+
+[TODO: Isi setelah hasil evaluasi seluruh konfigurasi tersedia.]
+
+Konfigurasi \textit{combined} merupakan konfigurasi yang mengaktifkan seluruh teknik
+mitigasi secara bersamaan. Hasil yang diperoleh menunjukkan [TODO: apakah ada sinergi
+atau justru konflik antar komponen]. [TODO: analisis lebih lanjut].
+
+
+\subsection{Diskusi Umum}
+\label{subsec:diskusi-umum}
+
+% TODO: Tulis diskusi menyeluruh yang menjawab pertanyaan penelitian utama:
+%       "Apakah kombinasi Query Rewriting, Context Reranking, dan Active Hallucination
+%        Detection secara signifikan mengurangi hallucination pada sistem RAG LLM
+%        dibandingkan baseline?"
+%       Sertakan juga: keterbatasan penelitian, ancaman validitas, dan
+%       rekomendasi untuk penelitian selanjutnya.
+
+[TODO: Isi setelah seluruh hasil evaluasi tersedia dan dianalisis.]

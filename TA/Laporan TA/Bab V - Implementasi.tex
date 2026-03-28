@@ -1,7 +1,263 @@
-% ==========================================
+% ============================================================================================
 % BAB V IMPLEMENTASI
-% ==========================================
+% MITIGASI HALUSINASI PADA RAG LLM MENGGUNAKAN
+% QUERY REWRITING, CONTEXT RERANKING, DAN ACTIVE HALLUCINATION DETECTION
+%
+% TODO: Ganti semua placeholder [TODO: ...] dengan isi yang sebenarnya.
+% TODO: Tambahkan screenshot atau listing kode yang relevan.
+% ============================================================================================
+
 \cleardoublepage
 \chapter{IMPLEMENTASI}
 \label{chap:implementasi}
-asdfasdf
+
+Bab ini menjelaskan implementasi teknis dari desain solusi yang telah dirumuskan pada
+Bab~\ref{chap:desain-solusi}. Implementasi mencakup penyiapan lingkungan pengembangan,
+pembangunan komponen \textit{pipeline} RAG \textit{baseline}, integrasi tiga komponen
+mitigasi halusinasi, serta penyiapan \textit{framework} evaluasi. Seluruh implementasi
+dilakukan dalam bentuk \textit{notebook} Python yang dijalankan secara lokal.
+
+
+% ============================================================================================
+\section{Lingkungan Implementasi}
+\label{sec:lingkungan-implementasi}
+% ============================================================================================
+
+\subsection{Perangkat Keras}
+\label{subsec:perangkat-keras}
+
+Seluruh proses implementasi dan eksperimen dijalankan pada satu unit komputer dengan
+spesifikasi yang disajikan pada Tabel~\ref{tbl:spesifikasi-hardware}.
+
+\begin{table}[H]
+  \centering
+  \caption{Spesifikasi Perangkat Keras}
+  \label{tbl:spesifikasi-hardware}
+  \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Komponen} & \textbf{Spesifikasi} \\
+    \hline
+    Prosesor   & [TODO: mis. Intel Core i7-12700H] \\
+    \hline
+    Memori RAM & [TODO: mis. 16 GB DDR5] \\
+    \hline
+    GPU        & [TODO: mis. NVIDIA RTX 3060 6 GB / CPU only] \\
+    \hline
+    Penyimpanan & [TODO: mis. 512 GB NVMe SSD] \\
+    \hline
+    Sistem Operasi & [TODO: mis. Windows 11 / Ubuntu 22.04] \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+\subsection{Perangkat Lunak dan Dependensi}
+\label{subsec:perangkat-lunak}
+
+Implementasi dilakukan menggunakan Python 3.11 dalam lingkungan virtual yang terisolasi.
+Model LLM dijalankan secara lokal menggunakan Ollama, sehingga tidak diperlukan akses
+internet atau \textit{API key} pihak ketiga pada saat inferensi. Daftar pustaka (\textit{library})
+utama yang digunakan disajikan pada Tabel~\ref{tbl:dependensi}.
+
+\begin{table}[H]
+  \centering
+  \caption{Daftar Dependensi Utama}
+  \label{tbl:dependensi}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{\textit{Library}} & \textbf{Versi} & \textbf{Fungsi} \\
+    \hline
+    \texttt{rank-bm25}    & [TODO] & Pembangunan dan pencarian indeks BM25 \\
+    \hline
+    \texttt{datasets}     & [TODO] & Pemuatan dataset PubMedQA dari Hugging Face \\
+    \hline
+    \texttt{langchain-ollama} & [TODO] & Antarmuka LLM melalui Ollama \\
+    \hline
+    \texttt{sentence-transformers} & [TODO] & Model \textit{cross-encoder} untuk \textit{reranking} \\
+    \hline
+    \texttt{ragas}        & 0.4.3  & \textit{Framework} evaluasi RAG \\
+    \hline
+    \texttt{numpy}        & [TODO] & Operasi numerik \\
+    \hline
+    \texttt{pandas}       & [TODO] & Pemrosesan dan penyimpanan hasil evaluasi \\
+    \hline
+    \texttt{tqdm}         & [TODO] & Tampilan progres eksperimen \\
+    \hline
+    Ollama                & [TODO] & \textit{Runtime} LLM lokal \\
+    \hline
+    Model LLM             & [TODO: mis. llama3.1:8b] & Model bahasa untuk generasi jawaban \\
+    \hline
+    Model \textit{embedding} & [TODO: mis. nomic-embed-text] & \textit{Embedding} untuk evaluasi RAGAS \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Struktur \textit{notebook} eksperimen diorganisasikan menjadi lima berkas terpisah yang
+bersesuaian dengan lima konfigurasi sistem, sebagaimana ditunjukkan pada
+Tabel~\ref{tbl:struktur-notebook}.
+
+\begin{table}[H]
+  \centering
+  \caption{Struktur \textit{Notebook} Eksperimen}
+  \label{tbl:struktur-notebook}
+  \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Berkas \textit{Notebook}} & \textbf{Konfigurasi} \\
+    \hline
+    \texttt{03-RAG-Baseline-Evaluation.ipynb}       & \textit{Baseline} \\
+    \hline
+    \texttt{04-RAG-QueryRewriting-Evaluation.ipynb} & \textit{Baseline} + QR \\
+    \hline
+    \texttt{05-RAG-ContextReranking-Evaluation.ipynb} & \textit{Baseline} + CR \\
+    \hline
+    \texttt{06-RAG-ActiveDetection-Evaluation.ipynb}  & \textit{Baseline} + AD \\
+    \hline
+    \texttt{07-RAG-Combined-Evaluation.ipynb}         & \textit{Combined} \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+% ============================================================================================
+\section{Implementasi Persiapan Data}
+\label{sec:impl-data-preparation}
+% ============================================================================================
+
+Dataset PubMedQA dimuat menggunakan pustaka \texttt{datasets} dari Hugging Face dengan
+identitas dataset \texttt{qiaojin/PubMedQA} dan konfigurasi \texttt{pqa\_labeled}. Setiap
+entri dataset yang dimuat memiliki struktur berupa \textit{dictionary} dengan kunci
+\textit{question}, \textit{context}, \textit{long\_answer}, dan \textit{final\_decision}.
+
+Untuk keperluan pengindeksan BM25, fitur \textit{context} setiap entri yang berisi daftar
+paragraf digabungkan menjadi satu unit teks menggunakan pemisah spasi. Teks gabungan tersebut
+kemudian ditokenisasi dengan memisahkan karakter berdasarkan tanda baca dan spasi, serta
+diubah seluruhnya ke dalam huruf kecil. Hasil tokenisasi seluruh entri membentuk korpus
+bertokenisasi yang digunakan sebagai masukan untuk membangun objek indeks \textit{BM25Okapi}.
+
+Untuk efisiensi eksperimen, indeks BM25 yang telah dibangun disimpan ke dalam berkas
+\texttt{pubmedqa\_bm25.pkl} menggunakan pustaka \texttt{pickle}. Pada eksekusi berikutnya,
+indeks dapat dimuat kembali tanpa perlu membangun ulang dari awal.
+
+
+% ============================================================================================
+\section{Implementasi \textit{Pipeline} RAG \textit{Baseline}}
+\label{sec:impl-pipeline-baseline}
+% ============================================================================================
+
+\subsection{Implementasi \textit{Retrieval Pipeline}}
+\label{subsec:impl-retrieval}
+
+Fungsi \textit{retrieval} menggunakan indeks BM25 yang telah dibangun sebelumnya.
+Pertanyaan masukan ditokenisasi menggunakan prosedur yang sama dengan tokenisasi korpus,
+kemudian skor relevansi dihitung terhadap seluruh dokumen menggunakan metode
+\textit{get\_scores}. Dokumen-dokumen diurutkan berdasarkan skor dari tertinggi ke terendah
+menggunakan \textit{argsort}, dan sepuluh dokumen dengan skor tertinggi dipilih sebagai
+konteks kandidat.
+
+
+\subsection{Implementasi \textit{Generation Pipeline}}
+\label{subsec:impl-generation}
+
+Tahap generasi menggunakan model LLM yang diakses melalui antarmuka \texttt{langchain-ollama}.
+\textit{Prompt} yang dikirimkan ke LLM memiliki struktur sebagai berikut: diawali dengan
+instruksi peran sebagai asisten peneliti medis, diikuti oleh tiga dokumen konteks yang dipisahkan
+oleh baris pemisah, kemudian pertanyaan masukan, dan diakhiri dengan instruksi eksplisit agar
+LLM menuliskan salah satu dari tiga kata \textit{yes}, \textit{no}, atau \textit{maybe} pada
+baris terakhir keluarannya.
+
+Keluaran LLM berupa teks bebas yang kemudian diproses oleh fungsi ekstraksi label.
+Fungsi ini mencoba menentukan label prediksi melalui tiga strategi secara berurutan.
+Strategi pertama adalah pencocokan langsung pada baris terakhir keluaran. Strategi kedua
+adalah penelusuran kata kunci \textit{yes}, \textit{no}, atau \textit{maybe} dalam seluruh
+teks keluaran. Strategi ketiga adalah pencocokan berbasis ekspresi reguler sebagai penanganan
+kasus tepi (\textit{edge case}). Apabila ketiga strategi tidak menghasilkan pencocokan,
+label ditetapkan sebagai \textit{unknown}.
+
+
+\subsection{Implementasi Penyimpanan Hasil Inkremental}
+\label{subsec:impl-incremental}
+
+Mengingat waktu eksekusi yang panjang untuk seribu entri, proses evaluasi dibagi menjadi
+dua fase yang masing-masing menyimpan hasilnya secara inkremental. Fase pertama menjalankan
+seluruh proses \textit{retrieval} dan \textit{generation} serta menyimpan hasilnya ke dalam
+berkas \texttt{baseline\_phase1\_answers.json}. Fase kedua menjalankan evaluasi RAGAS dan
+menyimpan hasilnya ke dalam berkas \texttt{baseline\_phase2\_ragas.json}. Kedua berkas
+diperiksa keberadaannya pada awal eksekusi sehingga proses dapat dilanjutkan dari titik
+terakhir apabila terhenti sebelum selesai.
+
+
+% ============================================================================================
+\section{Implementasi Komponen Mitigasi Halusinasi}
+\label{sec:impl-mitigasi}
+% ============================================================================================
+
+\subsection{Implementasi \textit{Query Rewriting}}
+\label{subsec:impl-qr}
+
+Komponen \textit{query rewriting} diimplementasikan sebagai fungsi yang menerima pertanyaan
+asli dan mengembalikan versi yang telah ditulis ulang. Fungsi ini mengirimkan \textit{prompt}
+khusus kepada LLM yang menginstruksikan model untuk menghasilkan versi pertanyaan yang lebih
+jelas, lebih eksplisit dalam terminologi biomedis, dan lebih tepat dalam menggambarkan
+kebutuhan informasi. LLM yang digunakan untuk \textit{query rewriting} adalah model yang
+sama dengan model generasi jawaban, yakni [TODO: nama model].
+
+Hasil \textit{query rewriting} menggantikan pertanyaan asli pada seluruh proses
+\textit{retrieval}. Pertanyaan asli tetap disimpan dan diteruskan ke tahap \textit{generation}
+serta evaluasi RAGAS agar jawaban yang dihasilkan tetap relevan terhadap pertanyaan asal
+pengguna.
+
+% TODO: Tambahkan contoh prompt query rewriting yang digunakan (dalam listing atau tabel)
+
+
+\subsection{Implementasi \textit{Context Reranking}}
+\label{subsec:impl-cr}
+
+Komponen \textit{context reranking} diimplementasikan menggunakan model \textit{cross-encoder}
+dari pustaka \texttt{sentence-transformers}. Sepuluh dokumen teratas hasil BM25 dipasangkan
+satu per satu dengan kueri, menghasilkan sepuluh pasangan masukan. Setiap pasangan diberi
+skor oleh model \textit{cross-encoder} menggunakan metode \textit{predict}. Dokumen kemudian
+diurutkan ulang berdasarkan skor tersebut dan tiga dokumen teratas dipilih sebagai konteks
+akhir yang diteruskan ke tahap generasi.
+
+Model \textit{cross-encoder} yang digunakan adalah [TODO: nama model, mis.
+\texttt{cross-encoder/ms-marco-MiniLM-L-6-v2}] yang memiliki keseimbangan yang baik antara
+akurasi penilaian relevansi dan kecepatan inferensi. Model dijalankan secara lokal tanpa
+memerlukan koneksi internet pada saat eksperimen berlangsung.
+
+% TODO: Tambahkan contoh perbandingan urutan sebelum/sesudah reranking untuk
+%       satu pertanyaan sampel (dalam tabel)
+
+
+\subsection{Implementasi \textit{Active Hallucination Detection}}
+\label{subsec:impl-ad}
+
+% TODO: Lengkapi bagian ini setelah implementasi Active Hallucination Detection selesai.
+%       Jelaskan: (1) mekanisme deteksi yang digunakan, (2) model atau pendekatan yang
+%       dipilih, (3) threshold yang ditetapkan, (4) cara penanganan jika halusinasi
+%       terdeteksi (mis. regenerasi, penandaan, atau penolakan jawaban).
+
+Implementasi komponen \textit{active hallucination detection} akan dijelaskan pada bagian
+ini setelah proses perancangan dan pengujian awal komponen tersebut selesai dilakukan.
+
+
+% ============================================================================================
+\section{Implementasi \textit{Framework} Evaluasi}
+\label{sec:impl-evaluasi}
+% ============================================================================================
+
+Evaluasi kuantitatif menggunakan \textit{framework} RAGAS versi 0.4.3 yang diintegrasikan
+dengan model LLM dan \textit{embedding} lokal melalui Ollama. Empat metrik RAGAS digunakan,
+yakni \textit{faithfulness}, \textit{answer relevancy}, \textit{context precision}, dan
+\textit{context recall}. Metrik-metrik tersebut diakses menggunakan antarmuka lama RAGAS
+(\textit{underscore-prefixed metrics}) yang kompatibel dengan \texttt{LangchainLLMWrapper}
+dari Ollama.
+
+Untuk mengatasi keterbatasan kapasitas inferensi Ollama yang memproses satu permintaan pada
+satu waktu, konfigurasi \texttt{RunConfig} RAGAS ditetapkan dengan nilai \texttt{max\_workers}
+sebesar satu dan nilai \texttt{timeout} sebesar 300 detik. Pengaturan ini mencegah kondisi
+\textit{timeout} yang terjadi apabila RAGAS mengirimkan permintaan secara paralel ke Ollama.
+
+Hasil evaluasi RAGAS setiap sampel disimpan secara inkremental ke dalam berkas JSON sehingga
+proses evaluasi dapat dilanjutkan dari titik terakhir tanpa kehilangan data apabila terjadi
+gangguan. Setelah seluruh sampel selesai dievaluasi, hasil digabungkan menjadi satu berkas
+CSV yang memuat seluruh metrik per sampel beserta label prediksi dan label referensi.
