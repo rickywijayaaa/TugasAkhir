@@ -1,0 +1,556 @@
+{
+  "config": "baseline",
+  "timestamp": "2026-03-29T17:53:05.213379",
+  "results": [
+    {
+      "idx": 0,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.75
+    },
+    {
+      "idx": 1,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.8333333333333334,
+      "answer_relevancy": NaN,
+      "context_precision": 0.99999999998,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 2,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.8,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 3,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.5,
+      "answer_relevancy": NaN,
+      "context_precision": 0.9999999999666667,
+      "context_recall": 0.75
+    },
+    {
+      "idx": 4,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": 0.99999999995,
+      "context_recall": 0.8333333333333334
+    },
+    {
+      "idx": 5,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.2,
+      "answer_relevancy": 0.0,
+      "context_precision": NaN,
+      "context_recall": 0.4
+    },
+    {
+      "idx": 6,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8623318273911488,
+      "context_precision": NaN,
+      "context_recall": 0.5714285714285714
+    },
+    {
+      "idx": 7,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.75,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.375
+    },
+    {
+      "idx": 8,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.0
+    },
+    {
+      "idx": 9,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 10,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": 0.999999999975,
+      "context_recall": 0.6666666666666666
+    },
+    {
+      "idx": 11,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.8571428571428571,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 12,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.4444444444444444,
+      "answer_relevancy": 0.8899833135337486,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 13,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.75,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.99999999998,
+      "context_recall": 0.3333333333333333
+    },
+    {
+      "idx": 14,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.9067534465975543,
+      "context_precision": NaN,
+      "context_recall": 0.5555555555555556
+    },
+    {
+      "idx": 15,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.25,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.8333333333333334
+    },
+    {
+      "idx": 16,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.3333333333333333
+    },
+    {
+      "idx": 17,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 18,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 19,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 20,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.6666666666666666
+    },
+    {
+      "idx": 21,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.0,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 22,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 23,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 24,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": NaN
+    },
+    {
+      "idx": 25,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 26,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6,
+      "answer_relevancy": NaN,
+      "context_precision": 0.999999999975,
+      "context_recall": 0.5714285714285714
+    },
+    {
+      "idx": 27,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.7272727272727273
+    },
+    {
+      "idx": 28,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.25
+    },
+    {
+      "idx": 29,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": 0.99999999995,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 30,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.75
+    },
+    {
+      "idx": 31,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 32,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.125
+    },
+    {
+      "idx": 33,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.23076923076923078
+    },
+    {
+      "idx": 34,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.997971573534434,
+      "context_precision": NaN,
+      "context_recall": 0.9230769230769231
+    },
+    {
+      "idx": 35,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": 0.99999999998,
+      "context_recall": 0.4166666666666667
+    },
+    {
+      "idx": 36,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.0,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 37,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.9655879328560212,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 38,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.4
+    },
+    {
+      "idx": 39,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 40,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.5333333333333333
+    },
+    {
+      "idx": 41,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.5,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 42,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.0,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 43,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.5714285714285714
+    },
+    {
+      "idx": 44,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": NaN
+    },
+    {
+      "idx": 45,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.0,
+      "context_precision": NaN,
+      "context_recall": 0.5
+    },
+    {
+      "idx": 46,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.6666666666666666
+    },
+    {
+      "idx": 47,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.8861135059869061,
+      "context_precision": NaN,
+      "context_recall": 0.6470588235294118
+    },
+    {
+      "idx": 48,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 49,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.8,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": NaN
+    },
+    {
+      "idx": 50,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 51,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.999999999975,
+      "context_recall": 1.0
+    },
+    {
+      "idx": 52,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.5,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.0
+    },
+    {
+      "idx": 53,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": NaN
+    },
+    {
+      "idx": 54,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": NaN,
+      "answer_relevancy": NaN,
+      "context_precision": NaN,
+      "context_recall": 0.0
+    }
+  ]
+}
