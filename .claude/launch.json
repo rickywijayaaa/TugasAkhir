@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite React UI",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173,
+      "cwd": "TA/Code TA/ui"
+    },
+    {
+      "name": "Jupyter Lab",
+      "runtimeExecutable": "jupyter",
+      "runtimeArgs": ["lab", "--no-browser", "--port=8888"],
+      "port": 8888,
+      "cwd": "TA/Code TA"
+    }
+  ]
+}

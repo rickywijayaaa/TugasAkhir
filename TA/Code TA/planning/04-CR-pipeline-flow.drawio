@@ -1,0 +1,208 @@
+<mxfile host="app.diagrams.net" version="21.0.0">
+  <diagram name="RAG + Context Reranking Pipeline" id="cr-rag-pipeline">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ====== TITLE ====== -->
+        <mxCell id="title" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Notebook 04 — RAG + Context Reranking Pipeline&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="184" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== SETUP SECTION ====== -->
+        <mxCell id="setup-bg" value="&lt;b&gt;INISIALISASI&lt;/b&gt;" style="swimlane;startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="84" y="75" width="1000" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="setup-dataset" value="&lt;b&gt;PubMedQA Dataset&lt;/b&gt;&lt;br&gt;pqa_labeled&lt;br&gt;500 sampel" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="setup-bg">
+          <mxGeometry x="20" y="35" width="165" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="setup-bm25" value="&lt;b&gt;BM25 Index&lt;/b&gt;&lt;br&gt;pubmedqa_bm25.pkl&lt;br&gt;(shared: Baseline &amp; QR)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="setup-bg">
+          <mxGeometry x="225" y="35" width="165" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="setup-ce" value="&lt;b&gt;CrossEncoder Model&lt;/b&gt;&lt;br&gt;ms-marco-MiniLM-L-6-v2&lt;br&gt;~22M params | ~85MB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="setup-bg">
+          <mxGeometry x="430" y="35" width="180" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="setup-llm" value="&lt;b&gt;LLM: Llama 3.2&lt;/b&gt;&lt;br&gt;via Ollama (lokal)&lt;br&gt;temperature=0, seed=42" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="setup-bg">
+          <mxGeometry x="650" y="35" width="180" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="setup-ragas" value="&lt;b&gt;Custom Evaluator&lt;/b&gt;&lt;br&gt;Zero-NaN&lt;br&gt;(Faithfulness + CtxRecall)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="setup-bg">
+          <mxGeometry x="860" y="35" width="120" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ====== FOR EACH QUESTION LABEL ====== -->
+        <mxCell id="loop-label" value="🔁  Untuk setiap pertanyaan (500×):" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="84" y="215" width="320" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ====== INPUT ====== -->
+        <mxCell id="input-q" value="&lt;b&gt;Input: Pertanyaan Biomedis&lt;/b&gt;&lt;br&gt;&lt;i&gt;Contoh: &quot;Does aspirin reduce the risk of myocardial infarction?&quot;&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="359" y="215" width="450" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: setup to input (dotted, "digunakan oleh") -->
+        <mxCell id="e-setup-input" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#6c8ebf;" edge="1" source="setup-bg" target="input-q" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== STAGE 1: BM25 RETRIEVAL ====== -->
+        <mxCell id="stage1-bg" value="&lt;b&gt;STAGE 1 — BM25 RETRIEVAL&lt;/b&gt; (Candidate Generation)" style="swimlane;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="184" y="305" width="800" height="185" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-step1" value="&lt;b&gt;1. Tokenisasi Query&lt;/b&gt;&lt;br&gt;Lowercase + hapus tanda baca&lt;br&gt;+ split whitespace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="stage1-bg">
+          <mxGeometry x="20" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-step2" value="&lt;b&gt;2. BM25 Scoring&lt;/b&gt;&lt;br&gt;Hitung skor relevansi&lt;br&gt;untuk SEMUA dokumen&lt;br&gt;(~1706 segmen)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="stage1-bg">
+          <mxGeometry x="265" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-step3" value="&lt;b&gt;3. Pilih Top-20 Kandidat&lt;/b&gt;&lt;br&gt;Ambil 20 dokumen dengan&lt;br&gt;skor BM25 tertinggi&lt;br&gt;&lt;i&gt;(berbasis kesamaan kata kunci)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="stage1-bg">
+          <mxGeometry x="510" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-note" value="⚠️ Baseline &amp; QR langsung pilih Top-5 dari BM25. Context Reranking ambil &lt;b&gt;Top-20 dulu&lt;/b&gt; untuk diproses lebih lanjut." style="text;html=1;strokeColor=#d79b00;fillColor=#fff0c0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;" vertex="1" parent="stage1-bg">
+          <mxGeometry x="100" y="135" width="600" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-s1a" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s1-step1" target="s1-step2" parent="stage1-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-s1b" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s1-step2" target="s1-step3" parent="stage1-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: input to stage1 -->
+        <mxCell id="e-in-s1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="input-q" target="stage1-bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== STAGE 2: CROSSENCODER RERANKING ====== -->
+        <mxCell id="stage2-bg" value="&lt;b&gt;STAGE 2 — CROSSENCODER RERANKING&lt;/b&gt; (Semantic Refinement)" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="184" y="540" width="800" height="195" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2-step1" value="&lt;b&gt;1. Buat Pasangan Input&lt;/b&gt;&lt;br&gt;(Query, Dokumen) × 20 pasang&lt;br&gt;sebagai input CrossEncoder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="stage2-bg">
+          <mxGeometry x="20" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2-step2" value="&lt;b&gt;2. CrossEncoder Scoring&lt;/b&gt;&lt;br&gt;Baca query + dokumen&lt;br&gt;&lt;b&gt;BERSAMAAN&lt;/b&gt; → skor relevansi&lt;br&gt;&lt;i&gt;(paham makna, bukan kata)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="stage2-bg">
+          <mxGeometry x="265" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2-step3" value="&lt;b&gt;3. Urutkan &amp; Pilih Top-5&lt;/b&gt;&lt;br&gt;Sort by reranker score (desc)&lt;br&gt;→ ambil 5 terbaik&lt;br&gt;&lt;i&gt;(konteks paling relevan semantik)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#6d4f7a;fontColor=#ffffff;fontSize=10;" vertex="1" parent="stage2-bg">
+          <mxGeometry x="510" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2-note" value="💡 CrossEncoder membaca &lt;b&gt;query + dokumen secara bersamaan&lt;/b&gt; → mengerti konteks kalimat → lebih presisi dari BM25 yang hanya cocokkan kata kunci." style="text;html=1;strokeColor=#9673a6;fillColor=#f3ecf9;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;" vertex="1" parent="stage2-bg">
+          <mxGeometry x="100" y="135" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-s2a" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s2-step1" target="s2-step2" parent="stage2-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-s2b" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s2-step2" target="s2-step3" parent="stage2-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: stage1 to stage2 -->
+        <mxCell id="e-s1-s2" value="Top-20 kandidat" style="edgeStyle=orthogonalEdgeStyle;fontStyle=2;fontSize=10;strokeColor=#d79b00;" edge="1" source="s1-step3" target="s2-step1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LLM GENERATION ====== -->
+        <mxCell id="gen-bg" value="&lt;b&gt;LLM GENERATION&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="184" y="785" width="800" height="185" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gen-step1" value="&lt;b&gt;1. Format Prompt&lt;/b&gt;&lt;br&gt;Top-5 konteks (reranked)&lt;br&gt;+ pertanyaan disusun&lt;br&gt;jadi satu prompt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-bg">
+          <mxGeometry x="20" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gen-step2" value="&lt;b&gt;2. Llama 3.2 Generate&lt;/b&gt;&lt;br&gt;Ollama API call&lt;br&gt;max 300 token&lt;br&gt;&lt;i&gt;Jawab berdasar konteks saja&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-bg">
+          <mxGeometry x="265" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gen-step3" value="&lt;b&gt;3. Ekstrak Label&lt;/b&gt;&lt;br&gt;Regex dari 3 baris terakhir&lt;br&gt;→ &lt;b&gt;yes / no / maybe&lt;/b&gt;&lt;br&gt;&lt;i&gt;(default: maybe jika gagal)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#82b366;strokeColor=#5a8a4e;fontColor=#ffffff;fontSize=10;" vertex="1" parent="gen-bg">
+          <mxGeometry x="510" y="48" width="195" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gen-note" value="📌 Prompt IDENTIK dengan Baseline — hanya konteks yang berbeda (hasil reranking lebih relevan secara semantik)" style="text;html=1;strokeColor=#82b366;fillColor=#eaf5e9;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;" vertex="1" parent="gen-bg">
+          <mxGeometry x="100" y="135" width="600" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-ga" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen-step1" target="gen-step2" parent="gen-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gb" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen-step2" target="gen-step3" parent="gen-bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: stage2 to gen -->
+        <mxCell id="e-s2-gen" value="Top-5 konteks (reranked)" style="edgeStyle=orthogonalEdgeStyle;fontStyle=2;fontSize=10;strokeColor=#9673a6;" edge="1" source="s2-step3" target="gen-step1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PHASE 1 OUTPUT ====== -->
+        <mxCell id="phase1-out" value="&lt;b&gt;💾  PHASE 1 OUTPUT — cr_phase1_answers.json&lt;/b&gt;&lt;br&gt;Prediksi label (yes/no/maybe) + jawaban LLM + Top-5 konteks + BM25 scores + Reranker scores&lt;br&gt;Disimpan setiap &lt;b&gt;10 sampel&lt;/b&gt; → resume-able jika interrupted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="259" y="1015" width="650" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: gen to phase1 -->
+        <mxCell id="e-gen-p1" value="500 sampel selesai" style="edgeStyle=orthogonalEdgeStyle;fontStyle=2;fontSize=10;" edge="1" source="gen-step3" target="phase1-out" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== CUSTOM EVALUATION ====== -->
+        <mxCell id="eval-bg" value="&lt;b&gt;CUSTOM EVALUATION (Zero-NaN Evaluator)&lt;/b&gt;" style="swimlane;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="184" y="1130" width="800" height="205" as="geometry" />
+        </mxCell>
+
+        <mxCell id="eval-faith" value="&lt;b&gt;Faithfulness&lt;/b&gt;&lt;br&gt;&lt;br&gt;Setiap kalimat jawaban LLM dicek:&lt;br&gt;&lt;i&gt;&quot;Apakah kalimat ini didukung&lt;br&gt;oleh konteks?&quot;&lt;/i&gt;&lt;br&gt;&lt;br&gt;LLM → yes/no per kalimat&lt;br&gt;Skor = fraksi yang &quot;yes&quot;&lt;br&gt;Hasil: 0.0 – 1.0 (no NaN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="eval-bg">
+          <mxGeometry x="60" y="45" width="250" height="145" as="geometry" />
+        </mxCell>
+
+        <mxCell id="eval-recall" value="&lt;b&gt;Context Recall&lt;/b&gt;&lt;br&gt;&lt;br&gt;Setiap fakta di &lt;i&gt;reference answer&lt;/i&gt; dicek:&lt;br&gt;&lt;i&gt;&quot;Apakah fakta ini ada&lt;br&gt;di dalam konteks retrieved?&quot;&lt;/i&gt;&lt;br&gt;&lt;br&gt;LLM → yes/no per kalimat&lt;br&gt;Skor = fraksi yang &quot;yes&quot;&lt;br&gt;Hasil: 0.0 – 1.0 (no NaN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="eval-bg">
+          <mxGeometry x="490" y="45" width="250" height="145" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: phase1 to eval -->
+        <mxCell id="e-p1-eval" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="phase1-out" target="eval-bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PHASE 2 OUTPUT ====== -->
+        <mxCell id="phase2-out" value="&lt;b&gt;💾  PHASE 2 OUTPUT — cr_phase2_custom.json&lt;/b&gt;&lt;br&gt;Faithfulness + Context Recall per sampel (500 sampel, 0 NaN dijamin)&lt;br&gt;Disimpan setiap &lt;b&gt;5 sampel&lt;/b&gt; → resume-able jika interrupted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="259" y="1380" width="650" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: eval to phase2 -->
+        <mxCell id="e-eval-p2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="eval-bg" target="phase2-out" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== FINAL COMPARISON ====== -->
+        <mxCell id="comparison" value="&lt;b&gt;📊  FINAL COMPARISON — Baseline vs Query Rewriting vs Context Reranking&lt;/b&gt;&lt;br&gt;Label Accuracy | Hallucination Rate | Faithfulness | Context Recall&lt;br&gt;→ Apakah CR berhasil mengurangi halusinasi dibandingkan Baseline &amp; QR?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="184" y="1490" width="800" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: phase2 to comparison -->
+        <mxCell id="e-p2-comp" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="phase2-out" target="comparison" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== SIDE NOTE: BM25 vs CR comparison ====== -->
+        <mxCell id="side-note" value="&lt;b&gt;Perbedaan utama CR vs Baseline:&lt;/b&gt;&lt;br&gt;&lt;br&gt;Baseline:&lt;br&gt;BM25 → &lt;b&gt;Top-5&lt;/b&gt; langsung&lt;br&gt;&lt;br&gt;Context Reranking:&lt;br&gt;BM25 → &lt;b&gt;Top-20&lt;/b&gt; → CrossEncoder → &lt;b&gt;Top-5&lt;/b&gt;&lt;br&gt;&lt;br&gt;Prompt LLM: &lt;b&gt;identik&lt;/b&gt;&lt;br&gt;Jumlah konteks final: &lt;b&gt;sama (5)&lt;/b&gt;&lt;br&gt;Yang beda: &lt;b&gt;kualitas konteksnya&lt;/b&gt;" style="text;html=1;strokeColor=#d79b00;fillColor=#fff9e6;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="305" width="190" height="230" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
