@@ -1,0 +1,5014 @@
+{
+  "config": "qr_llama",
+  "timestamp": "2026-04-24T01:22:09.590403",
+  "max_samples": 500,
+  "metrics": [
+    "faithfulness",
+    "context_recall",
+    "answer_relevancy",
+    "context_precision"
+  ],
+  "evaluator": "custom_zero_nan_4metrics",
+  "results": [
+    {
+      "idx": 0,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 1,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 2,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 3,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 4,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.8333333333333334,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 5,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 6,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 7,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 8,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 9,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 10,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 11,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 12,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 13,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 14,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 15,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 16,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 17,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 18,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 19,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 20,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7555555555555555
+    },
+    {
+      "idx": 21,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 22,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 23,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 24,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 25,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 26,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 27,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 28,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 29,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 30,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 31,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 32,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 33,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 34,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 35,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 36,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 37,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 38,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 39,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 40,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 41,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 42,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 43,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 44,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 45,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 46,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 47,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 48,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 49,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 50,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 51,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 52,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 53,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 54,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 55,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 56,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 57,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 58,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 59,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 60,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 61,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 62,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 63,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.75,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 64,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 65,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 66,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 67,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 68,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 69,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 70,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.45
+    },
+    {
+      "idx": 71,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 72,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 73,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.25,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 74,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 75,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 76,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 77,
+      "ground_truth": "maybe",
+      "predicted_label": "maybe",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 78,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 79,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 80,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.25
+    },
+    {
+      "idx": 81,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 82,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 83,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 84,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 0.42857142857142855,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 85,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 86,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 87,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 88,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 89,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 90,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 91,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.6,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 92,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 93,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 94,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.6388888888888888
+    },
+    {
+      "idx": 95,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 96,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 97,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 98,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 99,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 100,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 101,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7000000000000001
+    },
+    {
+      "idx": 102,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 103,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 104,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 105,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 106,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 107,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 108,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 109,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 110,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 111,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 112,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 113,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 114,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 115,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 116,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 117,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 118,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 119,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 120,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 121,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 122,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 123,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 124,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 125,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 126,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 127,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 128,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 129,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 130,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 131,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 132,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 133,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 134,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 135,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 136,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 137,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.25,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 138,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 139,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 140,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 141,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 142,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 143,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 144,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 145,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 146,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.25,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 147,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 148,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7000000000000001
+    },
+    {
+      "idx": 149,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 150,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 151,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 152,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 153,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 154,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 155,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 156,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 157,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 158,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 159,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 160,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 161,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 162,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 163,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 164,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 165,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 166,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 167,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 168,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 169,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 170,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 171,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 172,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 173,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 174,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.6388888888888888
+    },
+    {
+      "idx": 175,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 176,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 177,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 178,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 179,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 180,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 181,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 182,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 183,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 184,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 185,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 186,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.8,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.4,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 187,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 188,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 189,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7000000000000001
+    },
+    {
+      "idx": 190,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 191,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 192,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 193,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 194,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 195,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 196,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 197,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.25
+    },
+    {
+      "idx": 198,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 199,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 200,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 201,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 202,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 203,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 204,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 205,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 206,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 207,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 208,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 209,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 210,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 211,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 212,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7555555555555555
+    },
+    {
+      "idx": 213,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 214,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 215,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 216,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 217,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 218,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 219,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 220,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 221,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.25
+    },
+    {
+      "idx": 222,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 223,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 224,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 225,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 226,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 227,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 228,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 229,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 230,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 231,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 232,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 233,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 234,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 235,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 236,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 237,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 238,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.7555555555555555
+    },
+    {
+      "idx": 239,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 240,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 241,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5833333333333333
+    },
+    {
+      "idx": 242,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 243,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 244,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 245,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 246,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 247,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 248,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 249,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 250,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 251,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 252,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 253,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 254,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 255,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.3333333333333333
+    },
+    {
+      "idx": 256,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.6388888888888888
+    },
+    {
+      "idx": 257,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 258,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 259,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 260,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.75,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 261,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 262,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 263,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 264,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 265,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 266,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 267,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 268,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 269,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 270,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 271,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 272,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 273,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5833333333333333
+    },
+    {
+      "idx": 274,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 275,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 276,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 277,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 278,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 279,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 280,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 281,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5833333333333333
+    },
+    {
+      "idx": 282,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 283,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 284,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 285,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 286,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 287,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 288,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.3333333333333333
+    },
+    {
+      "idx": 289,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 290,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 291,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 292,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 293,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 294,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 295,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.16666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 296,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 297,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 298,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 299,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 300,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 301,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 302,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 303,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 304,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 305,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 306,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 307,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 308,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 309,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 310,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 0.0
+    },
+    {
+      "idx": 311,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 312,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 313,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 314,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 315,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 316,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 317,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 318,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 319,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 320,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 321,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 322,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 323,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 324,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 325,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 326,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 327,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 328,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.6388888888888888
+    },
+    {
+      "idx": 329,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 330,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 331,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 332,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 333,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 334,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 335,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 336,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 337,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 338,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 339,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 340,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 341,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 342,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 343,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 344,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 345,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 346,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 347,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 348,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 349,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 350,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 351,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 352,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 353,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 354,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 355,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 356,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 357,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 358,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 359,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 360,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 361,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 362,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 363,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.5,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 364,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 365,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 366,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.3666666666666667
+    },
+    {
+      "idx": 367,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 368,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 369,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 370,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 371,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 372,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 0.5833333333333333
+    },
+    {
+      "idx": 373,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 374,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 375,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 376,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 377,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 378,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 379,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 380,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 381,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 382,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 383,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7555555555555555
+    },
+    {
+      "idx": 384,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 385,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 386,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 387,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 388,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7555555555555555
+    },
+    {
+      "idx": 389,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 390,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 391,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 392,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 393,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 394,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 395,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 396,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 397,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 398,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 399,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 400,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 401,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 402,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 403,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 404,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 405,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 406,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 407,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 408,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 409,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 410,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 411,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 412,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 413,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 414,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 415,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 416,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 417,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 418,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 419,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 420,
+      "ground_truth": "maybe",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 421,
+      "ground_truth": "yes",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 0.5,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.5,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 422,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 423,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 424,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 425,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 426,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 427,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 428,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 429,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 430,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 431,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 432,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 433,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 434,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 435,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 436,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 437,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 438,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 439,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 440,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 441,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 442,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 443,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 444,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 445,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 446,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 447,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 448,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 449,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.7
+    },
+    {
+      "idx": 450,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 451,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 452,
+      "ground_truth": "no",
+      "predicted_label": "yes",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 453,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 454,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 455,
+      "ground_truth": "no",
+      "predicted_label": "maybe",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 456,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 457,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 0.95
+    },
+    {
+      "idx": 458,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 459,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.0,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 460,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8875
+    },
+    {
+      "idx": 461,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 462,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 463,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 464,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 0.3333333333333333,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 465,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 466,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 467,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 468,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 469,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 470,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 471,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 472,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 473,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 474,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 475,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 476,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 477,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 478,
+      "ground_truth": "maybe",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.3333333333333333,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 479,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 480,
+      "ground_truth": "yes",
+      "predicted_label": "no",
+      "is_correct": false,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8666666666666667
+    },
+    {
+      "idx": 481,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.75
+    },
+    {
+      "idx": 482,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 483,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.5,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 484,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.5
+    },
+    {
+      "idx": 485,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 486,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 487,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 488,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 489,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.6666666666666666,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8055555555555555
+    },
+    {
+      "idx": 490,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 1.0,
+      "answer_relevancy": 0.6666666666666666,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 491,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.6666666666666666,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 492,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 493,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.8333333333333333
+    },
+    {
+      "idx": 494,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 495,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 496,
+      "ground_truth": "yes",
+      "predicted_label": "yes",
+      "is_correct": true,
+      "faithfulness": 0.3333333333333333,
+      "context_recall": 0.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.9166666666666666
+    },
+    {
+      "idx": 497,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 498,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 1.0,
+      "answer_relevancy": 1.0,
+      "context_precision": 1.0
+    },
+    {
+      "idx": 499,
+      "ground_truth": "no",
+      "predicted_label": "no",
+      "is_correct": true,
+      "faithfulness": 1.0,
+      "context_recall": 0.8,
+      "answer_relevancy": 1.0,
+      "context_precision": 0.95
+    }
+  ]
+}

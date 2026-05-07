@@ -3,20 +3,27 @@ import Sidebar from './components/Sidebar'
 import ChatArea from './components/ChatArea'
 import DocumentPanel from './components/DocumentPanel'
 import DocumentModal from './components/DocumentModal'
+import StatsDashboard from './components/StatsDashboard'
+import { CONFIGS } from './data/realData'
 
-function getConfigKey(useQR, useCR) {
-  if (useQR && useCR) return 'qr_cr'
-  if (useQR) return 'qr'
-  if (useCR) return 'cr'
-  return 'baseline'
-}
+function getPhaseDelays(config) {
+  // Returns cumulative delays [phase1, phase2, phase3, phase4]
+  // based on config complexity (QR adds, Hybrid adds, CR adds)
+  const hasQR = config.useQR
+  const hasHybrid = config.useHybrid
+  const hasCR = config.useCrossEncoder
 
-function getPhaseDelays(useQR, useCR) {
-  // Returns [phase1Delay, phase2Delay, phase3Delay, phase4Delay] cumulative from t=0
-  if (!useQR && !useCR) return [80, 900, 980, 2400]
-  if (useQR && !useCR)  return [1200, 2900, 2980, 4700]
-  if (!useQR && useCR)  return [80, 900, 2500, 4200]
-  return [800, 2500, 5000, 6800]
+  let t = 80
+  const delays = []
+  if (hasQR) t += 900
+  delays.push(t) // phase 1: query processing done
+  t += hasHybrid ? 1400 : 800
+  delays.push(t) // phase 2: retrieval done
+  if (hasCR) t += 1200
+  delays.push(t) // phase 3: rerank done
+  t += 1700
+  delays.push(t) // phase 4: generation
+  return delays
 }
 
 export default function App() {
@@ -24,8 +31,8 @@ export default function App() {
   const [phase, setPhase] = useState(0)
   const [typedAnswer, setTypedAnswer] = useState('')
   const [selectedDoc, setSelectedDoc] = useState(null)
-  const [useQR, setUseQR] = useState(false)
-  const [useCR, setUseCR] = useState(false)
+  const [selectedConfig, setSelectedConfig] = useState('hybrid_cr_openai')
+  const [statsOpen, setStatsOpen] = useState(false)
 
   const timersRef = useRef([])
   const typewriterRef = useRef(null)
@@ -40,14 +47,15 @@ export default function App() {
   }, [])
 
   const runPipeline = useCallback(
-    (question, qr, cr) => {
+    (question, configKey) => {
       clearAllTimers()
+      const config = CONFIGS.find((c) => c.key === configKey) || CONFIGS[3]
 
       setActiveQuestion(question)
       setPhase(0)
       setTypedAnswer('')
 
-      const delays = getPhaseDelays(qr, cr)
+      const delays = getPhaseDelays(config)
       delays.forEach((delay, idx) => {
         const t = setTimeout(() => {
           setPhase(idx + 1)
@@ -60,37 +68,28 @@ export default function App() {
 
   const handleSelectQuestion = useCallback(
     (question) => {
-      if (activeQuestion?.id === question.id && phase > 0 && phase < 5) return
-      runPipeline(question, useQR, useCR)
+      if (activeQuestion?.idx === question.idx && phase > 0 && phase < 5) return
+      runPipeline(question, selectedConfig)
     },
-    [activeQuestion, phase, useQR, useCR, runPipeline]
+    [activeQuestion, phase, selectedConfig, runPipeline]
   )
 
-  const handleToggleQR = useCallback(
-    (newVal) => {
-      setUseQR(newVal)
+  const handleSelectConfig = useCallback(
+    (newConfig) => {
+      setSelectedConfig(newConfig)
       if (activeQuestion) {
-        runPipeline(activeQuestion, newVal, useCR)
+        runPipeline(activeQuestion, newConfig)
       }
     },
-    [activeQuestion, useCR, runPipeline]
+    [activeQuestion, runPipeline]
   )
 
-  const handleToggleCR = useCallback(
-    (newVal) => {
-      setUseCR(newVal)
-      if (activeQuestion) {
-        runPipeline(activeQuestion, useQR, newVal)
-      }
-    },
-    [activeQuestion, useQR, runPipeline]
-  )
-
-  // Typewriter effect: runs when phase reaches 4
+  // Typewriter effect
   useEffect(() => {
     if (phase !== 4 || !activeQuestion) return
 
-    const fullText = activeQuestion.answer
+    const cfg = activeQuestion.configs?.[selectedConfig]
+    const fullText = cfg?.answer || 'Jawaban tidak tersedia.'
     let idx = 0
     setTypedAnswer('')
 
@@ -112,9 +111,8 @@ export default function App() {
         typewriterRef.current = null
       }
     }
-  }, [phase, activeQuestion])
+  }, [phase, activeQuestion, selectedConfig])
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => clearAllTimers()
   }, [clearAllTimers])
@@ -127,44 +125,37 @@ export default function App() {
     setSelectedDoc(null)
   }, [])
 
-  const configKey = getConfigKey(useQR, useCR)
-
   return (
     <div className="flex h-screen overflow-hidden bg-gray-950">
-      {/* Sidebar */}
       <Sidebar
         activeQuestion={activeQuestion}
         onSelectQuestion={handleSelectQuestion}
-        useQR={useQR}
-        useCR={useCR}
-        onToggleQR={handleToggleQR}
-        onToggleCR={handleToggleCR}
-        configKey={configKey}
+        selectedConfig={selectedConfig}
+        onSelectConfig={handleSelectConfig}
+        onOpenStats={() => setStatsOpen(true)}
       />
 
-      {/* Chat area */}
       <ChatArea
         activeQuestion={activeQuestion}
         phase={phase}
         typedAnswer={typedAnswer}
         onDocClick={handleDocClick}
-        useQR={useQR}
-        useCR={useCR}
-        configKey={configKey}
+        selectedConfig={selectedConfig}
       />
 
-      {/* Document panel */}
       <DocumentPanel
         question={activeQuestion}
         phase={phase}
         onDocClick={handleDocClick}
-        useCR={useCR}
-        configKey={configKey}
+        selectedConfig={selectedConfig}
       />
 
-      {/* Document modal */}
-      {selectedDoc && (
-        <DocumentModal doc={selectedDoc} onClose={handleCloseModal} />
+      {selectedDoc && <DocumentModal doc={selectedDoc} onClose={handleCloseModal} />}
+      {statsOpen && (
+        <StatsDashboard
+          onClose={() => setStatsOpen(false)}
+          selectedConfig={selectedConfig}
+        />
       )}
     </div>
   )

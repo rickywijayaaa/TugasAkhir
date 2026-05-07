@@ -1,0 +1,50 @@
+# ==============================================
+# Secrets & environment
+# ==============================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ==============================================
+# Python
+# ==============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+*.egg-info/
+
+# ==============================================
+# Vector index & cache (regenerable)
+# ==============================================
+TA/Code TA/notebooks/pubmedqa_chroma/
+TA/Code TA/notebooks/pubmedqa_chroma_llama/
+TA/Code TA/notebooks/pubmedqa_bm25.pkl
+
+# ==============================================
+# Node / UI build artifacts
+# ==============================================
+node_modules/
+TA/Code TA/ui/dist/
+TA/Code TA/ui/.parcel-cache/
+
+# ==============================================
+# OS / editor
+# ==============================================
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# ==============================================
+# Claude Code worktrees & local agent state
+# ==============================================
+.claude/worktrees/

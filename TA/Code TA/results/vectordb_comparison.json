@@ -1,0 +1,38 @@
+{
+  "config": {
+    "embed_model": "text-embedding-3-small",
+    "llm_model": "gpt-4.1-mini",
+    "n_docs": 1706,
+    "n_test_queries": 100,
+    "n_end_to_end": 50,
+    "top_k": 5,
+    "top_k_broad": 20,
+    "timestamp": "2026-04-29T22:38:12.567719"
+  },
+  "indexing_time_sec": {
+    "chromadb": 2.503149800002575,
+    "qdrant": 2.748612299968954,
+    "weaviate": null
+  },
+  "phase_a_metrics": {
+    "chromadb": {
+      "recall@5": 1.0,
+      "recall@20": 0.9990000000000001,
+      "jaccard@5": 1.0,
+      "jaccard@20": 0.9980952380952381,
+      "mean_latency_ms": 2.5257239973871037,
+      "p95_latency_ms": 3.496359981363639
+    },
+    "qdrant": {
+      "recall@5": 1.0,
+      "recall@20": 1.0,
+      "jaccard@5": 1.0,
+      "jaccard@20": 1.0,
+      "mean_latency_ms": 24.361277998541482,
+      "p95_latency_ms": 28.434159976313822
+    }
+  },
+  "phase_b_e2e": {},
+  "jaccard_pairwise": {},
+  "oracle_self_recall_check": 1.0
+}

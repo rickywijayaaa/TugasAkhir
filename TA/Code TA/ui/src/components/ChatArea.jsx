@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import RAGSteps from './RAGSteps'
+import RAGASPanel from './RAGASPanel'
+import { CONFIGS, AGGREGATE_STATS } from '../data/realData'
 
 const labelConfig = {
   yes: {
@@ -19,7 +21,6 @@ const labelConfig = {
   },
 }
 
-// Spinner for loading states
 function Spinner() {
   return (
     <div className="flex items-center gap-1.5">
@@ -30,10 +31,17 @@ function Spinner() {
   )
 }
 
-export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClick, useQR, useCR, configKey }) {
+export default function ChatArea({
+  activeQuestion,
+  phase,
+  typedAnswer,
+  onDocClick,
+  selectedConfig,
+}) {
   const bottomRef = useRef(null)
+  const config = CONFIGS.find((c) => c.key === selectedConfig) || CONFIGS[3]
+  const stats = AGGREGATE_STATS[selectedConfig]
 
-  // Auto-scroll to bottom as content appears
   useEffect(() => {
     if (activeQuestion && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -41,10 +49,9 @@ export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClic
   }, [phase, typedAnswer, activeQuestion])
 
   if (!activeQuestion) {
-    // Empty state
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-950">
-        <div className="text-center max-w-sm px-6">
+        <div className="text-center max-w-md px-6">
           <div className="w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mx-auto mb-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,42 +68,82 @@ export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClic
               />
             </svg>
           </div>
-          <h3 className="text-white font-semibold text-base mb-2">Select a question to begin</h3>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Choose one of the sample PubMedQA questions from the sidebar to visualize the full RAG pipeline in action.
+          <h3 className="text-white font-semibold text-base mb-2">
+            Pilih pertanyaan untuk memulai
+          </h3>
+          <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            Pilih satu dari 5 sampel PubMedQA di sidebar untuk melihat pipeline RAG
+            berjalan. Tersedia 9 konfigurasi berbeda untuk dibandingkan.
           </p>
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {['Query Rewriting', 'BM25 Retrieval', 'Context Reranking'].map((label) => (
-              <div
-                key={label}
-                className="bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-center"
-              >
-                <p className="text-gray-500 text-xs">{label}</p>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-3">
+            <p className="text-gray-400 text-xs font-semibold mb-2">
+              Konfigurasi aktif:{' '}
+              <span style={{ color: config.color }}>{config.label}</span>
+            </p>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="bg-gray-950 rounded p-2">
+                <p className="text-gray-500 text-[10px]">Model</p>
+                <p className="text-gray-300">{config.model}</p>
               </div>
-            ))}
+              <div className="bg-gray-950 rounded p-2">
+                <p className="text-gray-500 text-[10px]">Accuracy</p>
+                <p className="text-white font-bold">{stats?.accuracy}%</p>
+              </div>
+              <div className="bg-gray-950 rounded p-2">
+                <p className="text-gray-500 text-[10px]">Faithful.</p>
+                <p className="text-white font-mono">
+                  {stats?.faithfulness.toFixed(3)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     )
   }
 
-  const predictedLabel = activeQuestion.configs[configKey].label
-  const lc = labelConfig[predictedLabel]
+  const cfgResult = activeQuestion.configs?.[selectedConfig]
+  const predictedLabel = cfgResult?.label || 'maybe'
+  const lc = labelConfig[predictedLabel] || labelConfig.maybe
+  const isCorrect = cfgResult?.is_correct
 
   const statusText =
-    phase === 1 ? (useQR ? 'Rewriting query...' : 'Retrieving documents...') :
-    phase === 2 ? 'Retrieving documents...' :
-    phase === 3 ? (useCR ? 'Reranking context...' : 'Generating answer...') :
-    phase === 4 ? 'Generating answer...' : ''
+    phase === 1
+      ? config.useQR
+        ? 'Query Rewriting...'
+        : config.useHybrid
+        ? 'Hybrid retrieval starting...'
+        : 'BM25 retrieval...'
+      : phase === 2
+      ? config.useHybrid
+        ? 'BM25 + Dense + RRF fusion...'
+        : 'Retrieving documents...'
+      : phase === 3
+      ? config.useCrossEncoder
+        ? 'CrossEncoder reranking...'
+        : 'Generating answer...'
+      : phase === 4
+      ? 'Generating answer...'
+      : ''
 
   return (
     <div className="flex-1 flex flex-col bg-gray-950 overflow-hidden">
       {/* Top bar */}
       <div className="flex-shrink-0 px-6 py-3 border-b border-gray-800 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-xs">Question {activeQuestion.id} of 5</span>
+          <span className="text-gray-400 text-xs">
+            Sampel idx {activeQuestion.idx}
+          </span>
           <span className="text-gray-700">·</span>
-          <span className="text-gray-400 text-xs">{activeQuestion.shortLabel}</span>
+          <span className="text-gray-400 text-xs">{activeQuestion.short_label}</span>
+          <span className="text-gray-700">·</span>
+          <span
+            className="text-xs font-medium"
+            style={{ color: config.color }}
+          >
+            {config.label} ({config.model})
+          </span>
         </div>
         {phase > 0 && phase < 5 && (
           <div className="flex items-center gap-2">
@@ -105,20 +152,37 @@ export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClic
           </div>
         )}
         {phase === 5 && (
-          <span className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${lc.badgeClasses}`}>
-            {lc.text}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 text-xs">
+              GT: {activeQuestion.ground_truth}
+            </span>
+            <span
+              className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${lc.badgeClasses}`}
+            >
+              {lc.text}
+            </span>
+            <span
+              className={`text-xs font-medium px-1.5 py-0.5 rounded ${
+                isCorrect
+                  ? 'bg-green-400/10 text-green-400'
+                  : 'bg-red-400/10 text-red-400'
+              }`}
+            >
+              {isCorrect ? 'BENAR' : 'SALAH'}
+            </span>
+          </div>
         )}
       </div>
 
       {/* Scrollable chat content */}
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="max-w-3xl mx-auto space-y-2">
-
           {/* User message bubble */}
           <div className="flex justify-end">
             <div className="max-w-lg bg-gray-800 rounded-2xl rounded-tr-sm px-4 py-3">
-              <p className="text-white text-sm leading-relaxed">{activeQuestion.query}</p>
+              <p className="text-white text-sm leading-relaxed">
+                {activeQuestion.question}
+              </p>
             </div>
           </div>
 
@@ -129,17 +193,14 @@ export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClic
               phase={phase}
               typedAnswer={typedAnswer}
               onDocClick={onDocClick}
-              useQR={useQR}
-              useCR={useCR}
-              configKey={configKey}
+              selectedConfig={selectedConfig}
             />
           )}
 
-          {/* Assistant answer bubble - shown when done */}
+          {/* Assistant answer bubble */}
           {phase === 5 && (
             <div className="flex justify-start fade-in">
               <div className="flex items-start gap-3 max-w-2xl">
-                {/* Avatar */}
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center mt-0.5">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -157,21 +218,26 @@ export default function ChatArea({ activeQuestion, phase, typedAnswer, onDocClic
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-white font-medium text-sm">RAG Assistant</span>
-                    <span className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${lc.badgeClasses}`}>
+                    <span
+                      className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${lc.badgeClasses}`}
+                    >
                       {lc.text}
                     </span>
                   </div>
                   <div className="bg-gray-900 border border-gray-700/60 rounded-2xl rounded-tl-sm px-4 py-3">
                     <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-line">
-                      {activeQuestion.answer}
+                      {cfgResult?.answer || 'Jawaban tidak tersedia.'}
                     </p>
                   </div>
+
+                  {/* RAGAS analysis panel */}
+                  <RAGASPanel sample={activeQuestion} configKey={selectedConfig} />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Thinking indicator while pipeline is running */}
+          {/* Thinking indicator */}
           {phase > 0 && phase < 5 && (
             <div className="flex justify-start">
               <div className="flex items-center gap-3">

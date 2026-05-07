@@ -1,542 +1,290 @@
-% ============================================================================================
-% BAB IV DESAIN SOLUSI
-% MITIGASI HALUSINASI PADA RAG LLM MENGGUNAKAN
-% QUERY REWRITING, CONTEXT RERANKING, DAN ACTIVE HALLUCINATION DETECTION
-%
-% TODO: Ganti semua placeholder [TODO: ...] dengan isi yang sebenarnya.
-% TODO: Tambahkan file gambar ke folder image/bab4/ sebelum kompilasi.
-% ============================================================================================
+% ==========================================
+% BAB IV PERANCANGAN
+% ==========================================
+\chapter{PERANCANGAN}
+\label{chap:perancangan}
 
-\cleardoublepage
-\chapter{DESAIN SOLUSI}
-\label{chap:desain-solusi}
+Bab ini menjelaskan rancangan sistem \textit{Retrieval-Augmented Generation Large Language Model} (RAG-LLM) untuk mengurangi halusinasi pada tanya jawab biomedis. Rancangan ini menggabungkan tiga \textit{pipeline} utama, yaitu \textit{indexing}, \textit{retrieval}, dan \textit{generation}, yang dilengkapi dengan dua teknik mitigasi pilihan, yaitu \textit{query rewriting} (QR) dan \textit{context reranking} (CR). Bab ini juga menjelaskan pilihan model yang dipakai, daftar konfigurasi yang dibandingkan, serta nilai \textit{hyperparameter} dalam eksperimen.
 
-Bab ini menjelaskan dua fase \textit{Cross-Industry Standard Process for Data Mining} (CRISP-DM)
-yang mencakup \textit{data preparation} dan \textit{modeling}. Pada fase \textit{data preparation},
-dilakukan pemilihan fitur dan prapemrosesan terhadap dataset PubMedQA yang digunakan sebagai
-korpus pengujian. Pada fase \textit{modeling}, dirancang dan diimplementasikan lima konfigurasi
-sistem \textit{retrieval-augmented generation} (RAG) yang mencakup konfigurasi \textit{baseline}
-serta empat konfigurasi dengan teknik mitigasi halusinasi yang bervariasi. Hasil pelaksanaan
-setiap fase disajikan pada bagian IV.2.
+% ==========================================
+\section{Gambaran Umum Solusi}
+\label{sec:gambaran-umum-solusi}
 
+Sistem yang dirancang menggunakan pendekatan \textbf{hybrid retrieval}. Pendekatan ini menggabungkan dua jenis pencarian dokumen, yaitu pencarian berbasis kata kunci (BM25) dan pencarian berbasis kemiripan makna (\textit{dense embeddings}), lalu menggabungkan hasilnya melalui metode \textit{Reciprocal Rank Fusion} (RRF). Kedua jenis pencarian ini saling melengkapi: BM25 unggul saat mencari istilah biomedis tertentu seperti nama obat, gen, atau penyakit, sedangkan \textit{dense retrieval} mampu menemukan dokumen yang maknanya mirip walaupun kata yang dipakai berbeda.
 
-% ============================================================================================
-\section{Tahapan Desain}
-\label{sec:tahapan-desain}
-% ============================================================================================
+Di atas dasar \textit{hybrid retrieval} tersebut, sistem menambahkan dua teknik mitigasi halusinasi sebagai pilihan:
 
+\begin{enumerate}[1.]
+  \item \textbf{\textit{Query Rewriting} (QR)}, yaitu modul \textit{Large Language Model} (LLM) yang menulis ulang pertanyaan pengguna sebelum dikirim ke \textit{pipeline retrieval}. Tujuannya adalah memperluas istilah medis dan membakukan singkatan agar pencarian lebih tepat. Modul ini bekerja \textit{sebelum} \textit{retrieval}.
+  \item \textbf{\textit{Context Reranking} (CR)}, yaitu model \textit{cross-encoder} yang mengurutkan ulang 20 dokumen kandidat hasil RRF dan memilih lima dokumen yang paling relevan untuk diteruskan ke tahap \textit{generation}. Modul ini bekerja \textit{setelah} \textit{retrieval}.
+\end{enumerate}
 
-% --------------------------------------------------------------------------------------------
-\subsection{Persiapan Data (\textit{Data Preparation})}
-\label{subsec:data-preparation}
-% --------------------------------------------------------------------------------------------
+Gambaran umum sistem dapat dilihat pada Gambar~\ref{fig:bab4-master}.
 
-Tahap persiapan data bertujuan untuk memilih, memahami, dan menyiapkan dataset yang digunakan
-dalam proses eksperimen. Sebagaimana telah dijelaskan pada Bab~\ref{chap:analisis-masalah},
-dataset yang dipilih adalah PubMedQA, yakni dataset berbasis abstrak ilmiah dalam basis data
-PubMed yang memiliki struktur pertanyaan, konteks, dan jawaban yang terstandarisasi. Dari
-keseluruhan subset yang tersedia, digunakan subset \textit{pqa\_labeled} yang terdiri dari
-sekitar seribu entri berlabel pakar (\textit{expert-labeled}).
-
-Setiap entri dalam PubMedQA memiliki empat fitur utama yang dimanfaatkan dalam penelitian ini.
-Fitur pertama adalah \textit{question}, yakni pertanyaan riset yang dirumuskan berdasarkan
-judul artikel ilmiah di PubMed. Fitur kedua adalah \textit{context}, yakni daftar paragraf
-abstrak dari artikel ilmiah yang menjadi dasar jawaban. Fitur ketiga adalah \textit{long\_answer},
-yakni narasi panjang yang merangkum temuan penelitian. Fitur keempat adalah
-\textit{final\_decision}, yakni label klasifikasi berupa satu dari tiga nilai, yaitu
-\textit{yes}, \textit{no}, atau \textit{maybe}, yang diberikan oleh pakar domain sebagai
-jawaban ringkas atas pertanyaan.
-
-Untuk keperluan pengindeksan dan pengambilan dokumen, paragraf-paragraf dalam fitur
-\textit{context} setiap entri digabungkan menjadi satu unit teks yang mewakili satu dokumen.
-Dokumen yang terbentuk kemudian ditokenisasi menggunakan pendekatan berbasis tanda baca dan
-spasi untuk membangun indeks \textit{Best Match 25} (BM25). Fitur \textit{final\_decision}
-digunakan sebagai label referensi (\textit{ground truth}) dalam proses evaluasi, sedangkan
-fitur \textit{long\_answer} digunakan sebagai konteks referensi untuk perhitungan metrik
-RAGAS.
-
-
-% --------------------------------------------------------------------------------------------
-\subsection{Pemodelan (\textit{Modeling})}
-\label{subsec:modeling}
-% --------------------------------------------------------------------------------------------
-
-Tahap pemodelan mencakup perancangan arsitektur sistem RAG beserta seluruh komponen
-mitigasi halusinasi yang akan diuji. Pada tahap ini dirumuskan lima konfigurasi sistem yang
-berbeda, rancangan \textit{pipeline} RAG \textit{baseline}, serta rancangan setiap komponen
-teknik mitigasi halusinasi.
-
-
-\subsubsection{Konfigurasi Sistem}
-\label{subsubsec:konfigurasi-sistem}
-
-Untuk mengukur kontribusi masing-masing teknik mitigasi halusinasi secara terpisah maupun
-gabungan, dirancang lima konfigurasi sistem yang bervariasi. Konfigurasi pertama adalah
-\textit{baseline}, yakni sistem RAG tanpa teknik mitigasi apa pun yang berfungsi sebagai
-titik acuan pengukuran. Konfigurasi kedua menambahkan komponen \textit{query rewriting}
-pada konfigurasi \textit{baseline}. Konfigurasi ketiga menambahkan komponen
-\textit{context reranking}. Konfigurasi keempat menambahkan komponen
-\textit{active hallucination detection}. Konfigurasi kelima merupakan konfigurasi
-gabungan yang mengaktifkan seluruh teknik mitigasi secara bersamaan. Ringkasan kelima
-konfigurasi tersebut ditunjukkan pada Tabel~\ref{tbl:konfigurasi-sistem}.
-
-\begin{table}[H]
-  \centering
-  \caption{Matriks Konfigurasi Sistem RAG}
-  \label{tbl:konfigurasi-sistem}
-  \begin{tabular}{|l|c|c|c|}
-    \hline
-    \textbf{Konfigurasi} &
-    \textbf{\textit{Query Rewriting}} &
-    \textbf{\textit{Context Reranking}} &
-    \textbf{\textit{Active Detection}} \\
-    \hline
-    \textit{Baseline}           & $\times$ & $\times$ & $\times$ \\
-    \hline
-    \textit{Baseline} + QR      & \checkmark & $\times$ & $\times$ \\
-    \hline
-    \textit{Baseline} + CR      & $\times$ & \checkmark & $\times$ \\
-    \hline
-    \textit{Baseline} + AD      & $\times$ & $\times$ & \checkmark \\
-    \hline
-    \textit{Combined}           & \checkmark & \checkmark & \checkmark \\
-    \hline
-  \end{tabular}
-\end{table}
-
-Selain matriks konfigurasi, ditetapkan pula parameter teknis yang berlaku pada seluruh
-konfigurasi secara konsisten. Parameter-parameter tersebut disajikan pada
-Tabel~\ref{tbl:parameter-teknis}.
-
-\begin{table}[H]
-  \centering
-  \caption{Parameter Teknis Sistem RAG}
-  \label{tbl:parameter-teknis}
-  \begin{tabular}{|p{5.5cm}|p{7cm}|}
-    \hline
-    \textbf{Komponen / Parameter} & \textbf{Nilai} \\
-    \hline
-    Model LLM                              & [TODO: nama model, mis. llama3.1:8b] \\
-    \hline
-    \textit{Framework} inferensi           & Ollama (lokal) \\
-    \hline
-    Metode \textit{retrieval}              & BM25 (\textit{library} rank-bm25) \\
-    \hline
-    Jumlah dokumen awal (\textit{top-k retrieval}) & 10 \\
-    \hline
-    Jumlah dokumen setelah \textit{reranking} (\textit{top-k final}) & 3 \\
-    \hline
-    Model \textit{reranker}                & [TODO: nama CrossEncoder, mis. cross-encoder/ms-marco-MiniLM-L-6-v2] \\
-    \hline
-    Model \textit{embedding} (RAGAS)       & [TODO: nama model embedding] \\
-    \hline
-    \textit{Temperature} LLM               & 0 \\
-    \hline
-    Jumlah sampel evaluasi                 & 1.000 entri \\
-    \hline
-    \textit{Framework} evaluasi            & RAGAS 0.4.3 \\
-    \hline
-  \end{tabular}
-\end{table}
-
-
-\subsubsection{Desain \textit{Pipeline} RAG \textit{Baseline}}
-\label{subsubsec:desain-pipeline-baseline}
-
-\textit{Pipeline} RAG \textit{baseline} dirancang sebagai fondasi sistem yang akan
-dibandingkan dengan konfigurasi-konfigurasi berikutnya. \textit{Pipeline} ini terdiri
-dari tiga tahapan utama yang dijalankan secara berurutan, yakni \textit{indexing pipeline},
-\textit{retrieval pipeline}, dan \textit{generation pipeline}, sebagaimana diilustrasikan
-pada Gambar~\ref{fig:pipeline-baseline}.
-
-% TODO: Buat diagram aliran pipeline baseline dan simpan di image/bab4/pipeline_baseline.png
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\textwidth]{image/bab4/pipeline_baseline.png}
-  \caption{Diagram Aliran \textit{Pipeline} RAG \textit{Baseline}}
-  \label{fig:pipeline-baseline}
+  \includegraphics[width=0.95\textwidth]{image/flowsolusi.png}
+  \caption[Diagram alur sistem RAG-LLM untuk mitigasi halusinasi]{Diagram alur sistem RAG-LLM untuk mitigasi halusinasi}
+  \label{fig:bab4-master}
 \end{figure}
 
-Tiga tahapan dalam \textit{pipeline} RAG \textit{baseline} dirancang sebagai berikut.
+% ==========================================
+\section{Tahapan Perancangan Sistem}
+\label{sec:tahapan-perancangan}
+
+Tahap perancangan sistem dibagi menjadi empat bagian, yaitu \textit{data preparation}, \textit{indexing pipeline}, \textit{retrieval pipeline}, dan \textit{generation pipeline}. Masing-masing dijelaskan pada subbab berikut.
+
+% ==========================================
+\subsection{\textit{Data Preparation}}
+\label{subsec:data-preparation}
+
+Sumber data yang digunakan adalah \textbf{PubMedQA} bagian \texttt{pqa\_labeled}, yaitu kumpulan data berisi 1.000 pasangan tanya jawab biomedis yang sudah diberi label oleh ahli. Dari 1.000 pasangan tersebut, 500 sampel pertama dipilih untuk evaluasi dengan urutan tetap (\textit{seed} 42) agar hasil dapat diulang. Setiap entri PubMedQA sudah memuat artikel yang dipecah menjadi beberapa segmen sesuai struktur asli artikel ilmiah, yaitu \texttt{BACKGROUND}, \texttt{METHODS}, \texttt{RESULTS}, dan \texttt{CONCLUSIONS}. Cara pemecahan artikel ini disebut \textit{document-based chunking} dan dipertahankan apa adanya, karena pemecahan per bagian sudah menjaga makna setiap segmen tetap utuh dan ukurannya cukup seimbang (rata-rata 200 sampai 400 token per segmen).
+
+Setelah seluruh sampel diproses, korpus akhir berisi \textbf{1.706 segmen dokumen} yang berasal dari 500 artikel sumber. Setiap segmen disimpan beserta metadata berikut: \texttt{pubid} (identitas artikel), \texttt{section\_label} (label bagian artikel), \texttt{question} (pertanyaan terkait artikel), \texttt{answer} (jawaban panjang), serta \texttt{decision} (label yes, no, atau maybe). Contoh hasil \textit{chunking} ditunjukkan pada Tabel~\ref{tbl:chunking-pubmedqa}.
+
+\begin{table}[H]
+\centering
+\caption[Contoh hasil document-based chunking pada korpus PubMedQA]{Contoh hasil \textit{document-based chunking} pada korpus PubMedQA}
+\label{tbl:chunking-pubmedqa}
+\begin{tabularx}{\textwidth}{|c|c|X|c|}
+\hline
+\textbf{pubid} & \textbf{section} & \textbf{content (potongan teks)} & \textbf{decision} \\ \hline
+21645374 & BACKGROUND & Programmed cell death is the regulated death of cells within an organism\ldots & yes \\ \hline
+21645374 & METHODS & Cells of various stages were dissected from window stage leaves\ldots & yes \\ \hline
+21645374 & RESULTS & Mitochondria were highly dynamic during early stages of PCD\ldots & yes \\ \hline
+\end{tabularx}
+\end{table}
+
+Selain pemecahan dokumen, dilakukan pula proses \textit{tokenization} khusus untuk indeks BM25. \textit{Tokenizer} yang dipakai melakukan tiga langkah, yaitu (1) mengubah seluruh karakter menjadi huruf kecil, (2) menghapus tanda baca dengan ekspresi reguler \texttt{[\textasciicircum a-zA-Z0-9$\backslash$s]}, dan (3) memisahkan token berdasarkan spasi. \textit{Tokenization} ini berbeda dari \textit{embedding} semantik karena BM25 memerlukan token terpisah untuk menghitung \textit{term frequency}.
+
+% ==========================================
+\subsection{\textit{Indexing Pipeline}}
+\label{subsec:indexing-pipeline}
+
+\textit{Indexing pipeline} bertugas mengubah seluruh segmen dokumen menjadi dua bentuk indeks paralel yang akan dipakai oleh \textit{retrieval pipeline}. Kedua indeks dibangun satu kali saja dan disimpan secara persisten agar eksperimen berikutnya tidak perlu mengulang proses \textit{embedding}. Detail aliran proses ditunjukkan pada Gambar~\ref{fig:bab4-indexing}.
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.9\textwidth}{\centering\vspace{1cm}\textit{[Placeholder: bab4\_indexing\_pipeline.png. Detail Indexing Pipeline dengan dua jalur, yaitu jalur sparse (BM25 Tokenization, BM25Okapi, dan pubmedqa\_bm25.pkl) serta jalur dense (Embedding Model, Vector Embeddings, dan ChromaDB)]}\vspace{1cm}}}
+  \caption[Detail aliran proses Indexing Pipeline]{Detail aliran proses \textit{Indexing Pipeline}}
+  \label{fig:bab4-indexing}
+\end{figure}
+
+\textbf{Jalur sparse (BM25)}. Setiap segmen di-\textit{tokenize} dengan \textit{tokenizer} BM25 (lihat Subbab~\ref{subsec:data-preparation}). Seluruh daftar token kemudian dibangun menjadi indeks BM25Okapi melalui pustaka \texttt{rank\_bm25}. Hasilnya disimpan ke berkas \texttt{pubmedqa\_bm25.pkl} yang berisi objek BM25Okapi dan daftar dokumen dalam urutan asli.
+
+\textbf{Jalur dense (\textit{embeddings})}. Setiap segmen diubah menjadi vektor menggunakan model \textit{embedding} sesuai konfigurasi (lihat Subbab~\ref{subsec:opsi-model}). Vektor tersebut kemudian disimpan dalam basis data vektor \textbf{ChromaDB} dengan mode \textit{persistent client}. Konfigurasi basis data vektor ditunjukkan pada Tabel~\ref{tbl:vector-db-spec}.
+
+\begin{table}[H]
+\centering
+\caption[Spesifikasi basis data vektor untuk Dense Retrieval]{Spesifikasi basis data vektor untuk \textit{Dense Retrieval}}
+\label{tbl:vector-db-spec}
+\begin{tabular}{|p{3.2cm}|p{4.2cm}|c|p{3.0cm}|}
+\hline
+\textbf{Embedder} & \textbf{Path persisten} & \textbf{Dim.} & \textbf{Distance metric} \\ \hline
+nomic-embed-text & \texttt{pubmedqa\_\allowbreak chroma\_llama/} & 768 & cosine (HNSW) \\ \hline
+text-embedding-3-small & \texttt{pubmedqa\_chroma/} & 1536 & cosine (HNSW) \\ \hline
+\end{tabular}
+\end{table}
+
+\textit{Cosine similarity} dipilih sebagai \textit{distance metric} karena merupakan metrik standar untuk model \textit{embedding} teks. Algoritma indeks \textit{Hierarchical Navigable Small World} (HNSW) dipakai agar pencarian \textit{nearest neighbor} berjalan cepat walaupun jumlah vektor besar.
+
+% ==========================================
+\subsection{\textit{Retrieval Pipeline}}
+\label{subsec:retrieval-pipeline}
+
+\textit{Retrieval pipeline} bertugas mengambil dokumen yang paling relevan dengan pertanyaan pengguna. Sistem ini dirancang dalam empat varian sesuai kombinasi penggunaan QR dan CR. Empat varian tersebut dibahas berurutan pada subbab di bawah ini.
+
+\subsubsection{Konfigurasi \textit{Baseline} (Hybrid Retrieval)}
+
+Konfigurasi dasar memakai \textbf{hybrid retrieval} murni tanpa QR maupun CR. Aliran proses ditunjukkan pada Gambar~\ref{fig:bab4-baseline}.
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.9\textwidth}{\centering\vspace{1cm}\textit{[Placeholder: bab4\_retrieval\_baseline.png. Pertanyaan pengguna diproses paralel oleh BM25 Search top-50 dan Dense Search top-50, lalu digabungkan dengan RRF Fusion (k=60), dan menghasilkan Top-5 Chunks]}\vspace{1cm}}}
+  \caption[Detail aliran proses Retrieval Pipeline konfigurasi Baseline]{Detail aliran proses \textit{Retrieval Pipeline} konfigurasi \textit{Baseline}}
+  \label{fig:bab4-baseline}
+\end{figure}
+
+Proses \textit{retrieval} pada konfigurasi ini terdiri dari tiga langkah:
 
 \begin{enumerate}[1.]
-
-  \item \textit{Indexing Pipeline}
-
-  Tahap \textit{indexing} bertujuan membangun representasi teks korpus yang memungkinkan
-  pencarian berbasis relevansi. Pada penelitian ini, \textit{indexing} dilakukan menggunakan
-  metode BM25 yang bekerja pada level token. Proses ini terdiri dari dua langkah:
-
-  \begin{enumerate}[a.]
-    \item Tokenisasi korpus: setiap dokumen dalam korpus PubMedQA ditokenisasi dengan
-    memisahkan teks berdasarkan karakter spasi dan tanda baca. Teks diubah menjadi
-    huruf kecil sebelum tokenisasi untuk mengurangi sensitivitas terhadap kapitalisasi.
-
-    \item Pembangunan indeks BM25: token-token hasil tokenisasi dari seluruh dokumen
-    korpus digunakan untuk membangun objek indeks \textit{BM25Okapi}. Indeks ini
-    menyimpan statistik frekuensi token yang diperlukan untuk menghitung skor relevansi
-    pada saat \textit{retrieval}.
-  \end{enumerate}
-
-  \item \textit{Retrieval Pipeline}
-
-  Tahap \textit{retrieval} bertujuan mengambil dokumen yang paling relevan dari korpus
-  berdasarkan pertanyaan masukan. Proses ini terdiri dari tiga langkah:
-
-  \begin{enumerate}[a.]
-    \item Tokenisasi kueri: pertanyaan masukan ditokenisasi menggunakan prosedur yang
-    sama dengan tokenisasi korpus sehingga representasinya konsisten dengan indeks BM25.
-
-    \item Perhitungan skor BM25: skor relevansi dihitung untuk setiap dokumen dalam
-    korpus menggunakan fungsi \textit{get\_scores} pada indeks BM25. Skor ini
-    mencerminkan tingkat kesesuaian antara token kueri dan token dokumen,
-    mempertimbangkan frekuensi kemunculan dan panjang dokumen.
-
-    \item Seleksi \textit{top-k}: dokumen-dokumen diurutkan berdasarkan skor BM25 dari
-    tertinggi ke terendah, kemudian diambil 10 dokumen teratas sebagai konteks kandidat
-    yang akan diteruskan ke tahap generasi.
-  \end{enumerate}
-
-  \item \textit{Generation Pipeline}
-
-  Tahap \textit{generation} bertujuan menghasilkan jawaban berdasarkan pertanyaan dan
-  konteks yang telah diambil. Proses ini terdiri dari dua langkah:
-
-  \begin{enumerate}[a.]
-    \item Perumusan \textit{prompt}: tiga dokumen teratas dari hasil \textit{retrieval}
-    digabungkan sebagai konteks dalam \textit{prompt} yang diberikan kepada LLM. Selain
-    konteks, \textit{prompt} juga memuat instruksi agar LLM menjawab dalam format
-    \textit{yes}, \textit{no}, atau \textit{maybe} pada baris terakhir keluarannya.
-    Pembatasan format ini diperlukan agar keluaran LLM dapat diperbandingkan secara
-    langsung dengan label referensi \textit{final\_decision} pada dataset PubMedQA.
-
-    \item Penghasilan jawaban: LLM menerima \textit{prompt} yang telah dirumuskan dan
-    menghasilkan respons. Dari respons tersebut, label prediksi diekstraksi menggunakan
-    strategi tiga lapis, yaitu pencocokan baris terakhir, penelusuran kata kunci dalam
-    seluruh teks, dan ekstraksi berbasis ekspresi reguler.
-  \end{enumerate}
-
+  \item \textbf{BM25 Search top-50}. Pertanyaan di-\textit{tokenize} dengan \textit{tokenizer} BM25 yang sama seperti pada \textit{indexing}. Setelah itu sistem menghitung skor BM25 terhadap seluruh segmen pada indeks \textit{sparse} dan mengambil 50 segmen dengan skor tertinggi.
+  \item \textbf{Dense Search top-50}. Pertanyaan diubah menjadi vektor oleh model \textit{embedding} yang sama dengan \textit{indexing}. ChromaDB kemudian mengembalikan 50 segmen dengan \textit{cosine similarity} tertinggi.
+  \item \textbf{RRF Fusion}. Kedua daftar peringkat (BM25 dan Dense) digabungkan menggunakan rumus \textit{Reciprocal Rank Fusion} (RRF):
+  \[
+    \mathrm{RRF}(d) = \sum_{r \in R} \frac{1}{k + \mathrm{rank}_r(d)}
+  \]
+  dengan $k = 60$ (nilai standar literatur~\parencite{cormack2009reciprocal}) dan $R$ adalah himpunan dua daftar peringkat. Lima segmen dengan skor RRF tertinggi diambil sebagai konteks akhir untuk \textit{generation pipeline}.
 \end{enumerate}
 
+\subsubsection{Konfigurasi + \textit{Query Rewriting} (QR)}
 
-\subsubsection{Desain Komponen Mitigasi Halusinasi}
-\label{subsubsec:desain-komponen-mitigasi}
+Konfigurasi QR menambahkan modul \textit{Query Rewriter} berbasis LLM \textit{sebelum} tahap \textit{hybrid retrieval}. Aliran proses ditunjukkan pada Gambar~\ref{fig:bab4-qr}.
 
-Tiga komponen mitigasi halusinasi dirancang untuk diintegrasikan ke dalam \textit{pipeline}
-RAG \textit{baseline} pada konfigurasi yang relevan. Setiap komponen bekerja pada
-tahap yang berbeda dalam \textit{pipeline}, sehingga bersifat saling melengkapi.
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.9\textwidth}{\centering\vspace{1cm}\textit{[Placeholder: bab4\_retrieval\_qr.png. Pertanyaan asli diproses oleh Query Rewriter (LLM, temp=0.3), menghasilkan Rewritten Query, lalu masuk ke BM25 Search dan Dense Search top-50, RRF Fusion, dan menghasilkan Top-5 Chunks. Catatan: tahap Generation tetap memakai pertanyaan asli.]}\vspace{1cm}}}
+  \caption[Detail aliran proses Retrieval Pipeline + Query Rewriting]{Detail aliran proses \textit{Retrieval Pipeline} + \textit{Query Rewriting}}
+  \label{fig:bab4-qr}
+\end{figure}
+
+\textit{Query Rewriter} menerima pertanyaan mentah dan menghasilkan versi yang sudah diperluas dengan istilah medis baku. Sebagai contoh, singkatan ``MI'' diperluas menjadi ``\textit{myocardial infarction}''. LLM yang sama dengan tahap \textit{generation} dipakai agar konsisten, namun dengan \textit{temperature} 0.3 untuk memberi sedikit ruang variasi parafrasa. \textbf{Pertanyaan hasil rewrite hanya dipakai untuk \textit{retrieval}}. Tahap \textit{generation} tetap memakai pertanyaan asli sehingga jawaban akhir menjawab pertanyaan pengguna apa adanya.
+
+\subsubsection{Konfigurasi + \textit{Context Reranking} (CR)}
+
+Konfigurasi CR mempertahankan \textit{hybrid retrieval} dasar, namun memperbanyak kandidat hasil RRF dari 5 menjadi \textbf{20 kandidat}, lalu mengurutkan ulang kandidat tersebut menggunakan model \textit{CrossEncoder}. Aliran proses ditunjukkan pada Gambar~\ref{fig:bab4-cr}.
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.9\textwidth}{\centering\vspace{1cm}\textit{[Placeholder: bab4\_retrieval\_cr.png. Pertanyaan pengguna diproses paralel oleh BM25 Search dan Dense Search top-50, lalu RRF Fusion (k=60) mengambil 20 kandidat, kemudian CrossEncoder Reranker (ms-marco-MiniLM-L-6-v2) memilih Top-5 Chunks akhir]}\vspace{1cm}}}
+  \caption[Detail aliran proses Retrieval Pipeline + Context Reranking]{Detail aliran proses \textit{Retrieval Pipeline} + \textit{Context Reranking}}
+  \label{fig:bab4-cr}
+\end{figure}
+
+Model \textit{CrossEncoder} \texttt{ms-marco-\allowbreak MiniLM-L-6-v2} menerima pasangan pertanyaan dan dokumen, lalu mengeluarkan skor relevansi yang lebih akurat dibandingkan \textit{cosine similarity} pada \textit{dense retrieval}. Hal ini terjadi karena model membaca pertanyaan dan dokumen secara bersamaan dalam satu \textit{forward pass}. Lima segmen dengan skor tertinggi diambil sebagai konteks akhir.
+
+\subsubsection{Konfigurasi + QR + CR}
+
+Konfigurasi terakhir menggabungkan kedua teknik mitigasi, yaitu modul QR di awal \textit{pipeline} dan modul CR di akhir \textit{pipeline}. Aliran proses ditunjukkan pada Gambar~\ref{fig:bab4-qrcr}.
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.9\textwidth}{\centering\vspace{1cm}\textit{[Placeholder: bab4\_retrieval\_qrcr.png. Pertanyaan pengguna diproses Query Rewriter, menghasilkan Rewritten Query, lalu BM25 dan Dense, RRF top-20, CrossEncoder Reranker, dan menghasilkan Top-5 Chunks. Tahap Generation tetap memakai pertanyaan asli.]}\vspace{1cm}}}
+  \caption[Detail aliran proses Retrieval Pipeline + QR + CR]{Detail aliran proses \textit{Retrieval Pipeline} + QR + CR}
+  \label{fig:bab4-qrcr}
+\end{figure}
+
+Konfigurasi ini diharapkan memberikan kualitas \textit{retrieval} terbaik karena memperbaiki dua titik penting sekaligus, yaitu kualitas pertanyaan di awal melalui QR dan kualitas pemilihan konteks di akhir melalui CR.
+
+% ==========================================
+\subsection{\textit{Generation Pipeline}}
+\label{subsec:generation-pipeline}
+
+\textit{Generation pipeline} menyusun \textit{prompt} berdasarkan pertanyaan asli pengguna dan lima segmen konteks hasil \textit{retrieval}. \textit{Prompt} tersebut kemudian dikirim ke LLM untuk menghasilkan jawaban. \textit{Pipeline} ini sama untuk seluruh empat konfigurasi \textit{retrieval}.
+
+\textit{Prompt template} dirancang dengan tiga prinsip utama, yaitu (1) instruksi tegas agar LLM hanya memakai informasi dari konteks yang diberikan, (2) panduan agar LLM memilih label \texttt{yes}, \texttt{no}, atau \texttt{maybe} secara konsisten, dan (3) format keluaran yang teratur agar label mudah diekstrak. Detail \textit{prompt template} ditunjukkan pada Tabel~\ref{tbl:prompt-generation}.
+
+\begin{table}[H]
+\centering
+\caption[Prompt template untuk Generation Pipeline]{\textit{Prompt template} untuk \textit{Generation Pipeline}}
+\label{tbl:prompt-generation}
+\begin{tabular}{|p{12.5cm}|}
+\hline
+\textbf{GENERATION\_PROMPT} \\ \hline
+\ttfamily\footnotesize
+You are a medical research assistant. Answer a biomedical yes/no/maybe question based solely on the provided scientific abstracts.\par\medskip
+Context from medical literature:\par
+\{context\}\par\medskip
+Question: \{question\}\par\medskip
+Instructions:\par
+\quad\quad - Carefully read the context and assess whether it supports or refutes the question.\par
+\quad\quad - Provide a brief explanation (2 to 3 sentences) using ONLY the information above.\par
+\quad\quad - End your response with EXACTLY ONE of these words on its own line: yes, no, or maybe.\par
+\quad\quad\quad\quad - yes\quad\,: the evidence supports the hypothesis, even if not perfectly conclusive\par
+\quad\quad\quad\quad - no\quad\,\,: the evidence refutes or does not support the hypothesis\par
+\quad\quad\quad\quad - maybe : ONLY if the evidence is directly contradictory, or contains no relevant info\par
+\quad\quad - IMPORTANT: If evidence leans in one direction, choose yes or no.\par\medskip
+Answer: \\ \hline
+\end{tabular}
+\end{table}
+
+Setelah jawaban dihasilkan, fungsi \textit{label extractor} membaca baris terakhir keluaran LLM dan mencocokkannya dengan tiga label valid (\texttt{yes}, \texttt{no}, atau \texttt{maybe}). Apabila format keluaran tidak sesuai, label \texttt{maybe} dipakai sebagai cadangan agar tidak ada sampel yang hilang.
+
+% ==========================================
+\section{Konfigurasi Model}
+\label{sec:konfigurasi-model}
+
+Sistem RAG-LLM membutuhkan tiga jenis model, yaitu \textit{embedding model} untuk \textit{dense retrieval}, \textit{reranker model} untuk \textit{context reranking}, dan \textit{Large Language Model} (LLM) untuk \textit{query rewriting} dan pembuatan jawaban. Subbab ini menjelaskan opsi model yang dipertimbangkan dan daftar konfigurasi yang akan dibandingkan.
+
+% ==========================================
+\subsection{Opsi Model}
+\label{subsec:opsi-model}
+
+Pemilihan model didasarkan pada empat kriteria, yaitu (1) kualitas keluaran pada bidang biomedis, (2) ketersediaan API atau model lokal yang stabil, (3) biaya operasional yang sesuai dengan anggaran tugas akhir, dan (4) kemampuan menangani konteks yang panjang. Berdasarkan kriteria tersebut, dipilih opsi model yang ditunjukkan pada Tabel~\ref{tbl:opsi-model}.
+
+\begin{table}[H]
+\centering
+\caption{Opsi model dalam implementasi sistem RAG-LLM}
+\label{tbl:opsi-model}
+\begin{tabularx}{\textwidth}{|c|p{2.5cm}|>{\raggedright\arraybackslash}X|p{3.5cm}|}
+\hline
+\textbf{No.} & \textbf{Jenis Model} & \textbf{Opsi Model} & \textbf{Penyedia} \\ \hline
+1 & \textit{Embedding} & nomic-embed-text (768d) & Ollama (lokal) \\ \cline{3-4}
+  &                    & text-embedding-3-small (1536d) & OpenAI API \\ \hline
+2 & \textit{Reranker}  & ms-marco-MiniLM-L-6-v2 & SentenceTransformers \\ \hline
+3 & LLM Generator      & llama-3.3-70b-instruct & OpenRouter API \\ \cline{3-4}
+  &                    & gpt-4.1-mini & OpenAI API \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Justifikasi pemilihan.} Model \textit{embedding} \texttt{nomic-embed-text} dipilih sebagai pasangan model Llama karena keduanya dapat dijalankan secara lokal melalui Ollama, sehingga tidak ada biaya API maupun keterlambatan jaringan. Model \textit{embedding} \texttt{text-embedding-3-small} dipilih untuk pasangan GPT-4.1-mini karena keduanya berasal dari penyedia yang sama, yaitu OpenAI, dan terbukti cocok dipakai bersama dalam berbagai studi RAG. Model \textit{reranker} \texttt{ms-marco-MiniLM-L-6-v2} dipilih karena ukurannya kecil (22 MB), berjalan cepat di CPU, dan secara umum kuat untuk \textit{passage reranking} lintas bidang. Untuk LLM generator, Llama 3.3 70B dipilih sebagai contoh model \textit{open-source} berukuran besar yang diakses melalui API OpenRouter, sedangkan GPT-4.1-mini dipilih sebagai contoh model \textit{closed-source} yang murah dengan kualitas mengikuti instruksi yang baik.
+
+% ==========================================
+\subsection{Matriks Konfigurasi yang Dibandingkan}
+\label{subsec:matriks-konfigurasi}
+
+Untuk mengukur kontribusi setiap teknik mitigasi terhadap penurunan halusinasi pada masing-masing LLM, dilakukan perbandingan \textbf{delapan konfigurasi} sebagai hasil kombinasi empat teknik \textit{retrieval} (\textit{Baseline}, +QR, +CR, dan +QR+CR) dengan dua LLM utama (Llama 3.3 70B dan GPT-4.1-mini). Daftar konfigurasi ditunjukkan pada Tabel~\ref{tbl:matriks-konfigurasi}.
+
+\begin{table}[H]
+\centering
+\caption{Matriks konfigurasi sistem RAG-LLM yang dibandingkan}
+\label{tbl:matriks-konfigurasi}
+\begin{tabular}{|p{3cm}|p{2.6cm}|p{3cm}|c|c|}
+\hline
+\textbf{Konfigurasi} & \textbf{LLM Generator} & \textbf{Embedder} & \textbf{QR} & \textbf{CR} \\ \hline
+baseline\_llama  & Llama 3.3 70B & nomic-embed-text & Tidak & Tidak \\ \hline
+qr\_llama        & Llama 3.3 70B & nomic-embed-text & Ya    & Tidak \\ \hline
+cr\_llama        & Llama 3.3 70B & nomic-embed-text & Tidak & Ya    \\ \hline
+qr\_cr\_llama    & Llama 3.3 70B & nomic-embed-text & Ya    & Ya    \\ \hline
+baseline\_openai & GPT-4.1-mini  & text-embedding-3-small & Tidak & Tidak \\ \hline
+qr\_openai       & GPT-4.1-mini  & text-embedding-3-small & Ya    & Tidak \\ \hline
+cr\_openai       & GPT-4.1-mini  & text-embedding-3-small & Tidak & Ya    \\ \hline
+qr\_cr\_openai   & GPT-4.1-mini  & text-embedding-3-small & Ya    & Ya    \\ \hline
+\end{tabular}
+\end{table}
+
+Seluruh konfigurasi memakai \textit{retriever} dasar yang sama (\textbf{hybrid BM25 dan Dense melalui RRF}), sehingga perbedaan hasil dapat langsung dikaitkan dengan kontribusi teknik QR, CR, atau kombinasi keduanya. Hasil eksperimen untuk seluruh konfigurasi dibahas pada Bab~\ref{chap:evaluasi}.
+
+% ==========================================
+\section{Hyperparameter dan Setup Eksperimen}
+\label{sec:hyperparameter-setup}
+
+Subbab ini menjelaskan nilai \textit{hyperparameter} yang dipakai pada setiap komponen \textit{pipeline} serta setup evaluasi. Seluruh nilai dipilih berdasarkan rekomendasi literatur atau hasil studi pustaka pada Bab~\ref{chap:studi}, dan ditetapkan sama untuk seluruh delapan konfigurasi agar perbandingan bersifat setara. Daftar lengkap ditunjukkan pada Tabel~\ref{tbl:hyperparameter}.
+
+\begin{table}[H]
+\centering
+\caption{Hyperparameter dan setup eksperimen}
+\label{tbl:hyperparameter}
+\begin{tabular}{|p{3cm}|p{4.2cm}|c|p{3.5cm}|}
+\hline
+\textbf{Komponen} & \textbf{Parameter} & \textbf{Nilai} & \textbf{Catatan} \\ \hline
+BM25     & top-K            & 50    & Sebelum RRF fusion \\ \hline
+Dense    & top-K            & 50    & Sebelum RRF fusion \\ \hline
+RRF      & konstanta $k$    & 60    & Standar literatur \\ \hline
+Final    & top-K (tanpa CR) & 5     & Diteruskan ke generator \\ \hline
+CR       & jumlah kandidat  & 20    & Sebelum reranking \\ \hline
+CR       & top-K final      & 5     & Setelah reranking \\ \hline
+Generator & temperature     & 0.0   & Keluaran konsisten \\ \hline
+Generator & max\_tokens     & 300   & Cukup untuk 2 sampai 3 kalimat dan label \\ \hline
+QR       & temperature      & 0.3   & Variasi parafrasa terbatas \\ \hline
+QR       & max\_tokens      & 150   & Cukup untuk \textit{rewritten query} \\ \hline
+Sampling & jumlah sampel    & 500   & Konsisten antar konfigurasi \\ \hline
+Sampling & seed             & 42    & Untuk reproduktibilitas \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Evaluator.} Setiap konfigurasi dievaluasi dengan metrik kuantitatif dalam dua tahap. Tahap pertama (\textit{Phase 1}) menghitung \textbf{Label Accuracy} dengan membandingkan label prediksi sistem (\texttt{yes}, \texttt{no}, atau \texttt{maybe}) terhadap \textit{ground truth} PubMedQA. Tahap kedua (\textit{Phase 2}) memakai \textbf{evaluator kustom 4 metrik} yang merupakan adaptasi dari kerangka RAGAS dengan jaminan zero-NaN, yaitu (1) \textit{faithfulness} (kesesuaian klaim jawaban dengan konteks), (2) \textit{context recall} (cakupan informasi referensi oleh konteks), (3) \textit{answer relevancy} (relevansi jawaban terhadap pertanyaan), dan (4) \textit{context precision} (ketepatan konteks dalam mendukung jawaban). Detail metrik dan implementasinya dijelaskan pada Bab~\ref{chap:evaluasi}.
+
+% ==========================================
+\section{Pengembangan Lanjutan}
+\label{sec:future-work}
+
+Beberapa arah pengembangan dipertimbangkan namun berada di luar cakupan eksperimen utama tugas akhir ini. Pengembangan tersebut dijelaskan sebagai \textit{future work} berikut:
 
 \begin{enumerate}[1.]
-
-  \item \textit{Query Rewriting}
-
-  Komponen \textit{query rewriting} bertujuan memperjelas dan memperbaiki struktur
-  pertanyaan pengguna sebelum proses pencarian dokumen dilakukan. Pertanyaan asli pada
-  dataset biomedis seperti PubMedQA sering kali mengandung istilah teknis yang ambigu
-  atau kurang eksplisit dalam menyatakan kebutuhan informasi. Perbaikan kueri diharapkan
-  meningkatkan presisi dokumen yang diambil oleh BM25, sehingga konteks yang disediakan
-  untuk LLM lebih relevan.
-
-  Komponen ini diintegrasikan di awal \textit{pipeline}, sebelum tahap \textit{retrieval}.
-  Proses \textit{query rewriting} dirancang sebagai berikut:
-
-  \begin{enumerate}[a.]
-    \item Perumusan \textit{prompt} penulisan ulang: pertanyaan asli diberikan kepada LLM
-    bersama instruksi untuk menghasilkan versi pertanyaan yang lebih jelas, lebih
-    eksplisit dalam menyatakan fokus informasi yang dicari, dan lebih sesuai dengan
-    terminologi ilmiah biomedis.
-
-    \item Penggantian kueri: pertanyaan hasil penulisan ulang menggantikan pertanyaan asli
-    pada seluruh tahap \textit{retrieval} berikutnya. Pertanyaan asli tetap disimpan dan
-    digunakan pada tahap evaluasi sebagai konteks penilaian relevansi jawaban.
-  \end{enumerate}
-
-  Aliran proses \textit{pipeline} dengan \textit{query rewriting} diilustrasikan pada
-  Gambar~\ref{fig:pipeline-qr}.
-
-  % TODO: Buat diagram pipeline + QR dan simpan di image/bab4/pipeline_qr.png
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{image/bab4/pipeline_qr.png}
-    \caption{Diagram Aliran \textit{Pipeline} RAG dengan \textit{Query Rewriting}}
-    \label{fig:pipeline-qr}
-  \end{figure}
-
-
-  \item \textit{Context Reranking}
-
-  Komponen \textit{context reranking} bertujuan memilih ulang urutan dokumen yang telah
-  diambil oleh BM25 berdasarkan relevansi semantik yang lebih presisi. BM25 mengandalkan
-  kecocokan token yang bersifat leksikal, sehingga dokumen yang relevan secara makna
-  namun menggunakan terminologi berbeda dapat memperoleh skor rendah. Sebaliknya, dokumen
-  yang mengandung banyak token yang sama dengan kueri tetapi tidak relevan secara
-  kontekstual dapat memperoleh skor tinggi. Mekanisme \textit{reranking} berbasis
-  \textit{cross-encoder} dapat mengoreksi ketidaktepatan ini.
-
-  Komponen ini diintegrasikan antara tahap \textit{retrieval} dan tahap \textit{generation}.
-  Proses \textit{context reranking} dirancang sebagai berikut:
-
-  \begin{enumerate}[a.]
-    \item Pemberian skor \textit{cross-encoder}: sepuluh dokumen teratas hasil BM25
-    dipasangkan satu per satu dengan kueri, kemudian masing-masing pasangan diberi
-    skor relevansi oleh model \textit{cross-encoder}. Berbeda dengan \textit{bi-encoder},
-    model \textit{cross-encoder} memproses pasangan kueri dan dokumen secara bersamaan
-    sehingga menghasilkan penilaian relevansi yang lebih akurat.
-
-    \item Pengurutan ulang dan seleksi: dokumen-dokumen diurutkan ulang berdasarkan skor
-    \textit{cross-encoder} dari tertinggi ke terendah. Tiga dokumen dengan skor tertinggi
-    dipilih sebagai konteks akhir yang diteruskan ke tahap \textit{generation}.
-  \end{enumerate}
-
-  Aliran proses \textit{pipeline} dengan \textit{context reranking} diilustrasikan pada
-  Gambar~\ref{fig:pipeline-cr}.
-
-  % TODO: Buat diagram pipeline + CR dan simpan di image/bab4/pipeline_cr.png
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{image/bab4/pipeline_cr.png}
-    \caption{Diagram Aliran \textit{Pipeline} RAG dengan \textit{Context Reranking}}
-    \label{fig:pipeline-cr}
-  \end{figure}
-
-
-  \item \textit{Active Hallucination Detection}
-
-  % TODO: Lengkapi bagian ini setelah rancangan Active Hallucination Detection
-  %       telah ditetapkan. Jelaskan mekanisme deteksi, model yang digunakan,
-  %       threshold, dan cara integrasi ke dalam pipeline.
-
-  Komponen \textit{active hallucination detection} bertujuan memeriksa kesesuaian antara
-  jawaban yang dihasilkan LLM dengan konteks yang tersedia sebelum jawaban tersebut
-  dianggap final. Deteksi dilakukan secara aktif, artinya proses verifikasi berjalan
-  setelah jawaban dihasilkan tetapi sebelum hasil evaluasi dicatat. Rancangan detail
-  komponen ini akan dijelaskan lebih lanjut setelah pengujian awal komponen
-  \textit{query rewriting} dan \textit{context reranking} selesai dilakukan.
-
-  Aliran proses \textit{pipeline} dengan \textit{active hallucination detection}
-  diilustrasikan pada Gambar~\ref{fig:pipeline-ad}.
-
-  % TODO: Buat diagram pipeline + AD dan simpan di image/bab4/pipeline_ad.png
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{image/bab4/pipeline_ad.png}
-    \caption{Diagram Aliran \textit{Pipeline} RAG dengan \textit{Active Hallucination Detection}}
-    \label{fig:pipeline-ad}
-  \end{figure}
-
+  \item \textbf{\textit{Active Hallucination Detection} (AHD)}, yaitu penambahan modul setelah tahap \textit{generation} yang menilai tingkat keyakinan keluaran LLM. Apabila ada bagian yang berpotensi halusinatif, modul ini akan memperbaikinya secara terbatas pada bagian yang bermasalah (\textit{span-level repair}) atau menghasilkan ulang seluruh jawaban dengan instruksi yang lebih ketat (\textit{strict regeneration}). Pendekatan ini menjanjikan untuk menutup kelemahan tahap \textit{generation} yang tidak dapat diatasi oleh QR maupun CR.
+  \item \textbf{Validasi lintas penyedia (\textit{multi-provider})}, yaitu uji coba memakai model Claude Haiku 4.5 dari Anthropic pada konfigurasi \textit{baseline}. Uji coba ini bertujuan memvalidasi sifat \textit{provider-agnostic} dari \textit{pipeline}. Pembahasan hasil uji coba tersebut disertakan pada Bab~\ref{chap:evaluasi} sebagai studi tambahan.
+  \item \textbf{Validasi lintas bidang (\textit{cross-domain})}, yaitu evaluasi pada dataset di luar bidang biomedis seperti ASQA atau Natural Questions. Tujuannya adalah menguji apakah keunggulan teknik QR dan CR konsisten saat dipakai pada bidang lain.
 \end{enumerate}
 
-
-% ============================================================================================
-\section{Hasil Desain}
-\label{sec:hasil-desain}
-% ============================================================================================
-
-Bagian ini menyajikan hasil nyata dari setiap tahapan desain yang telah dijelaskan
-pada bagian IV.1. Hasil mencakup kondisi dataset setelah prapemrosesan, keluaran
-konkret dari setiap komponen \textit{pipeline}, serta verifikasi bahwa seluruh
-konfigurasi sistem dapat berjalan dengan benar.
-
-
-% --------------------------------------------------------------------------------------------
-\subsection{Hasil Persiapan Data}
-\label{subsec:hasil-data-preparation}
-% --------------------------------------------------------------------------------------------
-
-Dataset PubMedQA subset \textit{pqa\_labeled} dimuat dari repositori Hugging Face
-menggunakan identitas dataset \texttt{qiaojin/PubMedQA} dengan konfigurasi
-\texttt{pqa\_labeled}. Statistik distribusi dataset disajikan pada
-Tabel~\ref{tbl:statistik-dataset}.
-
-\begin{table}[H]
-  \centering
-  \caption{Statistik Dataset PubMedQA \textit{pqa\_labeled}}
-  \label{tbl:statistik-dataset}
-  \begin{tabular}{|l|c|}
-    \hline
-    \textbf{Keterangan} & \textbf{Nilai} \\
-    \hline
-    Total entri                        & 1.000 \\
-    \hline
-    Entri berlabel \textit{yes}        & [TODO: isi setelah eksplorasi data] \\
-    \hline
-    Entri berlabel \textit{no}         & [TODO: isi setelah eksplorasi data] \\
-    \hline
-    Entri berlabel \textit{maybe}      & [TODO: isi setelah eksplorasi data] \\
-    \hline
-    Rata-rata jumlah paragraf konteks  & [TODO: isi setelah eksplorasi data] \\
-    \hline
-    Rata-rata panjang teks dokumen (token) & [TODO: isi setelah eksplorasi data] \\
-    \hline
-    Jumlah total dokumen dalam indeks BM25 & 1.000 \\
-    \hline
-  \end{tabular}
-\end{table}
-
-Tabel~\ref{tbl:contoh-data} menunjukkan contoh satu entri dari dataset PubMedQA setelah
-fitur yang diperlukan diekstraksi dan dokumen disatukan.
-
-\begin{table}[H]
-  \centering
-  \caption{Contoh Entri Dataset PubMedQA Setelah Prapemrosesan}
-  \label{tbl:contoh-data}
-  \begin{tabular}{|p{3cm}|p{10cm}|}
-    \hline
-    \textbf{Fitur} & \textbf{Nilai} \\
-    \hline
-    \textit{question}      & [TODO: salin satu pertanyaan contoh dari dataset] \\
-    \hline
-    \textit{context} (dokumen gabungan) &
-    [TODO: salin beberapa kalimat awal dari konteks gabungan] \\
-    \hline
-    \textit{final\_decision} & [TODO: yes / no / maybe] \\
-    \hline
-  \end{tabular}
-\end{table}
-
-
-% --------------------------------------------------------------------------------------------
-\subsection{Hasil Pemodelan}
-\label{subsec:hasil-modeling}
-% --------------------------------------------------------------------------------------------
-
-
-\subsubsection{Hasil \textit{Pipeline} RAG \textit{Baseline}}
-\label{subsubsec:hasil-pipeline-baseline}
-
-\textit{Pipeline} RAG \textit{baseline} diimplementasikan dan diuji menggunakan sampel
-pertanyaan dari dataset PubMedQA. Proses \textit{retrieval} menggunakan BM25 berhasil
-mengambil dokumen yang relevan berdasarkan kesesuaian token, dan tahap \textit{generation}
-menghasilkan jawaban dalam format \textit{yes}, \textit{no}, atau \textit{maybe} sesuai
-instruksi \textit{prompt}. Tabel~\ref{tbl:contoh-output-baseline} menunjukkan contoh
-keluaran \textit{pipeline} \textit{baseline} untuk satu pertanyaan sampel.
-
-\begin{table}[H]
-  \centering
-  \caption{Contoh Keluaran \textit{Pipeline} RAG \textit{Baseline}}
-  \label{tbl:contoh-output-baseline}
-  \begin{tabular}{|p{3cm}|p{10cm}|}
-    \hline
-    \textbf{Komponen} & \textbf{Keluaran} \\
-    \hline
-    \textit{Query} masukan &
-    [TODO: salin pertanyaan contoh] \\
-    \hline
-    Dokumen terambil (ringkasan) &
-    [TODO: ringkasan singkat 3 dokumen teratas dari BM25] \\
-    \hline
-    Jawaban LLM &
-    [TODO: salin jawaban yang dihasilkan LLM] \\
-    \hline
-    Label prediksi &
-    [TODO: yes / no / maybe] \\
-    \hline
-    Label referensi &
-    [TODO: label ground truth dari dataset] \\
-    \hline
-  \end{tabular}
-\end{table}
-
-
-\subsubsection{Hasil Komponen Mitigasi Halusinasi}
-\label{subsubsec:hasil-komponen-mitigasi}
-
-Setiap komponen mitigasi halusinasi diuji secara terpisah untuk memverifikasi
-bahwa integrasinya ke dalam \textit{pipeline} berjalan dengan benar sebelum
-evaluasi skala penuh dilakukan.
-
-\begin{enumerate}[1.]
-
-  \item Hasil \textit{Query Rewriting}
-
-  Komponen \textit{query rewriting} diuji dengan memberikan pertanyaan dari dataset
-  PubMedQA kepada LLM untuk ditulis ulang. Gambar~\ref{fig:contoh-qr} menunjukkan
-  perbandingan antara pertanyaan asli dan pertanyaan hasil penulisan ulang pada
-  beberapa sampel.
-
-  % TODO: Buat gambar atau tabel perbandingan original query vs rewritten query
-  %       Simpan di image/bab4/contoh_qr.png
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{image/bab4/contoh_qr.png}
-    \caption{Contoh Perbandingan Pertanyaan Asli dan Hasil \textit{Query Rewriting}}
-    \label{fig:contoh-qr}
-  \end{figure}
-
-  Pertanyaan yang dihasilkan menunjukkan perbaikan dalam hal kejelasan terminologi
-  dan eksplisitas fokus informasi yang dicari. Perubahan ini diharapkan meningkatkan
-  skor BM25 untuk dokumen-dokumen yang relevan secara semantik.
-
-
-  \item Hasil \textit{Context Reranking}
-
-  Komponen \textit{context reranking} diuji dengan memberikan sepuluh dokumen teratas
-  hasil BM25 kepada model \textit{cross-encoder} untuk diberi skor ulang.
-  Gambar~\ref{fig:contoh-cr} menunjukkan perbandingan urutan dokumen sebelum dan
-  sesudah proses \textit{reranking} untuk satu pertanyaan sampel.
-
-  % TODO: Buat tabel atau gambar perbandingan urutan dokumen sebelum/sesudah reranking
-  %       Tampilkan: rank BM25, rank CrossEncoder, skor masing-masing, ringkasan dokumen
-  %       Simpan di image/bab4/contoh_cr.png
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{image/bab4/contoh_cr.png}
-    \caption{Contoh Perubahan Urutan Dokumen Sebelum dan Sesudah \textit{Context Reranking}}
-    \label{fig:contoh-cr}
-  \end{figure}
-
-  Perubahan urutan yang terjadi menunjukkan bahwa model \textit{cross-encoder} berhasil
-  mengidentifikasi dokumen yang lebih relevan secara semantik dibandingkan pemeringkatan
-  awal BM25, terutama pada kasus di mana dokumen relevan menggunakan terminologi yang
-  berbeda dari kueri.
-
-
-  \item Hasil \textit{Active Hallucination Detection}
-
-  % TODO: Lengkapi bagian ini setelah komponen Active Hallucination Detection
-  %       diimplementasikan. Sertakan: contoh jawaban yang terdeteksi halusinatif,
-  %       contoh jawaban yang lolos deteksi, dan mekanisme penanganan yang diterapkan.
-
-  Pengujian komponen \textit{active hallucination detection} akan dilaporkan setelah
-  implementasi komponen ini selesai. Hasil pengujian awal akan disajikan pada bagian ini
-  bersama contoh kasus deteksi yang berhasil dan tidak berhasil.
-
-\end{enumerate}
-
-
-\subsubsection{Hasil Implementasi \textit{Pipeline} Terpadu}
-\label{subsubsec:hasil-implementasi-pipeline}
-
-% TODO: Lengkapi bagian ini setelah seluruh komponen diimplementasikan.
-%       Sertakan: tabel perbandingan output 5 konfigurasi untuk 3-5 sampel query,
-%       diskusi kualitatif perbedaan yang terlihat antar konfigurasi, dan
-%       screenshot atau log notebook sebagai bukti pipeline berjalan penuh.
-
-Setelah seluruh komponen mitigasi halusinasi berhasil diimplementasikan dan diverifikasi
-secara terpisah, dilakukan pengujian integrasi pada konfigurasi \textit{combined} yang
-mengaktifkan ketiga komponen sekaligus. Hasil pengujian awal ditunjukkan pada
-Tabel~\ref{tbl:contoh-output-gabungan}.
-
-\begin{table}[H]
-  \centering
-  \caption{Contoh Perbandingan Keluaran Lima Konfigurasi untuk Satu Pertanyaan Sampel}
-  \label{tbl:contoh-output-gabungan}
-  \begin{tabular}{|l|p{3.5cm}|p{2cm}|p{2cm}|}
-    \hline
-    \textbf{Konfigurasi} &
-    \textbf{Ringkasan Jawaban LLM} &
-    \textbf{Label Prediksi} &
-    \textbf{Label Referensi} \\
-    \hline
-    \textit{Baseline}      & [TODO] & [TODO] & [TODO] \\
-    \hline
-    \textit{Baseline} + QR & [TODO] & [TODO] & [TODO] \\
-    \hline
-    \textit{Baseline} + CR & [TODO] & [TODO] & [TODO] \\
-    \hline
-    \textit{Baseline} + AD & [TODO] & [TODO] & [TODO] \\
-    \hline
-    \textit{Combined}      & [TODO] & [TODO] & [TODO] \\
-    \hline
-  \end{tabular}
-\end{table}
+Ketiga pengembangan tersebut dapat menjadi titik awal penelitian lanjutan untuk memperluas kontribusi tugas akhir ini.

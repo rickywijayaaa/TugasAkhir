@@ -1,6 +1,7 @@
-\cleardoublepage % memastikan bab baru dimulai di halaman ganjil (kanan)
+% ==========================================
+% BAB I PENDAHULUAN
+% ==========================================
 \chapter{PENDAHULUAN}
-\label{chap:pendahuluan}
 
 % --- 1.1 Latar Belakang ---
 \section{Latar Belakang}
@@ -15,7 +16,7 @@ Berbagai insiden tersebut menggambarkan bahwa \textit{hallucination} bukan hanya
 
 Secara teoretis, RAG dapat mengurangi \textit{hallucination} karena model menjawab berdasarkan dokumen yang dapat diverifikasi. Namun dalam praktiknya, RAG tetap dapat menghasilkan informasi keliru apabila dokumen yang diperoleh tidak relevan, ambigu, atau tidak sesuai dengan maksud pertanyaan. Dengan demikian, kualitas jawaban tidak hanya bergantung pada kemampuan model generatif, tetapi juga pada proses pencarian dan pemilihan konteks yang tepat.
 
-Tinjauan terbaru oleh Zhang (2025) berjudul \textit{"Hallucination Mitigation for Retrieval-Augmented Large Language Models: A Review"} memetakan berbagai penyebab \textit{hallucination} dalam RAG serta merangkum strategi mitigasinya \parencite{math2024hallucination}. Meskipun memberikan gambaran yang komprehensif, tinjauan tersebut menunjukkan bahwa solusi yang ada saat ini masih berdiri sendiri dan belum digabungkan dalam satu sistem terpadu.
+Tinjauan terbaru oleh Zhang (2025) berjudul \textit{“Hallucination Mitigation for Retrieval-Augmented Large Language Models: A Review”} memetakan berbagai penyebab \textit{hallucination} dalam RAG serta merangkum strategi mitigasinya \parencite{math2024hallucination}. Meskipun memberikan gambaran yang komprehensif, tinjauan tersebut menunjukkan bahwa solusi yang ada saat ini masih berdiri sendiri dan belum digabungkan dalam satu sistem terpadu.
 
 Sebagian besar studi hanya menerapkan satu jenis mitigasi pada satu tahap tertentu. Akibatnya, belum terdapat implementasi yang mengintegrasikan beberapa teknik mitigasi dalam satu alur menyeluruh untuk menekan \textit{hallucination} secara lebih efektif. Kesenjangan ini menjadi penting untuk diatasi, terutama pada bidang yang membutuhkan tingkat kebenaran informasi yang tinggi, seperti layanan publik, kesehatan, dan penegakan hukum.
 
@@ -39,7 +40,6 @@ Tujuan dari tugas akhir ini adalah sebagai berikut:
     \item Mengevaluasi dampak mitigasi berdasarkan penurunan tingkat \textit{hallucination} serta skor kinerja model menggunakan metrik kuantitatif seperti \textit{accuracy}, \textit{precision}, \textit{recall}, dan \textit{F1-score}.
 \end{enumerate}
 
-% --- 1.4 Batasan Masalah ---
 \section{Batasan Masalah}
 
 Untuk menjaga fokus dan kejelasan ruang lingkup, tugas akhir ini dibatasi pada analisis dan pengembangan \textit{Large Language Models (LLM)} yang diperkaya dengan mekanisme \textit{Retrieval-Augmented Generation (RAG)}. Tugas akhir ini hanya menyoroti dua jenis \textit{hallucination} yang paling relevan dengan proses \textit{retrieval} dan \textit{generation}, yaitu \textit{halusinasi intrinsik} dan \textit{halusinasi faktual}. \textit{Halusinasi intrinsik} merujuk pada keluaran model yang bertentangan dengan informasi yang terdapat dalam \textit{prompt} atau konteks yang diberikan, sedangkan \textit{halusinasi faktual} berkaitan dengan keluaran yang mengandung informasi keliru atau tidak akurat meskipun tampak meyakinkan. Jenis \textit{hallucination} lain seperti \textit{reasoning hallucination}, \textit{linguistic hallucination}, dan \textit{bias-related hallucination} berada di luar cakupan studi ini.
@@ -55,7 +55,7 @@ Dari sisi sumber data, penelitian ini hanya menggunakan dataset \textit{PubMedQA
 Secara keseluruhan, batasan-batasan tersebut ditetapkan untuk menjaga ruang lingkup penelitian tetap fokus, terukur, dan relevan terhadap tujuan tugas akhir.
 
 % ==========================================
-% 1.5 Metodologi Tugas Akhir
+% 1.5 Metodologi Tugas Akhir (versi umum)
 % ==========================================
 \section{Metodologi Tugas Akhir}
 
@@ -69,7 +69,7 @@ Visualisasi tahapan metodologi \textit{CRISP-DM} dapat dilihat pada Gambar~\ref{
   \centering
   \captionsetup{justification=centering}
   \includegraphics[width=0.85\textwidth]{image/crispdm.png}
-  \caption{Tahapan Metodologi CRISP-DM \parencite{crispdm_datasciencepm}}
+  \caption[Tahapan Metodologi CRISP-DM]{Tahapan Metodologi CRISP-DM \parencite{crispdm_datasciencepm}}
   \label{gambar:crispdm}
 \end{figure}
 
@@ -92,18 +92,3 @@ Tahap ini mengevaluasi kinerja model berdasarkan metrik evaluasi kuantitatif. Se
 Tahap terakhir adalah penerapan model ke dalam lingkungan operasional atau simulasi implementasi. Pada tahap ini dilakukan pemantauan performa, dokumentasi, serta pengelolaan perubahan data dan model agar solusi tetap andal dalam jangka panjang.
 
 Metodologi CRISP-DM menyediakan kerangka terstruktur yang menyeimbangkan kebutuhan teknis dan praktis sehingga tugas akhir berbasis data dapat dijalankan secara sistematis, transparan, dan dapat direproduksi dengan baik.
-
-% --- Sistematika Penulisan ---
-\section{Sistematika Penulisan}
-Tuliskan gambaran umum isi dari setiap bab yang ada dalam laporan tugas akhir. Sistematika penulisan ini memberikan panduan bagi pembaca tentang struktur dan alur pembahasan dalam laporan tugas akhir. Berikut adalah contoh sistematika penulisan yang dapat diikuti:
-\begin{enumerate}
-\item	Bab I Pendahuluan: Berisi latar belakang, rumusan masalah, tujuan, batasan masalah, metodologi, dan sistematika penulisan laporan tugas akhir       .
-\item	Bab II Studi Literatur: Berisi kajian pustaka yang relevan dengan topik tugas akhir, termasuk teori-teori, konsep-konsep, dan hasil-hasil penelitian sebelumnya yang                mendukung pelaksanaan tugas akhir.
-\item	Bab III Analisis: Berisi penjelasan tentang analisis masalah dan kebutuhan pengguna serta berbagai alternatif solusinya.
-\item   Bab IV Perancangan: Berisi penjelasan tentang perancangan solusi yang diusulkan, misalnya arsitektur sistem, desain basis data, antarmuka pengguna, dan sebagainya.
-\item	Bab V Implementasi: Berisi penjelasan tentang proses implementasi solusi yang diusulkan, termasuk langkah-langkah yang diambil, teknologi yang digunakan, dan hasil yang diperoleh.
-\item	Bab VI Evaluasi: Berisi analisis dan evaluasi terhadap solusi yang diimplementasikan, termasuk metode pengujian, hal-hal yang disiapkan sebelum pengujian, hasil pengujian, dan penilaian kinerja.
-\item   Bab VII Kesimpulan dan Saran: Berisi kesimpulan dari hasil pelaksanaan tugas akhir dan saran untuk pengembangan lebih lanjut.
-\item   Daftar Pustaka: Berisi daftar referensi yang digunakan dalam penyusunan laporan tugas akhir.
-\item   Lampiran: Berisi dokumen-dokumen pendukung seperti kode program, data lengkap hasil pengujian, rekaman wawancara, dan lain-lain.
-\end{enumerate}

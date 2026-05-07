@@ -322,6 +322,12 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{12pt plus 2pt minus 1pt}
 
+% --- Bottom alignment: gunakan raggedbottom agar jarak antar paragraf KONSISTEN.
+% --- Konsekuensi: margin bawah halaman bisa sedikit beda-beda (tidak rata persis),
+% --- tetapi jarak antar paragraf tidak akan tiba-tiba membesar saat ada float
+% --- yang dipush ke halaman berikutnya.
+\raggedbottom
+
 \setlist[enumerate]{nosep, topsep=-10pt} % mengurangi spasi antar item dan atas bawah daftar
 \setlist[itemize]{nosep, topsep=-10pt} % mengurangi spasi antar item dan atas bawah daftar
 

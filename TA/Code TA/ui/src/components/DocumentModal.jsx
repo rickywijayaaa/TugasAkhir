@@ -11,24 +11,6 @@ export default function DocumentModal({ doc, onClose }) {
 
   if (!doc) return null
 
-  // Highlight the relevant snippet inside the full content
-  const renderHighlightedContent = () => {
-    if (!doc.relevantSnippet || !doc.content.includes(doc.relevantSnippet)) {
-      return <p className="text-gray-300 text-sm leading-relaxed">{doc.content}</p>
-    }
-
-    const parts = doc.content.split(doc.relevantSnippet)
-    return (
-      <p className="text-gray-300 text-sm leading-relaxed">
-        {parts[0]}
-        <mark className="bg-yellow-400/30 text-yellow-200 px-0.5 rounded">
-          {doc.relevantSnippet}
-        </mark>
-        {parts[1]}
-      </p>
-    )
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -45,9 +27,11 @@ export default function DocumentModal({ doc, onClose }) {
         <div className="flex items-start justify-between p-6 border-b border-gray-700 gap-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-white font-semibold text-base leading-snug">
-              {doc.title}
+              Dokumen {doc.id}
             </h2>
-            <p className="text-gray-400 text-xs mt-1">{doc.journal}</p>
+            <p className="text-gray-400 text-xs mt-1">
+              Konteks dari PubMedQA
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -70,32 +54,36 @@ export default function DocumentModal({ doc, onClose }) {
         </div>
 
         {/* Scores row */}
-        <div className="flex items-center gap-4 px-6 py-3 border-b border-gray-700/50 bg-gray-900/50">
-          {doc.bm25Score !== undefined && (
+        <div className="flex flex-wrap items-center gap-4 px-6 py-3 border-b border-gray-700/50 bg-gray-900/50">
+          {doc.bm25_score !== null && doc.bm25_score !== undefined && (
             <div className="flex items-center gap-2">
               <span className="text-gray-500 text-xs">BM25</span>
-              <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 rounded-full"
-                  style={{ width: `${doc.bm25Score * 100}%` }}
-                />
-              </div>
-              <span className="text-blue-400 text-xs font-mono">
-                {doc.bm25Score.toFixed(3)}
+              <span className="text-blue-400 text-xs font-mono font-bold">
+                {doc.bm25_score.toFixed(2)}
               </span>
             </div>
           )}
-          {doc.ceScore !== undefined && (
+          {doc.dense_score !== null && doc.dense_score !== undefined && (
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 text-xs">CE Score</span>
-              <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-violet-500 rounded-full"
-                  style={{ width: `${doc.ceScore * 100}%` }}
-                />
-              </div>
-              <span className="text-violet-400 text-xs font-mono">
-                {doc.ceScore.toFixed(3)}
+              <span className="text-gray-500 text-xs">Dense (cos-sim)</span>
+              <span className="text-emerald-400 text-xs font-mono font-bold">
+                {doc.dense_score.toFixed(3)}
+              </span>
+            </div>
+          )}
+          {doc.rrf_score !== null && doc.rrf_score !== undefined && (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500 text-xs">RRF</span>
+              <span className="text-amber-400 text-xs font-mono font-bold">
+                {doc.rrf_score.toFixed(4)}
+              </span>
+            </div>
+          )}
+          {doc.reranker_score !== null && doc.reranker_score !== undefined && (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500 text-xs">CrossEncoder</span>
+              <span className="text-teal-400 text-xs font-mono font-bold">
+                {doc.reranker_score.toFixed(3)}
               </span>
             </div>
           )}
@@ -103,24 +91,13 @@ export default function DocumentModal({ doc, onClose }) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {/* Relevant Snippet callout */}
-          {doc.relevantSnippet && (
-            <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-3">
-              <p className="text-yellow-300 text-xs font-semibold mb-1 uppercase tracking-wide">
-                Key Snippet
-              </p>
-              <p className="text-yellow-100 text-sm italic">
-                &ldquo;{doc.relevantSnippet}&rdquo;
-              </p>
-            </div>
-          )}
-
-          {/* Full text */}
           <div>
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
-              Full Abstract
+              Isi Dokumen
             </p>
-            {renderHighlightedContent()}
+            <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
+              {doc.content}
+            </p>
           </div>
         </div>
       </div>
