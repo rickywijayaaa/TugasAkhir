@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Analisis Model: Mengapa Performa Berbeda dengan Pipeline Identik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============ design tokens ============ */
+  :root {
+    --bg-deep: #0a0e1a;
+    --bg: #0c1120;
+    --bg-card: #161b2c;
+    --bg-elev: #1c2238;
+    --bg-glass: rgba(28, 34, 56, 0.65);
+    --text: #e8eaf0;
+    --text-mute: #8c95ab;
+    --text-dim: #5d6680;
+    --gold: #d4a957;
+    --gold-soft: #f1d49a;
+    --blue: #6ba3ff;
+    --blue-deep: #4a7fd6;
+    --green: #4ade80;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+    --border: #2a3148;
+    --border-light: #3a4262;
+    --slide-w: 1280px;
+    --slide-h: 720px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(ellipse at top, var(--bg) 0%, var(--bg-deep) 100%);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.55;
+    font-size: 16px;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ deck shell ============ */
+  .deck-header {
+    position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; z-index: 50;
+  }
+  .deck-header .brand {
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--gold);
+    letter-spacing: 1px; font-weight: 600;
+  }
+  .deck-header .title {
+    font-size: 12px; color: var(--text-mute);
+    flex: 1; text-align: center; margin: 0 24px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .deck-header .counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text);
+    background: var(--bg-elev);
+    padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .progress-bar {
+    position: fixed; top: 44px; left: 0; right: 0; height: 2px;
+    background: var(--border); z-index: 49;
+  }
+  .progress-bar .fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold) 0%, var(--blue) 100%);
+    width: 0%; transition: width 0.35s ease;
+  }
+  .deck-stage {
+    position: fixed; top: 46px; left: 0; right: 0; bottom: 56px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+
+  /* ============ slide 16:9 ============ */
+  .slide {
+    width: var(--slide-w); height: var(--slide-h);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    padding: 38px 52px;
+    display: none; flex-direction: column; overflow: hidden;
+    transform: scale(var(--scale, 1));
+    transform-origin: center center;
+    position: absolute;
+  }
+  .slide.active {
+    display: flex;
+    animation: fadeIn 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(var(--scale, 1)) translateY(8px); }
+    to { opacity: 1; transform: scale(var(--scale, 1)) translateY(0); }
+  }
+
+  /* ============ navigation ============ */
+  .deck-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; z-index: 50;
+  }
+  .deck-nav button {
+    background: var(--bg-elev); color: var(--text);
+    border: 1px solid var(--gold);
+    padding: 9px 20px; border-radius: 4px;
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .deck-nav button:hover:not(:disabled) {
+    background: var(--gold); color: var(--bg-deep);
+  }
+  .deck-nav button:disabled {
+    border-color: var(--border); color: var(--text-dim);
+    cursor: not-allowed; opacity: 0.4;
+  }
+  .deck-nav .dots {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    max-width: 60%; justify-content: center;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border-light);
+    cursor: pointer; transition: all 0.25s;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.6); }
+  .dot:hover { background: var(--text-mute); }
+  .nav-hint {
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  /* ============ typography ============ */
+  h1, h2, h3 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: var(--text); line-height: 1.2;
+    font-weight: 700; letter-spacing: -0.5px;
+  }
+  h1 { font-size: 44px; margin-bottom: 12px; }
+  h2 { font-size: 28px; margin-bottom: 14px; padding-bottom: 12px;
+       border-bottom: 1px solid var(--border); }
+  h2 .mark { color: var(--gold); margin-right: 8px; font-family: 'JetBrains Mono', monospace;
+             font-size: 18px; font-weight: 500; vertical-align: middle; }
+  h3 { font-size: 18px; margin: 16px 0 6px 0; color: var(--gold-soft); }
+  h4 { font-family: 'Inter', sans-serif; font-size: 11px;
+       color: var(--gold); text-transform: uppercase;
+       letter-spacing: 2px; font-weight: 600;
+       margin: 10px 0 4px 0; }
+  p { margin: 6px 0 12px 0; font-size: 15px; color: var(--text); }
+  .lead { font-size: 16px; color: var(--text-mute); font-weight: 300; }
+  ul, ol { padding-left: 22px; margin: 6px 0 12px 0; }
+  li { margin-bottom: 6px; font-size: 14px; color: var(--text); }
+  ul.bullets li::marker { color: var(--gold); }
+  strong { color: var(--gold-soft); font-weight: 600; }
+  em { color: var(--blue); font-style: italic; }
+  code, .mono { font-family: 'JetBrains Mono', monospace;
+                background: var(--bg-elev); padding: 1px 6px;
+                border-radius: 3px; font-size: 13px;
+                color: var(--blue); border: 1px solid var(--border); }
+
+  .slide-body { flex: 1; overflow: hidden; min-height: 0; }
+
+  /* ============ secnum ============ */
+  .secnum {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--gold);
+    letter-spacing: 3px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* ============ COVER ============ */
+  .cover {
+    background: radial-gradient(ellipse at top right, rgba(212,169,87,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(107,163,255,0.08) 0%, transparent 50%),
+                var(--bg-card);
+    justify-content: center;
+    border-top: 4px solid var(--gold);
+  }
+  .cover .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold); font-size: 12px;
+    letter-spacing: 4px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .cover h1 {
+    font-size: 56px; line-height: 1.1; max-width: 920px;
+    margin-bottom: 18px; font-family: 'Crimson Pro', serif;
+  }
+  .cover h1 .accent { color: var(--gold); font-style: italic; }
+  .cover .sub {
+    font-size: 19px; color: var(--text-mute);
+    font-weight: 300; max-width: 800px; margin-bottom: 56px;
+    line-height: 1.5;
+  }
+  .cover .meta-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 24px; padding-top: 28px; border-top: 1px solid var(--border);
+  }
+  .cover .meta-grid .item .k {
+    font-size: 10px; color: var(--gold);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cover .meta-grid .item .v {
+    font-size: 14px; color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ============ TOC ============ */
+  .toc-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-top: 14px;
+  }
+  .toc-item {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--gold);
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0 4px 4px 0;
+  }
+  .toc-item:hover {
+    background: var(--bg-card);
+    transform: translateX(4px);
+    border-left-color: var(--blue);
+  }
+  .toc-item .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--gold);
+    letter-spacing: 1.5px;
+  }
+  .toc-item .title {
+    font-size: 13px; color: var(--text);
+    font-weight: 500; margin-top: 2px;
+  }
+
+  /* ============ stats ============ */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin: 14px 0;
+  }
+  .stat {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 14px 16px; border-radius: 4px;
+  }
+  .stat .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 600; color: var(--gold-soft);
+    letter-spacing: -0.5px; line-height: 1;
+  }
+  .stat .lbl {
+    font-size: 11px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    margin-top: 6px; font-weight: 500;
+  }
+  .stat.blue { border-top-color: var(--blue); }
+  .stat.blue .num { color: var(--blue); }
+  .stat.green { border-top-color: var(--green); }
+  .stat.green .num { color: var(--green); }
+  .stat.red { border-top-color: var(--red); }
+  .stat.red .num { color: var(--red); }
+
+  /* ============ table ============ */
+  table {
+    width: 100%; border-collapse: collapse; margin: 10px 0;
+    font-family: 'Inter', sans-serif; font-size: 13px;
+  }
+  thead th {
+    background: var(--bg-elev); color: var(--gold);
+    text-align: left; padding: 9px 12px;
+    font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; font-size: 10.5px;
+    border-bottom: 2px solid var(--gold);
+  }
+  tbody td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tbody tr:hover td { background: rgba(212, 169, 87, 0.04); }
+  td.num, th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+  td.label { color: var(--gold-soft); font-weight: 500; }
+
+  /* ============ callouts ============ */
+  .callout {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px; margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--gold);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 5px; font-weight: 600;
+  }
+  .callout p { font-size: 14px; margin: 0; }
+  .callout.blue { border-left-color: var(--blue); }
+  .callout.blue .lbl { color: var(--blue); }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .lbl { color: var(--green); }
+  .callout.red { border-left-color: var(--red); }
+  .callout.red .lbl { color: var(--red); }
+  .callout.purple { border-left-color: var(--purple); }
+  .callout.purple .lbl { color: var(--purple); }
+
+  /* ============ utility ============ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .center { text-align: center; }
+
+  /* ============ cite ============ */
+  .cite {
+    color: var(--blue); font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; vertical-align: super; line-height: 1;
+    text-decoration: none; padding: 0 1px;
+  }
+  .cite:hover { color: var(--gold); }
+
+  /* ============ pipeline diagram ============ */
+  .pipeline {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; flex-wrap: wrap; margin: 16px 0;
+  }
+  .pipe-node {
+    background: var(--bg-elev);
+    border: 1.5px solid var(--border-light);
+    padding: 12px 16px; border-radius: 6px;
+    min-width: 130px; text-align: center;
+  }
+  .pipe-node .icon { font-size: 18px; color: var(--gold); margin-bottom: 4px; }
+  .pipe-node .lbl { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .pipe-node .det { font-size: 10px; color: var(--text-mute); }
+  .pipe-node.gen { border-color: var(--gold); background: rgba(212,169,87,0.08); }
+  .pipe-node.ret { border-color: var(--blue); background: rgba(107,163,255,0.08); }
+  .pipe-arrow { color: var(--gold); font-size: 20px; }
+
+  /* ============ model card ============ */
+  .model-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 14px;
+  }
+  .model-card.llama32 { border-top: 3px solid var(--orange); }
+  .model-card.llama33 { border-top: 3px solid var(--red); }
+  .model-card.openai  { border-top: 3px solid var(--blue); }
+  .model-card.claude  { border-top: 3px solid var(--green); }
+  .model-card .name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .model-card .stat-line {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-mute); margin: 2px 0;
+  }
+  .model-card .stat-line .v { color: var(--gold-soft); float: right; }
+
+  /* ============ references ============ */
+  .ref-list { font-size: 12px; }
+  .ref-list .ref {
+    padding: 6px 0; border-bottom: 1px dotted var(--border);
+    line-height: 1.5;
+  }
+  .ref-list .ref .id {
+    color: var(--gold); font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; margin-right: 6px;
+  }
+  .ref-list .ref .venue {
+    color: var(--blue); font-style: italic; font-size: 11px;
+  }
+
+  /* ============ print ============ */
+  @media print {
+    body { background: white; overflow: visible; }
+    .deck-header, .deck-nav, .progress-bar { display: none; }
+    .deck-stage { position: static; padding: 0; display: block; }
+    .slide { display: flex !important; page-break-after: always;
+             box-shadow: none; transform: none !important;
+             position: relative !important; width: 100% !important;
+             height: auto !important; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="deck-header">
+  <div class="brand">Analisa Model · TA Ricky Wijaya</div>
+  <div class="title" id="slide-title">Cover</div>
+  <div class="counter"><span id="cur">1</span> / <span id="total">32</span></div>
+</div>
+<div class="progress-bar"><div class="fill" id="progress"></div></div>
+
+<!-- STAGE -->
+<div class="deck-stage" id="stage">
+
+<!-- ====== 1. COVER ====== -->
+<section class="slide cover active" data-title="Cover">
+  <div class="eyebrow">Technical Deep-Dive · Mini Research Review</div>
+  <h1>Mengapa Performa <span class="accent">Berbeda</span><br>Padahal Pipeline <span class="accent">Identik</span>?</h1>
+  <div class="sub">
+    Analisis komparatif 4 LLM (Llama 3.2, Llama 3.3 70B, GPT-4.1-mini, Claude Haiku 4.5)
+    pada PubMedQA dengan retriever Hybrid BM25+Dense+RRF yang sama. Fokus: faktor internal
+    LLM yang menyebabkan divergensi kinerja meskipun candidate evidence identik.
+  </div>
+  <div class="meta-grid">
+    <div class="item"><div class="k">Dataset</div><div class="v">PubMedQA n=500</div></div>
+    <div class="item"><div class="k">Retriever</div><div class="v">Hybrid + RRF</div></div>
+    <div class="item"><div class="k">LLMs</div><div class="v">4 model</div></div>
+    <div class="item"><div class="k">Methods</div><div class="v">4 mitigasi</div></div>
+  </div>
+</section>
+
+<!-- ====== 2. TOC ====== -->
+<section class="slide" data-title="Daftar Isi">
+  <div class="secnum">Daftar Isi</div>
+  <h2><span class="mark">00</span>Navigasi Dokumen</h2>
+  <div class="slide-body">
+  <div class="toc-grid">
+    <div class="toc-item" onclick="show(2)"><div class="num">03 - 05</div><div class="title">Executive Summary</div></div>
+    <div class="toc-item" onclick="show(5)"><div class="num">06 - 08</div><div class="title">Pipeline & Architecture</div></div>
+    <div class="toc-item" onclick="show(8)"><div class="num">09</div><div class="title">Tesis Utama: Retrieval ≠ Reasoning</div></div>
+    <div class="toc-item" onclick="show(9)"><div class="num">10</div><div class="title">Dimensi Divergensi LLM</div></div>
+    <div class="toc-item" onclick="show(10)"><div class="num">11</div><div class="title">Reasoning Capability</div></div>
+    <div class="toc-item" onclick="show(11)"><div class="num">12</div><div class="title">Instruction Following</div></div>
+    <div class="toc-item" onclick="show(12)"><div class="num">13</div><div class="title">Context Utilization</div></div>
+    <div class="toc-item" onclick="show(13)"><div class="num">14</div><div class="title">Hallucination Resistance</div></div>
+    <div class="toc-item" onclick="show(14)"><div class="num">15</div><div class="title">Calibration & Confidence</div></div>
+    <div class="toc-item" onclick="show(15)"><div class="num">16</div><div class="title">Robustness ke Noise</div></div>
+    <div class="toc-item" onclick="show(16)"><div class="num">17</div><div class="title">Biomedical Knowledge</div></div>
+    <div class="toc-item" onclick="show(17)"><div class="num">18</div><div class="title">Tokenizer & Embedding</div></div>
+    <div class="toc-item" onclick="show(18)"><div class="num">19</div><div class="title">Alignment Tuning</div></div>
+    <div class="toc-item" onclick="show(19)"><div class="num">20 - 23</div><div class="title">Per-Model Deep Dive</div></div>
+    <div class="toc-item" onclick="show(23)"><div class="num">24 - 27</div><div class="title">Hybrid Retrieval Mechanics</div></div>
+    <div class="toc-item" onclick="show(27)"><div class="num">28 - 30</div><div class="title">Synthesis & Conclusions</div></div>
+    <div class="toc-item" onclick="show(30)"><div class="num">31 - 32</div><div class="title">Referensi Akademik</div></div>
+  </div>
+  </div>
+</section>
+
+<!-- ====== 3. EXEC SUMMARY 1 ====== -->
+<section class="slide" data-title="I · Executive Summary">
+  <div class="secnum">I · Executive Summary</div>
+  <h2><span class="mark">01</span>Temuan Utama</h2>
+  <div class="slide-body">
+    <div class="callout">
+      <div class="lbl">Tesis</div>
+      <p>Walaupun seluruh model menggunakan <strong>retriever, query, dan dataset yang identik</strong>,
+      label accuracy berbeda hingga <strong>16 poin persentase</strong> (Llama 3.2: 55% vs Llama 3.3 70B: 71%).
+      Divergensi ini <strong>bukan disebabkan oleh kualitas retrieval</strong>, melainkan oleh karakteristik
+      generator-side LLM dalam reasoning, instruction following, dan context utilization
+      <a class="cite" href="#ref-1">[1]</a><a class="cite" href="#ref-9">[9]</a>.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">16 pp</div><div class="lbl">Gap acc max-min</div></div>
+      <div class="stat blue"><div class="num">4</div><div class="lbl">LLMs dibandingkan</div></div>
+      <div class="stat green"><div class="num">16</div><div class="lbl">Konfigurasi total</div></div>
+      <div class="stat red"><div class="num">0%</div><div class="lbl">Maybe acc terendah</div></div>
+    </div>
+    <div class="grid-2" style="margin-top: 14px;">
+      <div>
+        <h4>Pertanyaan Riset</h4>
+        <p style="font-size: 14px;">Faktor internal LLM apa saja yang menjelaskan perbedaan kinerja
+        ketika candidate evidence (top-k chunks) yang diberikan persis sama?</p>
+      </div>
+      <div>
+        <h4>Kontribusi</h4>
+        <p style="font-size: 14px;">Karakterisasi sistematis 12+ dimensi capability LLM yang memengaruhi
+        downstream RAG accuracy, dengan validasi empiris pada domain biomedis tertutup.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 4. EXEC SUMMARY 2 - DATA TABLE ====== -->
+<section class="slide" data-title="I · Hasil Eksperimen">
+  <div class="secnum">I · Executive Summary</div>
+  <h2><span class="mark">02</span>Hasil Eksperimen Lengkap</h2>
+  <div class="slide-body">
+    <p class="lead">Label Accuracy 4 LLM × 4 Method (n=500 PubMedQA pqa_labeled, retriever Hybrid BM25+Dense+RRF identik):</p>
+    <table>
+      <thead><tr>
+        <th>Model</th>
+        <th class="num">Baseline</th>
+        <th class="num">+QR</th>
+        <th class="num">+CR</th>
+        <th class="num">+QR+CR</th>
+        <th class="num">Best</th>
+        <th class="num">Maybe (BL)</th>
+        <th class="num">Faith (BL)</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="label">Llama 3.2</td><td class="num">55.0%</td><td class="num">53.4%</td><td class="num">55.2%</td><td class="num">55.0%</td><td class="num" style="color:var(--orange)">55.2%</td><td class="num" style="color:var(--red)">0.0%</td><td class="num">0.596</td></tr>
+        <tr><td class="label">Llama 3.3 70B</td><td class="num">69.4%</td><td class="num">68.2%</td><td class="num">70.8%</td><td class="num">71.0%</td><td class="num" style="color:var(--green)">71.0%</td><td class="num">1.5%</td><td class="num">0.821</td></tr>
+        <tr><td class="label">GPT-4.1-mini</td><td class="num">69.2%</td><td class="num">70.8%</td><td class="num">69.8%</td><td class="num">70.0%</td><td class="num" style="color:var(--blue)">70.8%</td><td class="num">4.5%</td><td class="num" style="color:var(--gold)">0.893</td></tr>
+        <tr><td class="label">Claude Haiku 4.5</td><td class="num">65.4%</td><td class="num">64.0%</td><td class="num">68.0%</td><td class="num">64.8%</td><td class="num">68.0%</td><td class="num" style="color:var(--green)">19.7%</td><td class="num">0.599</td></tr>
+      </tbody>
+    </table>
+    <div class="grid-3" style="margin-top: 14px;">
+      <div class="callout green"><div class="lbl">Best overall</div><p style="font-size:13px;">Llama 3.3 70B + QR+CR (71.0%) — model terbesar + method paling lengkap.</p></div>
+      <div class="callout blue"><div class="lbl">Best maybe-recall</div><p style="font-size:13px;">Claude + QR+CR (24.2%) — alignment kalibrasi natural ke uncertainty.</p></div>
+      <div class="callout red"><div class="lbl">Worst overall</div><p style="font-size:13px;">Llama 3.2 + QR (53.4%) — model size terkecil, anti-maybe bias ekstrem.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 5. EXEC SUMMARY 3 - PARADOX ====== -->
+<section class="slide" data-title="I · Paradoks">
+  <div class="secnum">I · Executive Summary</div>
+  <h2><span class="mark">03</span>Paradoks: Pipeline Sama, Hasil Beda</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Yang IDENTIK di seluruh eksperimen</h4>
+        <ul class="bullets">
+          <li><strong>Korpus</strong>: 1.706 chunks dari 1.000 paper PubMedQA</li>
+          <li><strong>Tokenizer BM25</strong>: lowercase + alphanumeric split</li>
+          <li><strong>Dense embedder</strong>: text-embedding-3-small (1536d)</li>
+          <li><strong>Retrieval k</strong>: BM25 top-50 + Dense top-50</li>
+          <li><strong>Fusion</strong>: RRF dengan k=60 <a class="cite" href="#ref-4">[4]</a></li>
+          <li><strong>Top-k final</strong>: 5 chunks ke generator</li>
+          <li><strong>Query input</strong>: pertanyaan asli PubMedQA</li>
+          <li><strong>Sampel</strong>: 500 pertanyaan pertama (deterministik)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Yang BERBEDA</h4>
+        <ul class="bullets">
+          <li>Hanya <strong>generator LLM</strong> dan <strong>method mitigasi</strong></li>
+        </ul>
+        <div class="callout purple" style="margin-top: 16px;">
+          <div class="lbl">Implikasi metodologis</div>
+          <p>Karena retrieval layer fully controlled, seluruh variasi kinerja secara ilmiah
+          dapat <strong>diatribusikan ke generator-side capability</strong>. Ini setup ideal untuk
+          mengisolasi efek LLM internal terhadap downstream task accuracy
+          <a class="cite" href="#ref-1">[1]</a><a class="cite" href="#ref-19">[19]</a>.</p>
+        </div>
+        <div class="callout blue">
+          <div class="lbl">Konsekuensi analitis</div>
+          <p>Penjelasan harus berbasis: (1) reasoning capability, (2) instruction following,
+          (3) context utilization, (4) calibration, (5) alignment philosophy.
+          Bukan kualitas retrieval.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 6. PIPELINE OVERVIEW ====== -->
+<section class="slide" data-title="II · Pipeline RAG">
+  <div class="secnum">II · Pipeline & Architecture</div>
+  <h2><span class="mark">04</span>Anatomi Pipeline RAG yang Digunakan</h2>
+  <div class="slide-body">
+    <div class="pipeline">
+      <div class="pipe-node ret"><div class="icon">Q</div><div class="lbl">User Query</div><div class="det">"Does X reduce Y?"</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node ret"><div class="icon">⊕</div><div class="lbl">Hybrid Retriever</div><div class="det">BM25 + Dense + RRF</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node ret"><div class="icon">≣</div><div class="lbl">Top-k Chunks</div><div class="det">5 candidate evidence</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node gen"><div class="icon">★</div><div class="lbl">Generator LLM</div><div class="det">4 model dibandingkan</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node gen"><div class="icon">A</div><div class="lbl">Answer</div><div class="det">yes / no / maybe</div></div>
+    </div>
+    <div class="grid-2" style="margin-top: 18px;">
+      <div class="callout blue">
+        <div class="lbl">Retrieval Layer (controlled)</div>
+        <p>Identik untuk seluruh eksperimen. Outputnya 5 chunks yang sama untuk query yang sama.
+        Lewis et al. <a class="cite" href="#ref-1">[1]</a> menunjukkan bahwa retrieval quality
+        adalah upper bound untuk RAG accuracy, tapi <em>generator capability menentukan seberapa banyak
+        upper bound itu termanfaatkan</em>.</p>
+      </div>
+      <div class="callout">
+        <div class="lbl">Generation Layer (variable)</div>
+        <p>Tahap di mana variasi kinerja terjadi. Setiap LLM menerima prompt dan konteks identik,
+        tapi menghasilkan jawaban berbeda karena perbedaan pada parameter weights, training data,
+        alignment philosophy, dan inference behavior.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 7. HYBRID RETRIEVAL DIAGRAM ====== -->
+<section class="slide" data-title="II · Hybrid Retrieval">
+  <div class="secnum">II · Pipeline & Architecture</div>
+  <h2><span class="mark">05</span>Hybrid Retrieval: BM25 + Dense + RRF</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Sparse retrieval (BM25)</h4>
+        <p style="font-size: 13px;">Pencocokan kata kunci eksak berbasis frekuensi term dan inverse document frequency
+        <a class="cite" href="#ref-3">[3]</a>. Unggul untuk istilah medis spesifik (mis. "myocardial infarction"),
+        nama obat, dan akronim yang muncul verbatim di abstrak.</p>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--blue);">
+        score(D, Q) = Σᵢ IDF(qᵢ) · f(qᵢ, D) · (k₁+1) / (f(qᵢ,D) + k₁·(1-b+b·|D|/avgdl))</p>
+
+        <h4 style="margin-top: 16px;">Dense retrieval</h4>
+        <p style="font-size: 13px;">Pencocokan semantik via cosine similarity dalam ruang embedding 1536d
+        <a class="cite" href="#ref-2">[2]</a>. Unggul untuk parafrasa, sinonim, dan konsep medis yang
+        diekspresikan dengan istilah berbeda.</p>
+      </div>
+      <div>
+        <h4>Reciprocal Rank Fusion (RRF)</h4>
+        <p style="font-size: 13px;">Cormack et al. <a class="cite" href="#ref-4">[4]</a> menunjukkan bahwa
+        kombinasi rank lists via RRF outperform Condorcet method dan supervised learning-to-rank,
+        bahkan tanpa tuning hyperparameter.</p>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--blue);">
+        RRF(d) = Σᵣ 1 / (k + rank_r(d))<br>k = 60 (standar)</p>
+
+        <div class="callout green" style="margin-top: 14px;">
+          <div class="lbl">Mengapa hybrid lebih baik</div>
+          <p style="font-size: 13px;">BM25 dan dense retrieval memiliki <em>complementary failure modes</em>
+          <a class="cite" href="#ref-6">[6]</a>. Hybrid mengkombinasikan kekuatan keduanya. Bruch et al.
+          <a class="cite" href="#ref-7">[7]</a> menunjukkan rata-rata gain 5-12% nDCG vs single retriever
+          di benchmark BEIR.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 8. MITIGATION TECHNIQUES ====== -->
+<section class="slide" data-title="II · Mitigation Techniques">
+  <div class="secnum">II · Pipeline & Architecture</div>
+  <h2><span class="mark">06</span>Empat Method Mitigasi yang Diuji</h2>
+  <div class="slide-body">
+    <div class="grid-4">
+      <div class="model-card" style="border-top: 3px solid var(--text-mute);">
+        <div class="name">Baseline</div>
+        <p style="font-size: 12px; color: var(--text-mute); margin: 8px 0;">Query asli → Hybrid retrieve → Top-5 → LLM</p>
+        <div class="stat-line">Komponen tambahan <span class="v">none</span></div>
+        <div class="stat-line">Cost relatif <span class="v">1.0×</span></div>
+      </div>
+      <div class="model-card" style="border-top: 3px solid var(--blue);">
+        <div class="name">+ QR</div>
+        <p style="font-size: 12px; color: var(--text-mute); margin: 8px 0;">Query rewrite oleh LLM <a class="cite" href="#ref-18">[18]</a> → Hybrid retrieve → Top-5 → LLM</p>
+        <div class="stat-line">Komponen tambahan <span class="v">+1 LLM call</span></div>
+        <div class="stat-line">Cost relatif <span class="v">1.4×</span></div>
+      </div>
+      <div class="model-card" style="border-top: 3px solid var(--purple);">
+        <div class="name">+ CR</div>
+        <p style="font-size: 12px; color: var(--text-mute); margin: 8px 0;">Query asli → Hybrid Top-20 → CrossEncoder rerank → Top-5 → LLM</p>
+        <div class="stat-line">Komponen tambahan <span class="v">+CrossEncoder</span></div>
+        <div class="stat-line">Cost relatif <span class="v">1.1×</span></div>
+      </div>
+      <div class="model-card" style="border-top: 3px solid var(--gold);">
+        <div class="name">+ QR + CR</div>
+        <p style="font-size: 12px; color: var(--text-mute); margin: 8px 0;">QR → Hybrid Top-20 → Rerank → Top-5 → LLM</p>
+        <div class="stat-line">Komponen tambahan <span class="v">QR + CE</span></div>
+        <div class="stat-line">Cost relatif <span class="v">1.5×</span></div>
+      </div>
+    </div>
+    <div class="callout purple" style="margin-top: 16px;">
+      <div class="lbl">Catatan kritis</div>
+      <p>Method-method ini mengubah <em>kualitas konteks yang masuk ke LLM</em>, bukan capability LLM itu
+      sendiri. Karena itu efektivitas method bisa <strong>berbeda per LLM</strong> — ini observable di hasil
+      eksperimen kita (CR helps Llama 3.3 dan Claude, tapi nyaris flat di Llama 3.2).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 9. RETRIEVAL ≠ REASONING ====== -->
+<section class="slide" data-title="III · Retrieval ≠ Reasoning">
+  <div class="secnum">III · Tesis Utama</div>
+  <h2><span class="mark">07</span>Retrieval ≠ Reasoning</h2>
+  <div class="slide-body">
+    <div class="callout" style="margin-bottom: 18px;">
+      <div class="lbl">Tesis sentral</div>
+      <p style="font-size: 16px; line-height: 1.6;">
+        <strong>Retriever menyediakan candidate evidence; LLM menentukan apa yang dilakukan dengan evidence itu.</strong>
+        Pipeline RAG yang identik <em>menjamin input identik</em>, bukan output identik. Output bergantung pada
+        <strong>fungsi pemetaan</strong> yang diparameterisasi oleh weights LLM <a class="cite" href="#ref-1">[1]</a>.
+      </p>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h4>Yang dilakukan retriever</h4>
+        <ul class="bullets">
+          <li>Mencari chunk yang <em>topically related</em> dengan query</li>
+          <li>Memberi ranking berbasis lexical + semantic similarity</li>
+          <li>Menjamin recall (chunk relevan ada di top-k)</li>
+        </ul>
+        <h4 style="margin-top: 14px;">Yang TIDAK dilakukan retriever</h4>
+        <ul class="bullets">
+          <li>Menentukan chunk mana yang <em>menjawab</em> pertanyaan</li>
+          <li>Melakukan inferensi atau sintesis</li>
+          <li>Mengabaikan chunk yang relevan secara topik tapi tidak menjawab</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Yang dilakukan LLM (bagian variabel)</h4>
+        <ul class="bullets">
+          <li><strong>Selection</strong>: pilih chunk mana yang dipakai untuk reasoning</li>
+          <li><strong>Synthesis</strong>: gabung informasi multi-chunk yang konsisten</li>
+          <li><strong>Inference</strong>: simpulkan jawaban dari evidence parsial</li>
+          <li><strong>Contradiction handling</strong>: resolusi chunk yang bertentangan</li>
+          <li><strong>Calibration</strong>: kapan jawab "maybe" vs "yes/no"</li>
+          <li><strong>Faithfulness</strong>: tidak menambah klaim di luar konteks</li>
+        </ul>
+        <div class="callout blue" style="margin-top: 12px;">
+          <div class="lbl">Konsekuensi</div>
+          <p style="font-size: 13px;">Setiap kemampuan di atas <em>diparameterisasi oleh weights LLM</em>
+          dan tergantung pada training data, alignment, dan arsitektur. Karena itu hasilnya berbeda
+          antar LLM bahkan dengan input identik.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 10. DIMENSIONS OF DIVERGENCE ====== -->
+<section class="slide" data-title="IV · Dimensi Divergensi">
+  <div class="secnum">IV · Mengapa Berbeda</div>
+  <h2><span class="mark">08</span>Sembilan Dimensi Divergensi LLM</h2>
+  <div class="slide-body">
+    <p class="lead">Kami identifikasi 9 dimensi capability yang menjelaskan perbedaan kinerja generator-side:</p>
+    <div class="grid-3">
+      <div class="callout">
+        <div class="lbl">D1 · Reasoning Capability</div>
+        <p style="font-size: 12px;">Kemampuan multi-step inference dan logical chaining. Berkorelasi kuat dengan parameter scale <a class="cite" href="#ref-12">[12]</a>.</p>
+      </div>
+      <div class="callout blue">
+        <div class="lbl">D2 · Instruction Following</div>
+        <p style="font-size: 12px;">Kepatuhan ke format output yang diminta. Hasil dari instruction tuning <a class="cite" href="#ref-13">[13]</a>.</p>
+      </div>
+      <div class="callout green">
+        <div class="lbl">D3 · Context Utilization</div>
+        <p style="font-size: 12px;">Efektivitas memakai konteks panjang. Lost-in-the-middle adalah failure mode umum <a class="cite" href="#ref-9">[9]</a>.</p>
+      </div>
+      <div class="callout red">
+        <div class="lbl">D4 · Hallucination Resistance</div>
+        <p style="font-size: 12px;">Tidak menambah klaim eksternal. Diukur via faithfulness metric <a class="cite" href="#ref-10">[10]</a>.</p>
+      </div>
+      <div class="callout purple">
+        <div class="lbl">D5 · Calibration</div>
+        <p style="font-size: 12px;">Apakah confidence sesuai akurasi. Linear bagi distinguishing yes/no/maybe <a class="cite" href="#ref-16">[16]</a>.</p>
+      </div>
+      <div class="callout">
+        <div class="lbl">D6 · Noise Robustness</div>
+        <p style="font-size: 12px;">Tidak terdistraksi chunk irrelevant. Failure mode terdokumentasi <a class="cite" href="#ref-17">[17]</a>.</p>
+      </div>
+      <div class="callout blue">
+        <div class="lbl">D7 · Domain Knowledge</div>
+        <p style="font-size: 12px;">Familiaritas dengan istilah biomedis. Long-tail knowledge effect <a class="cite" href="#ref-25">[25]</a>.</p>
+      </div>
+      <div class="callout green">
+        <div class="lbl">D8 · Tokenizer Behavior</div>
+        <p style="font-size: 12px;">Bagaimana istilah medis dipecah jadi tokens. Memengaruhi attention dan recall.</p>
+      </div>
+      <div class="callout purple">
+        <div class="lbl">D9 · Alignment Philosophy</div>
+        <p style="font-size: 12px;">RLHF vs Constitutional AI <a class="cite" href="#ref-14">[14]</a>. Memengaruhi tendency untuk hedge.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 11. D1 REASONING ====== -->
+<section class="slide" data-title="IV · D1 Reasoning">
+  <div class="secnum">IV · Mengapa Berbeda · D1</div>
+  <h2><span class="mark">09</span>Reasoning Capability</h2>
+  <div class="slide-body">
+    <p class="lead">Kemampuan inferensi multi-step adalah determinan paling kuat untuk RAG accuracy.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Mekanisme</h4>
+        <p style="font-size: 13px;">PubMedQA membutuhkan <em>compositional reasoning</em>: model harus
+        (1) mengidentifikasi temuan empiris di abstrak, (2) menentukan arah efek, (3) memetakan ke claim
+        di pertanyaan, (4) menyimpulkan yes/no/maybe. Setiap langkah membutuhkan reasoning yang correct.</p>
+
+        <p style="font-size: 13px;">Wei et al. <a class="cite" href="#ref-12">[12]</a> menunjukkan bahwa
+        kemampuan ini <strong>emerge pada parameter scale tertentu</strong> (umumnya >60B parameter untuk
+        complex reasoning). Model kecil (Llama 3.2 8B) struggle dengan multi-step inference bahkan dengan
+        chain-of-thought prompting.</p>
+
+        <h4 style="margin-top: 14px;">Implikasi empiris</h4>
+        <p style="font-size: 13px;">Llama 3.2 menunjukkan akurasi terendah (55%) <em>terlepas dari method</em>.
+        Ini menandakan bottleneck-nya adalah reasoning capability, bukan retrieval atau prompt.
+        Method mitigasi (QR, CR) tidak membantu karena masalahnya di tahap synthesis.</p>
+      </div>
+      <div>
+        <div class="callout">
+          <div class="lbl">Empirical signal</div>
+          <p style="font-size: 13px;">Llama 3.2 (8B) baseline: <strong>55.0%</strong><br>
+             Llama 3.3 70B baseline: <strong>69.4%</strong><br>
+             Δ = 14.4 pp dari parameter scale saja (8B → 70B = 8.75×).</p>
+        </div>
+        <h4 style="margin-top: 12px;">Mengapa parameter scale matter</h4>
+        <ul class="bullets">
+          <li><strong>Capacity untuk represent</strong> rantai sebab-akibat panjang</li>
+          <li><strong>Higher-order pattern matching</strong> dalam attention layers</li>
+          <li><strong>Better generalization</strong> dari training data ke task baru</li>
+          <li><strong>Reduced confusion</strong> saat menghadapi ambiguity</li>
+        </ul>
+        <div class="callout red" style="margin-top: 12px;">
+          <div class="lbl">Caveat</div>
+          <p style="font-size: 13px;">Scale bukan satu-satunya faktor. GPT-4.1-mini (~kecil) outperform
+          Llama 3.3 70B di beberapa method. Ini menunjukkan training quality dan alignment juga critical.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 12. D2 INSTRUCTION FOLLOWING ====== -->
+<section class="slide" data-title="IV · D2 Instruction Following">
+  <div class="secnum">IV · Mengapa Berbeda · D2</div>
+  <h2><span class="mark">10</span>Instruction Following</h2>
+  <div class="slide-body">
+    <p class="lead">Patuh ke format output dan constraint instruksi adalah hasil dari instruction tuning + RLHF.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Definisi & mekanisme</h4>
+        <p style="font-size: 13px;">Ouyang et al. <a class="cite" href="#ref-13">[13]</a> mendefinisikan
+        instruction following sebagai kemampuan model menghasilkan output yang <em>sesuai dengan
+        spesifikasi yang dinyatakan dalam prompt</em>, termasuk format, panjang, dan content constraints.</p>
+
+        <p style="font-size: 13px;">Pada PubMedQA, prompt meminta jawaban diakhiri dengan "yes/no/maybe"
+        di baris terakhir. Model dengan instruction following lemah:</p>
+        <ul class="bullets">
+          <li>Lupa menyertakan label di akhir</li>
+          <li>Memberi label tapi tidak di baris terakhir</li>
+          <li>Memberi label di luar pilihan (mis. "uncertain")</li>
+          <li>Menambah penjelasan berlebihan yang membingungkan extractor</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Empirical signal</h4>
+        <p style="font-size: 13px;">Llama 3.2 sering menghasilkan jawaban yang membingungkan label extractor.
+        Sebaliknya GPT-4.1-mini dan Claude sangat patuh format.</p>
+
+        <div class="callout blue">
+          <div class="lbl">Hubungan ke training</div>
+          <p style="font-size: 13px;">RLHF memberi reward eksplisit untuk format compliance.
+          Model dengan RLHF intensif (GPT-4.1-mini, Claude) outperform model dengan RLHF terbatas
+          (Llama 3.2 chat fine-tuned).</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Implikasi praktis</div>
+          <p style="font-size: 13px;">Format yang ketat (regex extraction) <em>menghukum</em> model dengan
+          instruction following lemah lebih dari yang terlihat dari content quality. Bisa undercount
+          akurasi reasoning sebenarnya.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 13. D3 CONTEXT UTILIZATION ====== -->
+<section class="slide" data-title="IV · D3 Context Utilization">
+  <div class="secnum">IV · Mengapa Berbeda · D3</div>
+  <h2><span class="mark">11</span>Context Utilization</h2>
+  <div class="slide-body">
+    <p class="lead">Bagaimana LLM memakai 5 chunks yang diberikan secara efektif berbeda drastis antar model.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Lost-in-the-middle phenomenon</h4>
+        <p style="font-size: 13px;">Liu et al. <a class="cite" href="#ref-9">[9]</a> mendemonstrasikan bahwa
+        LLM tidak memberi attention sama untuk semua posisi konteks. <strong>Posisi awal dan akhir</strong>
+        mendapat attention lebih tinggi dari middle. Pattern ini terkonfirmasi di GPT-3.5/4, Claude, dan
+        Llama family.</p>
+
+        <p style="font-size: 13px;">Implikasi untuk RAG: chunk paling relevan harus di posisi top atau bottom
+        konteks. Karena retriever sudah mengurutkan by relevance (chunk pertama paling relevan),
+        chunk #3 cenderung terabaikan jika model punya bias lost-in-the-middle parah.</p>
+      </div>
+      <div>
+        <h4>Differensial antar model</h4>
+        <p style="font-size: 13px;">Model dengan context utilization yang baik:</p>
+        <ul class="bullets">
+          <li>Mengintegrasikan informasi dari multiple chunks</li>
+          <li>Mendeteksi konflik antar chunk</li>
+          <li>Tidak terlalu bias ke chunk pertama saja</li>
+          <li>Bisa "ignore" chunk yang topik mirip tapi tidak menjawab</li>
+        </ul>
+
+        <div class="callout">
+          <div class="lbl">Connection ke faithfulness</div>
+          <p style="font-size: 13px;">Faithfulness rendah (Llama 3.2: 0.596, Claude: 0.599) bisa menandakan
+          model menambah klaim eksternal karena <em>tidak menemukan jawaban di konteks</em>.
+          Faithfulness tinggi (GPT-4.1-mini: 0.893) menandakan model patuh pada konteks.</p>
+        </div>
+
+        <div class="callout purple">
+          <div class="lbl">Counter-intuitive</div>
+          <p style="font-size: 13px;">Claude faithfulness rendah <em>bukan karena hallucinate banyak</em>,
+          tapi karena Claude menambah <em>hedge</em> dan <em>kontekstualisasi</em> yang tidak literal di chunks.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 14. D4 HALLUCINATION ====== -->
+<section class="slide" data-title="IV · D4 Hallucination">
+  <div class="secnum">IV · Mengapa Berbeda · D4</div>
+  <h2><span class="mark">12</span>Hallucination Resistance</h2>
+  <div class="slide-body">
+    <p class="lead">Faithfulness adalah proksi terbalik untuk hallucination dalam RAG context.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Taxonomy of RAG hallucination</h4>
+        <p style="font-size: 13px;">Ji et al. <a class="cite" href="#ref-7">[7]</a> dan Huang et al.
+        <a class="cite" href="#ref-8">[8]</a> mengklasifikasi 3 jenis hallucination:</p>
+        <ul class="bullets">
+          <li><strong>Factuality</strong>: klaim yang salah secara faktual</li>
+          <li><strong>Faithfulness</strong>: klaim yang tidak didukung konteks (paling relevan untuk RAG)</li>
+          <li><strong>Plausibility</strong>: jawaban yang tampak masuk akal tapi tidak grounded</li>
+        </ul>
+
+        <p style="font-size: 13px;">Di RAG, fokus utama adalah <em>faithfulness hallucination</em>: model
+        menambah klaim atau inferensi yang tidak ada di chunk yang di-retrieve. Ini lebih dangerous di
+        domain medis karena pengguna mungkin tidak verifikasi.</p>
+      </div>
+      <div>
+        <h4>Faktor yang memengaruhi</h4>
+        <ul class="bullets">
+          <li><strong>Training data composition</strong>: paparan ke biomedical text</li>
+          <li><strong>Inference-time grounding</strong>: kemampuan attend ke konteks vs internal knowledge</li>
+          <li><strong>Confidence calibration</strong>: kapan model "berani" extrapolate</li>
+          <li><strong>Verbosity</strong>: jawaban panjang lebih rentan menambah klaim ekstra</li>
+        </ul>
+
+        <div class="callout">
+          <div class="lbl">Empirical observations</div>
+          <p style="font-size: 13px;">Faithfulness ranking di hasil kita:</p>
+          <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-top: 4px;">
+          GPT-4.1-mini  : 0.893 (terbaik)<br>
+          Llama 3.3 70B : 0.821<br>
+          Claude Haiku  : 0.599<br>
+          Llama 3.2     : 0.596 (terendah)</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Mengapa Claude rendah</div>
+          <p style="font-size: 13px;">Bukan hallucinate aggresif, tapi cenderung memberi <em>hedge</em>
+          ("based on context, but...") yang tidak verbatim ada di chunks. Constitutional AI
+          <a class="cite" href="#ref-14">[14]</a> mendorong epistemik humility yang triggering this pattern.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 15. D5 CALIBRATION ====== -->
+<section class="slide" data-title="IV · D5 Calibration">
+  <div class="secnum">IV · Mengapa Berbeda · D5</div>
+  <h2><span class="mark">13</span>Calibration & Confidence</h2>
+  <div class="slide-body">
+    <p class="lead">Kapan model berani jawab "maybe" vs commit ke yes/no.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Definisi kalibrasi</h4>
+        <p style="font-size: 13px;">Kadavath et al. <a class="cite" href="#ref-16">[16]</a> mendefinisikan
+        calibration sebagai <em>"alignment antara confidence model dan akurasi sebenarnya"</em>.
+        Model well-calibrated jawab "maybe" tepat saat bukti memang inconclusive.</p>
+
+        <p style="font-size: 13px;">Pada PubMedQA, distribusi GT yes:no:maybe = 55%:32%:13%.
+        Model well-calibrated harus prediksi maybe sekitar 13% kalau memahami inconclusive findings.</p>
+
+        <h4 style="margin-top: 14px;">Distribusi prediksi maybe per model</h4>
+        <table style="font-size: 12px;">
+          <thead><tr><th>Model</th><th class="num">% maybe pred</th><th class="num">Acc maybe</th></tr></thead>
+          <tbody>
+            <tr><td>Llama 3.2</td><td class="num">1.4%</td><td class="num" style="color:var(--red)">0.0%</td></tr>
+            <tr><td>Llama 3.3 70B</td><td class="num">1.0%</td><td class="num">1.5%</td></tr>
+            <tr><td>GPT-4.1-mini</td><td class="num">5.2%</td><td class="num">4.5%</td></tr>
+            <tr><td>Claude Haiku</td><td class="num">17.4%</td><td class="num" style="color:var(--green)">19.7%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Insight: alignment philosophy matters</h4>
+        <div class="callout green">
+          <div class="lbl">Claude's natural calibration</div>
+          <p style="font-size: 13px;">Claude prediksi maybe 17.4% (mendekati GT 13%) <em>tanpa intervensi
+          prompt khusus</em>. Constitutional AI training <a class="cite" href="#ref-14">[14]</a> mendorong
+          honest uncertainty expression.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Llama dan GPT under-predict maybe</div>
+          <p style="font-size: 13px;">Llama 3.2/3.3 dan GPT-4.1-mini punya prior ke commit (yes/no).
+          Ini hasil dari (1) baseline prompt yang melarang maybe, dan (2) RLHF reward function yang
+          mungkin menghukum hedge response.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Connection ke prompt sensitivity</div>
+          <p style="font-size: 13px;">Eksperimen prompt variation kami menunjukkan: hapus larangan
+          eksplisit terhadap maybe → maybe accuracy melonjak 0% → 62.5% (Llama 3.2 prompt P1).
+          Confirms bahwa kalibrasi sebagian besar driven by alignment & prompting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 16. D6 NOISE ROBUSTNESS ====== -->
+<section class="slide" data-title="IV · D6 Noise Robustness">
+  <div class="secnum">IV · Mengapa Berbeda · D6</div>
+  <h2><span class="mark">14</span>Robustness terhadap Retrieval Noise</h2>
+  <div class="slide-body">
+    <p class="lead">Tidak semua dari 5 chunks yang di-retrieve relevan. Bagaimana LLM menangani noise?</p>
+    <div class="grid-2">
+      <div>
+        <h4>Realitas retrieval di RAG</h4>
+        <p style="font-size: 13px;">Untuk PubMedQA, observasi kami menunjukkan:</p>
+        <ul class="bullets">
+          <li>Chunk #1-2 biasanya dari paper sumber pertanyaan (high relevance)</li>
+          <li>Chunk #3-5 sering dari paper lain dengan topik mirip (medium-low relevance)</li>
+          <li>Beberapa chunk berisi <em>unrelated info</em> dengan kata kunci sama</li>
+        </ul>
+
+        <p style="font-size: 13px;">Shi et al. <a class="cite" href="#ref-17">[17]</a> menunjukkan bahwa
+        LLM <em>"can be easily distracted by irrelevant context"</em> bahkan jika relevant info juga
+        tersedia. Distraction rate berbeda antar model dan ukuran.</p>
+
+        <h4 style="margin-top: 14px;">CR (rerank) sebagai mitigasi</h4>
+        <p style="font-size: 13px;">CrossEncoder reranker memilih top-5 dari top-20, mengurangi noise.
+        Method ini paling efektif untuk model yang <em>tidak robust ke noise</em>.</p>
+      </div>
+      <div>
+        <h4>Empirical: dampak CR per model</h4>
+        <table style="font-size: 12px;">
+          <thead><tr><th>Model</th><th class="num">Δ Acc CR vs BL</th><th>Interpretasi</th></tr></thead>
+          <tbody>
+            <tr><td>Llama 3.3 70B</td><td class="num" style="color:var(--green)">+1.4 pp</td><td>Manfaat moderate</td></tr>
+            <tr><td>Claude Haiku</td><td class="num" style="color:var(--green)">+2.6 pp</td><td>Paling diuntungkan</td></tr>
+            <tr><td>GPT-4.1-mini</td><td class="num">+0.6 pp</td><td>Hampir flat</td></tr>
+            <tr><td>Llama 3.2</td><td class="num">+0.2 pp</td><td>Tidak terbantu</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <div class="lbl">Interpretasi</div>
+          <p style="font-size: 13px;">GPT-4.1-mini sudah robust, tidak perlu CR. Llama 3.2 terlalu lemah
+          untuk memanfaatkan konteks yang lebih bersih (bottleneck di reasoning, bukan retrieval).
+          Claude paling diuntungkan karena punya reasoning baik tapi sensitif noise.</p>
+        </div>
+
+        <div class="callout purple">
+          <div class="lbl">Implikasi desain RAG</div>
+          <p style="font-size: 13px;">Pemilihan method mitigasi <em>tidak universal</em>. Harus disesuaikan
+          dengan karakteristik LLM yang dipakai. Eksperimen sistematis dalam riset ini memberi
+          empirical guidance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 17. D7 BIOMEDICAL KNOWLEDGE ====== -->
+<section class="slide" data-title="IV · D7 Biomedical Knowledge">
+  <div class="secnum">IV · Mengapa Berbeda · D7</div>
+  <h2><span class="mark">15</span>Biomedical Domain Knowledge</h2>
+  <div class="slide-body">
+    <p class="lead">Familiaritas LLM dengan istilah dan konsep medis memengaruhi reasoning quality.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Long-tail knowledge effect</h4>
+        <p style="font-size: 13px;">Kandpal et al. <a class="cite" href="#ref-25">[25]</a> menunjukkan
+        bahwa <em>LLM struggle dengan knowledge yang jarang muncul di training data</em>. Untuk biomedis,
+        ini berarti istilah umum (aspirin, diabetes) ditangani baik, tapi istilah specialized
+        (cytokine signaling pathways, rare diseases) butuh extra grounding.</p>
+
+        <p style="font-size: 13px;">Singhal et al. <a class="cite" href="#ref-27">[27]</a> menemukan
+        bahwa LLM general purpose seperti GPT-4 dan Claude <em>encode substantial clinical knowledge</em>
+        cukup untuk mendekati expert level di USMLE. Tapi performa di niche topics (langka) menurun signifikan.</p>
+
+        <h4 style="margin-top: 14px;">Mengapa relevant untuk hasil kita</h4>
+        <p style="font-size: 13px;">PubMedQA mencakup banyak topik medis specialized. Model dengan
+        biomedical knowledge yang lebih luas bisa <em>better leverage</em> chunks yang ambiguous,
+        atau bisa cross-check klaim chunks dengan internal knowledge.</p>
+      </div>
+      <div>
+        <h4>Trade-off knowledge vs grounding</h4>
+        <div class="callout">
+          <div class="lbl">Paradoks</div>
+          <p style="font-size: 13px;">Model dengan banyak biomedical knowledge bisa <em>kontradiksi konteks</em>
+          jika internal knowledge mereka berbeda dari claim di chunk. Inilah mengapa "grounding" penting
+          di RAG: kita ingin model patuh ke konteks, bukan ke training prior-nya.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">GPT vs Claude</div>
+          <p style="font-size: 13px;">GPT-4.1-mini faithfulness 0.893 (sangat patuh konteks).
+          Claude faithfulness 0.599 (lebih sering tambah hedge berbasis internal knowledge).
+          Tapi accuracy keduanya mirip — menandakan trade-off bukan strict.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Llama family observation</div>
+          <p style="font-size: 13px;">Llama 3 series <a class="cite" href="#ref-15">[15]</a> dilatih
+          dengan <em>massive multilingual + scientific text</em>. Llama 3.3 70B menunjukkan biomedical
+          knowledge competitif vs GPT/Claude meskipun open source.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 18. D8 TOKENIZER ====== -->
+<section class="slide" data-title="IV · D8 Tokenizer">
+  <div class="secnum">IV · Mengapa Berbeda · D8</div>
+  <h2><span class="mark">16</span>Tokenizer & Embedding Differences</h2>
+  <div class="slide-body">
+    <p class="lead">Bagaimana istilah biomedis dipecah jadi tokens memengaruhi attention dan reasoning.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Mengapa tokenization matter</h4>
+        <p style="font-size: 13px;">Setiap LLM punya tokenizer berbeda (GPT BPE, Llama SentencePiece,
+        Claude CL100K-base atau variant). Istilah medis kompleks bisa di-tokenize menjadi:</p>
+        <ul class="bullets">
+          <li>1 token (kalau common di training data)</li>
+          <li>Multi-token sub-word breakdown (kalau jarang)</li>
+          <li>Character-level decomposition (worst case)</li>
+        </ul>
+
+        <p style="font-size: 13px;">Contoh: "myocardial infarction" mungkin <code>[my][ocard][ial] [infarct][ion]</code>
+        di Llama, tapi <code>[myocardial] [infarction]</code> di GPT karena medical term lebih sering muncul
+        di training corpus mereka.</p>
+      </div>
+      <div>
+        <h4>Implikasi untuk attention</h4>
+        <p style="font-size: 13px;">Attention mechanism beroperasi pada level token. Kalau "myocardial"
+        dipecah jadi 3 token, attention harus <em>aggregate</em> 3 representasi untuk membentuk
+        konsep. Ini lebih sulit dan rentan error.</p>
+
+        <div class="callout purple">
+          <div class="lbl">Konsekuensi untuk PubMedQA</div>
+          <p style="font-size: 13px;">Llama 3.2 (8B) dengan tokenizer kurang optimal untuk biomedis +
+          attention layer terbatas → akumulasi disadvantage. Faithfulness 0.596 sebagian disebabkan
+          ini.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Mitigasi level model</div>
+          <p style="font-size: 13px;">Domain-specific tokenizer (mis. PubMedBERT, BioBERT)
+          biasanya 20-30% lebih efisien untuk biomedis. Tapi LLM general purpose masih dominan
+          karena ekosistem yang lebih besar.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Embedder choice</div>
+          <p style="font-size: 13px;">Eksperimen kita pakai text-embedding-3-small (OpenAI) untuk dense
+          retrieval. Ini affect retrieval recall tapi <em>tidak affect</em> generation karena
+          embedder berbeda dari LLM tokenizer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 19. D9 ALIGNMENT ====== -->
+<section class="slide" data-title="IV · D9 Alignment Tuning">
+  <div class="secnum">IV · Mengapa Berbeda · D9</div>
+  <h2><span class="mark">17</span>Alignment Philosophy</h2>
+  <div class="slide-body">
+    <p class="lead">RLHF vs Constitutional AI menghasilkan perilaku yang berbeda.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Tiga pendekatan alignment</h4>
+        <p style="font-size: 13px;"><strong>1. RLHF</strong> (Ouyang et al. <a class="cite" href="#ref-13">[13]</a>):
+        reward model dilatih dari preferensi human, lalu policy optimization via PPO. Dipakai oleh OpenAI
+        (GPT) dan Meta (Llama instruct).</p>
+
+        <p style="font-size: 13px;"><strong>2. Constitutional AI</strong> (Bai et al. <a class="cite" href="#ref-14">[14]</a>):
+        LLM dilatih untuk self-critique berdasarkan prinsip eksplisit, lalu self-improve. Dipakai oleh
+        Anthropic (Claude).</p>
+
+        <p style="font-size: 13px;"><strong>3. Direct preference optimization</strong> (DPO): variant simpler
+        dari RLHF tanpa explicit reward model. Mulai banyak dipakai di model open-source.</p>
+
+        <h4 style="margin-top: 14px;">Implikasi untuk RAG behavior</h4>
+        <p style="font-size: 13px;">Constitutional AI (Claude) cenderung mendorong:</p>
+        <ul class="bullets">
+          <li>Honest uncertainty expression (jawab maybe lebih sering)</li>
+          <li>Hedge dan kontekstualisasi (faithfulness lebih rendah)</li>
+          <li>Refusal pada query ambiguous (rare di PubMedQA)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>RLHF behavior pattern</h4>
+        <p style="font-size: 13px;">RLHF (GPT, Llama instruct) cenderung mendorong:</p>
+        <ul class="bullets">
+          <li>Format compliance ketat</li>
+          <li>Direct & confident answers</li>
+          <li>Lebih jarang hedge</li>
+          <li>Faithfulness tinggi (terutama GPT)</li>
+        </ul>
+
+        <div class="callout purple">
+          <div class="lbl">Trade-off observable</div>
+          <p style="font-size: 13px;">Claude: maybe acc <strong>tertinggi (19.7%)</strong>, faithfulness rendah.<br>
+          GPT-4.1-mini: faithfulness <strong>tertinggi (0.893)</strong>, maybe acc rendah.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Tidak ada "winner"</div>
+          <p style="font-size: 13px;">Pemilihan alignment philosophy <em>tergantung use case</em>.
+          Untuk medical RAG: jika false confident answer berbahaya, Claude lebih cocok.
+          Jika strict adherence ke literature lebih penting, GPT lebih cocok.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Riset lanjut</div>
+          <p style="font-size: 13px;">Touvron et al. <a class="cite" href="#ref-24">[24]</a> dan Grattafiori et al.
+          <a class="cite" href="#ref-15">[15]</a> mendokumentasikan evolusi RLHF di Llama family.
+          Llama 3.3 RLHF-nya jauh lebih mature dari 3.2.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 20. LLAMA 3.2 ====== -->
+<section class="slide" data-title="V · Llama 3.2">
+  <div class="secnum">V · Per-Model Analysis</div>
+  <h2><span class="mark">18</span>Llama 3.2: Compact Open-Source</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Profile arsitektur</h4>
+        <ul class="bullets">
+          <li><strong>Provider</strong>: Meta AI (open-source)</li>
+          <li><strong>Parameter</strong>: ~3B / 8B variant (kita pakai 3B)</li>
+          <li><strong>Architecture</strong>: dense transformer, no MoE</li>
+          <li><strong>Context window</strong>: 128K tokens</li>
+          <li><strong>Training</strong>: knowledge distillation dari Llama 3.1 70B</li>
+          <li><strong>Alignment</strong>: SFT + DPO (lebih ringan dari RLHF full)</li>
+          <li><strong>Tokenizer</strong>: SentencePiece, vocab 128K</li>
+        </ul>
+
+        <h4 style="margin-top: 12px;">Hasil di eksperimen</h4>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+        BL: 55.0% | QR: 53.4% | CR: 55.2% | QR+CR: 55.0%<br>
+        Faithfulness baseline: 0.596<br>
+        Maybe acc baseline: 0.0%</p>
+      </div>
+      <div>
+        <h4>Analisis</h4>
+        <div class="callout red">
+          <div class="lbl">Bottleneck utama</div>
+          <p style="font-size: 13px;">Reasoning capability terbatas oleh parameter scale. Method mitigasi
+          (QR, CR) hampir tidak membantu (Δ &lt;0.5pp).</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Strength</div>
+          <p style="font-size: 13px;">Cost gratis (lokal via Ollama). Privasi terjaga. Cocok untuk
+          deployment edge atau scenario rate-limit.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Anti-maybe bias ekstrem</div>
+          <p style="font-size: 13px;">Prediksi maybe hanya 1.4% (vs GT 13%). Model commit ke yes/no
+          terlepas evidence. Ini hasil dari (1) prompt baseline melarang maybe, (2) DPO mendorong
+          decisive answers.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Insight kritis</div>
+          <p style="font-size: 13px;">QR memberi gain Δ +25.8pp di kelas maybe (eksperimen prompt variation).
+          Llama 3.2 paling responsive ke prompt engineering — <em>compensation mechanism</em> untuk
+          model lemah <a class="cite" href="#ref-18">[18]</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 21. LLAMA 3.3 70B ====== -->
+<section class="slide" data-title="V · Llama 3.3 70B">
+  <div class="secnum">V · Per-Model Analysis</div>
+  <h2><span class="mark">19</span>Llama 3.3 70B: Open-Source Flagship</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Profile arsitektur</h4>
+        <ul class="bullets">
+          <li><strong>Provider</strong>: Meta AI (open-source)</li>
+          <li><strong>Parameter</strong>: 70B (dense)</li>
+          <li><strong>Architecture</strong>: dense transformer dengan grouped query attention</li>
+          <li><strong>Context window</strong>: 128K tokens</li>
+          <li><strong>Training</strong>: 15T+ tokens, multilingual + scientific corpus</li>
+          <li><strong>Alignment</strong>: SFT + RLHF + DPO + rejection sampling</li>
+          <li><strong>Note</strong>: improvement utama 3.3 vs 3.1 = math + reasoning + instruction following</li>
+        </ul>
+
+        <h4 style="margin-top: 12px;">Hasil di eksperimen</h4>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+        BL: 69.4% | QR: 68.2% | CR: 70.8% | QR+CR: 71.0%<br>
+        Faithfulness baseline: 0.821<br>
+        Maybe acc baseline: 1.5%</p>
+      </div>
+      <div>
+        <h4>Analisis</h4>
+        <div class="callout green">
+          <div class="lbl">Best overall di eksperimen</div>
+          <p style="font-size: 13px;">QR+CR mencapai 71.0% — tertinggi dari 16 konfigurasi. Parameter scale
+          70B memberi reasoning yang competitif dengan model proprietary.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">CR effective</div>
+          <p style="font-size: 13px;">Δ +1.4pp dari Baseline ke CR. Konsisten dengan ekspektasi:
+          model yang sudah baik bisa <em>memanfaatkan</em> konteks yang lebih bersih.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Maybe handling lemah</div>
+          <p style="font-size: 13px;">Maybe acc cuma 1.5% (vs Claude 19.7%). Llama family konsisten
+          under-predict maybe, kemungkinan dari RLHF reward yang menghukum hedge.</p>
+        </div>
+
+        <div class="callout purple">
+          <div class="lbl">Cost-performance</div>
+          <p style="font-size: 13px;">Via OpenRouter, Llama 3.3 70B sekitar 5-10x lebih murah dari GPT-4.
+          Sweet spot untuk production RAG di domain dengan literature publik.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 22. GPT-4.1-MINI ====== -->
+<section class="slide" data-title="V · GPT-4.1-mini">
+  <div class="secnum">V · Per-Model Analysis</div>
+  <h2><span class="mark">20</span>GPT-4.1-mini: Closed-Source Efficient</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Profile arsitektur</h4>
+        <ul class="bullets">
+          <li><strong>Provider</strong>: OpenAI (closed-source)</li>
+          <li><strong>Parameter</strong>: undisclosed (estimasi sub-100B)</li>
+          <li><strong>Architecture</strong>: speculated MoE atau hybrid</li>
+          <li><strong>Context window</strong>: 1M tokens</li>
+          <li><strong>Training</strong>: post-2023 cutoff, includes scientific literature</li>
+          <li><strong>Alignment</strong>: RLHF + safety RL, intensive</li>
+          <li><strong>Tokenizer</strong>: cl100k_base / o200k_base</li>
+        </ul>
+
+        <h4 style="margin-top: 12px;">Hasil di eksperimen</h4>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+        BL: 69.2% | QR: 70.8% | CR: 69.8% | QR+CR: 70.0%<br>
+        Faithfulness baseline: 0.893<br>
+        Maybe acc baseline: 4.5%</p>
+      </div>
+      <div>
+        <h4>Analisis</h4>
+        <div class="callout">
+          <div class="lbl">Best faithfulness</div>
+          <p style="font-size: 13px;">Faithfulness 0.893 — tertinggi dari 4 LLM. Strict adherence ke konteks,
+          jarang menambah klaim ekstra. Ideal untuk RAG di domain regulated.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">QR helps</div>
+          <p style="font-size: 13px;">Δ +1.6pp dari Baseline ke QR. Salah satu LLM yang benefit dari QR
+          (Llama dan Claude tidak). Mungkin karena GPT punya "internal" QR yang sinergis dengan external QR.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Robust ke noise</div>
+          <p style="font-size: 13px;">CR cuma kasih +0.6pp — menandakan GPT sudah natively robust ke
+          irrelevant chunks. Tidak butuh reranker untuk filtering noise.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Trade-off cost</div>
+          <p style="font-size: 13px;">Closed-source, $0.4/1M input + $1.6/1M output. Untuk 500 sampel
+          full eksperimen ~$5. Affordable tapi tetap proprietary lock-in.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 23. CLAUDE HAIKU 4.5 ====== -->
+<section class="slide" data-title="V · Claude Haiku 4.5">
+  <div class="secnum">V · Per-Model Analysis</div>
+  <h2><span class="mark">21</span>Claude Haiku 4.5: Constitutional AI</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Profile arsitektur</h4>
+        <ul class="bullets">
+          <li><strong>Provider</strong>: Anthropic (closed-source)</li>
+          <li><strong>Parameter</strong>: undisclosed (Haiku = tier compact)</li>
+          <li><strong>Architecture</strong>: dense transformer, hybrid speculated</li>
+          <li><strong>Context window</strong>: 200K tokens</li>
+          <li><strong>Training</strong>: web + scientific + curated dialog</li>
+          <li><strong>Alignment</strong>: Constitutional AI <a class="cite" href="#ref-14">[14]</a> + RLAIF</li>
+          <li><strong>Note</strong>: Anthropic <a class="cite" href="#ref-22">[22]</a> emphasize honesty + safety</li>
+        </ul>
+
+        <h4 style="margin-top: 12px;">Hasil di eksperimen</h4>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+        BL: 65.4% | QR: 64.0% | CR: 68.0% | QR+CR: 64.8%<br>
+        Faithfulness baseline: 0.599<br>
+        Maybe acc baseline: 19.7%</p>
+      </div>
+      <div>
+        <h4>Analisis</h4>
+        <div class="callout green">
+          <div class="lbl">Best maybe-recall</div>
+          <p style="font-size: 13px;">Maybe acc 19.7% — jauh di atas GPT (4.5%) dan Llama (1.5%).
+          Claude punya natural calibration ke uncertainty, hasil dari Constitutional AI training
+          yang mendorong epistemik humility.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Faithfulness rendah</div>
+          <p style="font-size: 13px;">0.599 — di antara 4 LLM. Bukan hallucinate aggresif, tapi sering
+          tambah hedge ("based on context, but...") yang tidak verbatim ada di chunks.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">CR sangat membantu</div>
+          <p style="font-size: 13px;">Δ +2.6pp dari Baseline ke CR — gain terbesar di antara 4 LLM.
+          Claude punya reasoning baik tapi sensitif noise. Reranker sangat efektif untuk Claude.</p>
+        </div>
+
+        <div class="callout purple">
+          <div class="lbl">Best for safety-critical</div>
+          <p style="font-size: 13px;">Karakteristik Claude (calibrated uncertainty + hedge) cocok untuk
+          medical decision support di mana false confident answer berbahaya. Bukan untuk strict
+          literature lookup.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 24. BM25 DETAIL ====== -->
+<section class="slide" data-title="VI · BM25">
+  <div class="secnum">VI · Hybrid Retrieval Mechanics</div>
+  <h2><span class="mark">22</span>BM25: Sparse Lexical Matching</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Formula BM25 <a class="cite" href="#ref-3">[3]</a></h4>
+        <p style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--blue);
+                  background: var(--bg-elev); padding: 12px; border-radius: 4px; margin: 8px 0;">
+        score(D, Q) =<br>
+        &nbsp;&nbsp;Σᵢ IDF(qᵢ) ·<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;f(qᵢ, D) · (k₁ + 1)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;─────────────────────<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;f(qᵢ, D) + k₁ · (1 - b + b · |D|/avgdl)
+        </p>
+
+        <p style="font-size: 13px;">Komponen:</p>
+        <ul class="bullets">
+          <li><strong>IDF</strong>: kata jarang dapat bobot lebih tinggi</li>
+          <li><strong>f(qᵢ, D)</strong>: term frequency di document D</li>
+          <li><strong>k₁ = 1.5</strong>: term frequency saturation</li>
+          <li><strong>b = 0.75</strong>: length normalization</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Karakteristik untuk biomedis</h4>
+        <div class="callout green">
+          <div class="lbl">Strength</div>
+          <p style="font-size: 13px;">Excellent untuk istilah medis spesifik (nama obat, nama penyakit,
+          akronim). "Aspirin" di query langsung match "aspirin" di chunk dengan high score.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Weakness</div>
+          <p style="font-size: 13px;">Tidak menangkap parafrasa atau sinonim. "Heart attack" vs
+          "myocardial infarction" treated berbeda meskipun semantically equivalent.</p>
+        </div>
+
+        <h4 style="margin-top: 14px;">Kontribusi di pipeline</h4>
+        <p style="font-size: 13px;">Memberi <em>high precision</em> untuk query dengan istilah medis spesifik.
+        Hasil top-50 BM25 jadi seed yang complementary dengan dense retrieval.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 25. DENSE RETRIEVAL DETAIL ====== -->
+<section class="slide" data-title="VI · Dense Retrieval">
+  <div class="secnum">VI · Hybrid Retrieval Mechanics</div>
+  <h2><span class="mark">23</span>Dense Retrieval: Semantic Embedding</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Mekanisme <a class="cite" href="#ref-2">[2]</a></h4>
+        <p style="font-size: 13px;">Karpukhin et al. memperkenalkan Dense Passage Retrieval (DPR):</p>
+        <ol class="bullets">
+          <li>Encode query dan document jadi vektor d-dim (d=1536 di sini)</li>
+          <li>Hitung cosine similarity: <code>sim(q, d) = q · d / (||q|| · ||d||)</code></li>
+          <li>Return top-k dengan similarity tertinggi</li>
+        </ol>
+
+        <p style="font-size: 13px;">Khattab & Zaharia <a class="cite" href="#ref-5">[5]</a> mengembangkan
+        ColBERT yang melakukan late interaction (token-level matching), tapi kompromi efisiensi.
+        Untuk eksperimen kita pakai dense retrieval standard via text-embedding-3-small.</p>
+
+        <h4 style="margin-top: 12px;">Embedder choice</h4>
+        <p style="font-size: 13px;">text-embedding-3-small (OpenAI):</p>
+        <ul class="bullets">
+          <li>1536 dimensi</li>
+          <li>Trained pada web + scientific corpus</li>
+          <li>Cost $0.02/1M tokens (very cheap)</li>
+          <li>Excellent untuk english medical text</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Karakteristik untuk biomedis</h4>
+        <div class="callout green">
+          <div class="lbl">Strength</div>
+          <p style="font-size: 13px;">Menangkap semantic similarity. "Heart attack" cocok dengan
+          "myocardial infarction" karena vektornya berdekatan di embedding space.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Weakness</div>
+          <p style="font-size: 13px;">Kadang too liberal — menarik chunk yang topik mirip tapi sebenarnya
+          tidak menjawab. Kalibrasi precision-recall harus tuned via reranker (CR method).</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Kontribusi di pipeline</div>
+          <p style="font-size: 13px;">Memberi <em>high recall</em> untuk semantic match. Hasil top-50 dense
+          melengkapi BM25 dengan chunk yang mungkin tidak match keyword tapi relevant secara konsep.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 26. RRF DETAIL ====== -->
+<section class="slide" data-title="VI · RRF">
+  <div class="secnum">VI · Hybrid Retrieval Mechanics</div>
+  <h2><span class="mark">24</span>Reciprocal Rank Fusion</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Formula RRF <a class="cite" href="#ref-4">[4]</a></h4>
+        <p style="font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--blue);
+                  background: var(--bg-elev); padding: 14px; border-radius: 4px; margin: 8px 0;">
+        RRF(d) = Σᵣ 1 / (k + rank_r(d))<br><br>
+        d = document<br>
+        r = retriever (BM25, Dense)<br>
+        rank_r(d) = posisi d di hasil retriever r<br>
+        k = 60 (konstanta standar)
+        </p>
+
+        <h4 style="margin-top: 12px;">Mengapa RRF efektif</h4>
+        <ul class="bullets">
+          <li><strong>Rank-based, bukan score-based</strong>: tidak butuh kalibrasi skor antar retriever</li>
+          <li><strong>Self-bounded</strong>: dokumen di top-1 dapat 1/(60+0) = 0.0164</li>
+          <li><strong>Tail damping</strong>: dokumen rendah cepat dibuang</li>
+          <li><strong>Empirically robust</strong>: outperform supervised LTR di banyak benchmark</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contoh konkret</h4>
+        <p style="font-size: 13px;">Untuk query "Does aspirin reduce MI risk?":</p>
+        <table style="font-size: 11px; margin: 8px 0;">
+          <thead><tr><th>Doc</th><th class="num">BM25 rank</th><th class="num">Dense rank</th><th class="num">RRF score</th></tr></thead>
+          <tbody>
+            <tr><td>D1 (aspirin RCT)</td><td class="num">1</td><td class="num">2</td><td class="num">0.0323</td></tr>
+            <tr><td>D2 (cardio epidemiology)</td><td class="num">3</td><td class="num">1</td><td class="num">0.0319</td></tr>
+            <tr><td>D3 (NSAIDs general)</td><td class="num">2</td><td class="num">5</td><td class="num">0.0314</td></tr>
+            <tr><td>D4 (hyperlipidemia)</td><td class="num">5</td><td class="num">3</td><td class="num">0.0308</td></tr>
+            <tr><td>D5 (diabetes & MI)</td><td class="num">4</td><td class="num">7</td><td class="num">0.0303</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <div class="lbl">Catatan kritis</div>
+          <p style="font-size: 13px;">D1 menang karena rank tinggi di kedua retriever. D2 dapat boost
+          dari Dense (ranking pertama) meski BM25 cuma rank 3. Ini esensi hybrid: <em>aggregate
+          complementary signals</em>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 27. WHY HYBRID ====== -->
+<section class="slide" data-title="VI · Why Hybrid">
+  <div class="secnum">VI · Hybrid Retrieval Mechanics</div>
+  <h2><span class="mark">25</span>Mengapa Hybrid Outperform Single Retriever</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Complementary failure modes</h4>
+        <p style="font-size: 13px;">Bruch et al. <a class="cite" href="#ref-7">[7]</a> menganalisis bahwa:</p>
+        <ul class="bullets">
+          <li>BM25 fail: query dengan parafrasa atau sinonim</li>
+          <li>Dense fail: query dengan named entity rare yang tidak well-represented di embedding</li>
+          <li>BM25 + Dense: keduanya fail simultan jauh lebih jarang dari salah satu fail</li>
+        </ul>
+
+        <p style="font-size: 13px;">Lin et al. <a class="cite" href="#ref-26">[26]</a> di benchmark BEIR
+        menunjukkan hybrid retrieval konsisten outperform single retriever dengan rata-rata gain
+        5-12% nDCG@10.</p>
+
+        <h4 style="margin-top: 12px;">Eksperimen kami juga konsisten</h4>
+        <p style="font-size: 13px;">Eksperimen pendukung di main notebook menunjukkan baseline OpenAI:</p>
+        <ul class="bullets">
+          <li>BM25-only: 65.4% accuracy</li>
+          <li>Hybrid: 69.2% accuracy</li>
+          <li>Δ = +3.8pp dari fusion</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Tapi gain tidak transfer ke generation accuracy</h4>
+        <div class="callout purple">
+          <div class="lbl">Important caveat</div>
+          <p style="font-size: 13px;">Hybrid memberi candidate evidence yang lebih baik (recall + precision),
+          tapi itu tidak otomatis jadi generation accuracy yang lebih tinggi. Generator capability
+          tetap menjadi bottleneck.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Empirical verifikasi</div>
+          <p style="font-size: 13px;">Llama 3.2 dengan hybrid retrieval cuma 55%, sementara Llama 3.3
+          dengan hybrid retrieval mencapai 69%. Retrieval sama, generator beda → accuracy beda 14pp.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Insight desain</div>
+          <p style="font-size: 13px;">Investasi waktu di hybrid retrieval valuable, tapi return-on-investment
+          juga tergantung kemampuan generator. Untuk model lemah, peningkatan retrieval saja tidak cukup.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 28. SYNTHESIS ====== -->
+<section class="slide" data-title="VII · Synthesis">
+  <div class="secnum">VII · Synthesis & Conclusions</div>
+  <h2><span class="mark">26</span>Synthesis: 5 Insight Utama</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <div class="callout">
+          <div class="lbl">Insight 1</div>
+          <p style="font-size: 13px;"><strong>Retrieval ≠ Reasoning.</strong> Pipeline RAG yang identik tidak
+          menjamin output identik. Generator capability adalah bottleneck terakhir
+          <a class="cite" href="#ref-1">[1]</a>.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Insight 2</div>
+          <p style="font-size: 13px;"><strong>Parameter scale matters, tapi tidak monoton.</strong> Llama 3.3 70B
+          (open) competitive dengan GPT-4.1-mini (closed). Quality training + alignment bisa
+          compensate ukuran <a class="cite" href="#ref-15">[15]</a>.</p>
+        </div>
+
+        <div class="callout green">
+          <div class="lbl">Insight 3</div>
+          <p style="font-size: 13px;"><strong>Alignment philosophy memengaruhi calibration.</strong> Constitutional AI
+          (Claude) natural untuk uncertainty, RLHF (GPT, Llama) cenderung commit
+          <a class="cite" href="#ref-14">[14]</a>.</p>
+        </div>
+      </div>
+      <div>
+        <div class="callout purple">
+          <div class="lbl">Insight 4</div>
+          <p style="font-size: 13px;"><strong>Method mitigasi bukan universal.</strong> CR efektif untuk Llama 3.3
+          dan Claude, tapi marginal untuk Llama 3.2 dan GPT. Pemilihan method harus mempertimbangkan
+          karakteristik LLM.</p>
+        </div>
+
+        <div class="callout red">
+          <div class="lbl">Insight 5</div>
+          <p style="font-size: 13px;"><strong>Faithfulness ≠ Accuracy.</strong> Trade-off antara strict adherence ke
+          konteks (GPT 0.893) dan honest uncertainty (Claude 0.599) tidak terprediksi dari accuracy
+          saja. Pemilihan model tergantung use case <a class="cite" href="#ref-7">[7]</a>.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Implikasi praktis untuk RAG biomedis</div>
+          <p style="font-size: 13px;">Untuk decision support: <em>Claude Haiku 4.5</em> + CR.<br>
+          Untuk literature lookup: <em>GPT-4.1-mini</em> + QR.<br>
+          Untuk cost-effective open-source: <em>Llama 3.3 70B</em> + QR+CR.<br>
+          Untuk edge deployment: <em>Llama 3.2</em> + QR (sebagai compensation).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 29. IMPLICATIONS ====== -->
+<section class="slide" data-title="VII · Implikasi Riset">
+  <div class="secnum">VII · Synthesis & Conclusions</div>
+  <h2><span class="mark">27</span>Implikasi untuk Riset RAG Biomedis</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Untuk komunitas riset</h4>
+        <ul class="bullets">
+          <li><strong>Benchmarking harus include multiple LLMs</strong>. Single-model evaluation tidak
+          representatif untuk klaim "method X improves RAG". Perlu cross-LLM validation.</li>
+          <li><strong>Faithfulness dan accuracy harus diukur bersama</strong>. Trade-off-nya non-trivial
+          dan use-case dependent.</li>
+          <li><strong>Per-class accuracy lebih informatif dari overall</strong>. Class imbalance bisa
+          tutupi failure mode kritis (mis. maybe acc 0%).</li>
+          <li><strong>Method efficacy harus diuji dengan ablation</strong>. CR helps Claude tapi tidak
+          Llama 3.2 — pattern ini hanya muncul lewat ablation systematic.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Untuk praktik production RAG</h4>
+        <ul class="bullets">
+          <li><strong>Pemilihan LLM tidak universal</strong>. Cocokkan dengan use case (decision support
+          vs literature lookup vs edge deployment).</li>
+          <li><strong>Investasi di retrieval quality tetap valuable</strong>, tapi tidak cukup. Generator
+          capability harus juga di-optimize.</li>
+          <li><strong>Prompt engineering memberi gain compounding</strong> di model lemah, tapi marginal
+          di model kuat. Cost-benefit analisis penting.</li>
+          <li><strong>Kalibrasi (maybe handling) adalah safety feature</strong>. Untuk medical, model
+          yang well-calibrated lebih trustworthy meskipun overall accuracy lebih rendah.</li>
+        </ul>
+
+        <div class="callout green" style="margin-top: 12px;">
+          <div class="lbl">Future work</div>
+          <p style="font-size: 13px;">Replikasi di domain non-biomedis (legal, finance) untuk validasi
+          generalizability pattern. Cross-validation dengan reasoning model (o1, DeepSeek-R1).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 30. IMPORTANT NOTES ====== -->
+<section class="slide" data-title="VII · Important Notes">
+  <div class="secnum">VII · Synthesis & Conclusions</div>
+  <h2><span class="mark">28</span>Important Notes & Limitations</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Limitations metodologis</h4>
+        <ul class="bullets">
+          <li><strong>n=500</strong>: cukup untuk pola umum, tapi kelas maybe (n=66) confidence interval
+          masih lebar (~±10pp pada 95% CI).</li>
+          <li><strong>Single domain</strong>: PubMedQA biomedis. Pola mungkin berbeda di legal, finance,
+          atau open-domain.</li>
+          <li><strong>Closed-source LLM opaque</strong>: arsitektur GPT-4.1-mini dan Claude Haiku tidak
+          publicly documented. Beberapa klaim arsitektur adalah inference dari behavior.</li>
+          <li><strong>Single embedder</strong>: text-embedding-3-small. Hasil mungkin sedikit beda dengan
+          biomedical-specific embedder seperti PubMedBERT.</li>
+          <li><strong>Single prompt baseline</strong>: experimental design fix prompt; gain dari prompt
+          engineering tersembunyi (eksperimen prompt variation menjawab ini).</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Caveat interpretasi</h4>
+        <div class="callout red">
+          <div class="lbl">Causality vs correlation</div>
+          <p style="font-size: 13px;">Klaim "alignment philosophy menyebabkan calibration difference"
+          adalah inference dari pola yang konsisten. Tidak ada randomized intervention experiment.
+          Konfirmasi causality membutuhkan controlled training experiments.</p>
+        </div>
+
+        <div class="callout blue">
+          <div class="lbl">Model versioning</div>
+          <p style="font-size: 13px;">Kinerja model bisa berubah seiring update API provider. Hasil ini
+          snapshot pada Mei 2026. Replikasi periodik direkomendasikan untuk klaim production.</p>
+        </div>
+
+        <div class="callout">
+          <div class="lbl">Reproducibility</div>
+          <p style="font-size: 13px;">Seed=42, temperature=0, fix prompt. Tapi sampling internal LLM
+          (especially OpenAI/Claude API) tidak fully deterministic. Variansi kecil mungkin terjadi
+          pada replikasi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 31. REFERENCES 1 ====== -->
+<section class="slide" data-title="VIII · Referensi 1/2">
+  <div class="secnum">VIII · Referensi Akademik</div>
+  <h2><span class="mark">29</span>Daftar Referensi (1 dari 2)</h2>
+  <div class="slide-body">
+    <div class="ref-list">
+      <div class="ref" id="ref-1"><span class="id">[1]</span> Lewis, P., et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. <span class="venue">NeurIPS 2020</span>. arXiv:2005.11401</div>
+      <div class="ref" id="ref-2"><span class="id">[2]</span> Karpukhin, V., et al. (2020). Dense Passage Retrieval for Open-Domain Question Answering. <span class="venue">EMNLP 2020</span>. arXiv:2004.04906</div>
+      <div class="ref" id="ref-3"><span class="id">[3]</span> Robertson, S., & Zaragoza, H. (2009). The Probabilistic Relevance Framework: BM25 and Beyond. <span class="venue">Foundations and Trends in Information Retrieval, 3(4), 333–389</span></div>
+      <div class="ref" id="ref-4"><span class="id">[4]</span> Cormack, G. V., Clarke, C. L. A., & Buettcher, S. (2009). Reciprocal Rank Fusion outperforms Condorcet and Individual Rank Learning Methods. <span class="venue">SIGIR 2009</span></div>
+      <div class="ref" id="ref-5"><span class="id">[5]</span> Khattab, O., & Zaharia, M. (2020). ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. <span class="venue">SIGIR 2020</span>. arXiv:2004.12832</div>
+      <div class="ref" id="ref-6"><span class="id">[6]</span> Bruch, S., et al. (2023). An Analysis of Fusion Functions for Hybrid Retrieval. <span class="venue">ACM Transactions on Information Systems</span>. arXiv:2210.11934</div>
+      <div class="ref" id="ref-7"><span class="id">[7]</span> Ji, Z., et al. (2023). Survey of Hallucination in Natural Language Generation. <span class="venue">ACM Computing Surveys, 55(12)</span>. arXiv:2202.03629</div>
+      <div class="ref" id="ref-8"><span class="id">[8]</span> Huang, L., et al. (2025). A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. <span class="venue">ACM TOIS</span>. arXiv:2311.05232</div>
+      <div class="ref" id="ref-9"><span class="id">[9]</span> Liu, N. F., et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. <span class="venue">TACL 2024</span>. arXiv:2307.03172</div>
+      <div class="ref" id="ref-10"><span class="id">[10]</span> Es, S., et al. (2024). RAGAS: Automated Evaluation of Retrieval Augmented Generation. <span class="venue">EACL 2024 Demo</span>. arXiv:2309.15217</div>
+      <div class="ref" id="ref-11"><span class="id">[11]</span> Jin, Q., Dhingra, B., Liu, Z., Cohen, W. W., & Lu, X. (2019). PubMedQA: A Dataset for Biomedical Research Question Answering. <span class="venue">EMNLP 2019</span>. arXiv:1909.06146</div>
+      <div class="ref" id="ref-12"><span class="id">[12]</span> Wei, J., et al. (2022). Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. <span class="venue">NeurIPS 2022</span>. arXiv:2201.11903</div>
+      <div class="ref" id="ref-13"><span class="id">[13]</span> Ouyang, L., et al. (2022). Training Language Models to Follow Instructions with Human Feedback. <span class="venue">NeurIPS 2022</span>. arXiv:2203.02155</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 32. REFERENCES 2 ====== -->
+<section class="slide" data-title="VIII · Referensi 2/2">
+  <div class="secnum">VIII · Referensi Akademik</div>
+  <h2><span class="mark">30</span>Daftar Referensi (2 dari 2)</h2>
+  <div class="slide-body">
+    <div class="ref-list">
+      <div class="ref" id="ref-14"><span class="id">[14]</span> Bai, Y., et al. (2022). Constitutional AI: Harmlessness from AI Feedback. <span class="venue">Anthropic Technical Report</span>. arXiv:2212.08073</div>
+      <div class="ref" id="ref-15"><span class="id">[15]</span> Grattafiori, A., et al. (2024). The Llama 3 Herd of Models. <span class="venue">Meta AI Research</span>. arXiv:2407.21783</div>
+      <div class="ref" id="ref-16"><span class="id">[16]</span> Kadavath, S., et al. (2022). Language Models (Mostly) Know What They Know. <span class="venue">Anthropic</span>. arXiv:2207.05221</div>
+      <div class="ref" id="ref-17"><span class="id">[17]</span> Shi, F., et al. (2023). Large Language Models Can Be Easily Distracted by Irrelevant Context. <span class="venue">ICML 2023</span>. arXiv:2302.00093</div>
+      <div class="ref" id="ref-18"><span class="id">[18]</span> Ma, X., Gong, Y., He, P., Zhao, H., & Duan, N. (2023). Query Rewriting for Retrieval-Augmented Large Language Models. <span class="venue">EMNLP 2023</span>. arXiv:2305.14283</div>
+      <div class="ref" id="ref-19"><span class="id">[19]</span> Asai, A., et al. (2024). Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection. <span class="venue">ICLR 2024</span>. arXiv:2310.11511</div>
+      <div class="ref" id="ref-20"><span class="id">[20]</span> Min, S., et al. (2023). FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long-Form Text Generation. <span class="venue">EMNLP 2023</span>. arXiv:2305.14251</div>
+      <div class="ref" id="ref-21"><span class="id">[21]</span> Zheng, L., et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. <span class="venue">NeurIPS 2023</span>. arXiv:2306.05685</div>
+      <div class="ref" id="ref-22"><span class="id">[22]</span> Anthropic (2024). Claude 3 Model Card and Evaluations. <span class="venue">Anthropic Technical Report</span></div>
+      <div class="ref" id="ref-23"><span class="id">[23]</span> OpenAI (2025). GPT-4.1 System Card. <span class="venue">OpenAI Technical Report</span></div>
+      <div class="ref" id="ref-24"><span class="id">[24]</span> Touvron, H., et al. (2023). Llama 2: Open Foundation and Fine-Tuned Chat Models. <span class="venue">Meta AI Research</span>. arXiv:2307.09288</div>
+      <div class="ref" id="ref-25"><span class="id">[25]</span> Kandpal, N., et al. (2023). Large Language Models Struggle to Learn Long-Tail Knowledge. <span class="venue">ICML 2023</span>. arXiv:2211.08411</div>
+      <div class="ref" id="ref-26"><span class="id">[26]</span> Lin, S.-C., Yang, J.-H., & Lin, J. (2021). In-Batch Negatives for Knowledge Distillation with Tightly-Coupled Teachers for Dense Retrieval. <span class="venue">RepL4NLP 2021</span></div>
+      <div class="ref" id="ref-27"><span class="id">[27]</span> Singhal, K., et al. (2023). Large Language Models Encode Clinical Knowledge. <span class="venue">Nature, 620, 172–180</span></div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- NAV -->
+<div class="deck-nav">
+  <button id="prev" onclick="prev()">← Prev</button>
+  <div class="dots" id="dots"></div>
+  <div style="display: flex; align-items: center; gap: 14px;">
+    <span class="nav-hint">← → keys · Home/End</span>
+    <button id="next" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  document.getElementById('total').textContent = total;
+  const dotsCt = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.title = slides[i].dataset.title || ('Slide ' + (i + 1));
+    d.onclick = () => show(i);
+    dotsCt.appendChild(d);
+  }
+
+  function show(i) {
+    if (i < 0 || i >= total) return;
+    slides[cur].classList.remove('active');
+    slides[i].classList.add('active');
+    dotsCt.children[cur].classList.remove('active');
+    dotsCt.children[i].classList.add('active');
+    cur = i;
+    document.getElementById('cur').textContent = i + 1;
+    document.getElementById('slide-title').textContent = slides[i].dataset.title || '';
+    document.getElementById('progress').style.width = ((i + 1) / total * 100) + '%';
+    document.getElementById('prev').disabled = (i === 0);
+    document.getElementById('next').disabled = (i === total - 1);
+    history.replaceState(null, '', '#slide-' + (i + 1));
+  }
+
+  function next() { show(cur + 1); }
+  function prev() { show(cur - 1); }
+
+  function fitSlide() {
+    const stage = document.getElementById('stage');
+    const availW = stage.clientWidth - 24;
+    const availH = stage.clientHeight - 24;
+    const scale = Math.min(availW / 1280, availH / 720, 1);
+    document.documentElement.style.setProperty('--scale', scale);
+  }
+
+  window.addEventListener('resize', fitSlide);
+  window.addEventListener('load', () => {
+    fitSlide();
+    const m = window.location.hash.match(/^#slide-(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1]) - 1;
+      if (n >= 0 && n < total) show(n);
+    } else {
+      document.getElementById('progress').style.width = (1 / total * 100) + '%';
+      document.getElementById('prev').disabled = true;
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    switch (e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(total - 1); break;
+    }
+  });
+</script>
+
+</body>
+</html>

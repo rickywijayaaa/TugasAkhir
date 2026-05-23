@@ -36,7 +36,7 @@ Subbab ini akan membahas desain dari solusi yang telah terpilih. Desain solusi m
 \subsection{Data Preparation}
 \label{subsec:data-preparation}
 
-Pada tugas akhir ini, tahap \textit{data preparation} dilakukan pada \textit{dataset} PubMedQA, yaitu \textit{dataset} \textit{question answering} di bidang biomedis yang dirancang untuk menguji kemampuan sistem dalam menjawab pertanyaan mengenai biomedis ataupun kesehatan. Subset yang digunakan adalah \textit{pqa\_labeled} yang berisi 1.000 artikel berlabel \textit{expert}. Setiap artikel di PubMedQA diambil dari \textit{Public Medical} (PubMed)\footnote{\url{https://pubmed.ncbi.nlm.nih.gov/}}, yakni basis data artikel ilmiah biomedis yang dikelola oleh \textit{National Library of Medicine} (NLM), Amerika Serikat. Karena bersumber dari PubMed, setiap artikel dilengkapi dengan \textit{PubMed ID} (\textit{pubid}) yang dapat digunakan untuk menelusuri artikel aslinya secara langsung.
+Pada tugas akhir ini, tahap \textit{data preparation} dilakukan pada \textit{dataset} PubMedQA, yaitu \textit{dataset} \textit{question answering} di bidang biomedis yang dirancang untuk menguji kemampuan sistem dalam menjawab pertanyaan mengenai biomedis ataupun kesehatan. Subset yang digunakan adalah \textit{pqa\_labeled} yang berisi 1.000 artikel berlabel \textit{expert}. Setiap artikel di PubMedQA diambil dari \textit{Public Medical} (PubMed), yakni basis data artikel ilmiah biomedis yang dikelola oleh \textit{National Library of Medicine} (NLM), Amerika Serikat. Karena bersumber dari PubMed, setiap artikel dilengkapi dengan \textit{PubMed ID} (\textit{pubid}) yang dapat digunakan untuk menelusuri artikel aslinya secara langsung.
 
 Pada tahap ini, dilakukan pemilihan fitur dari \textit{dataset} PubMedQA. Setiap artikel memiliki empat fitur utama: \textit{question}, \textit{context}, \textit{long\_answer}, dan \textit{final\_decision}. Fitur \textit{question} digunakan sebagai \textit{query} masukan untuk \textit{retriever}, sedangkan fitur \textit{context} dijadikan korpus dokumen yang disimpan ke dalam basis data. Fitur \textit{long\_answer} dan \textit{final\_decision} disisihkan sebagai \textit{ground truth} untuk keperluan evaluasi dan tidak dimasukkan ke dalam basis data agar tidak terjadi kebocoran jawaban (\textit{answer leakage}) saat proses \textit{retrieval}.
 
@@ -97,7 +97,9 @@ Konfigurasi \textit{baseline} merupakan sistem RAG dasar tanpa penambahan teknik
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{image/flowbaseline-2.png}
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=\textwidth]{image/flowbaseline-5.png}
+    }
     \caption{Diagram Alur \textit{Pipeline} Konfigurasi \textit{Baseline}}
     \label{fig:flow-baseline}
 \end{figure}
@@ -110,7 +112,7 @@ Konfigurasi ini menambahkan komponen \textit{Query Rewriting} sebelum proses \te
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{image/flow-query rewriting-2.png}
+    \includegraphics[width=\textwidth]{image/flow-query rewriting-5.png}
     \caption{Diagram Alur \textit{Pipeline} Konfigurasi \textit{Query Rewriting}}
     \label{fig:flow-qr}
 \end{figure}
@@ -123,7 +125,7 @@ Konfigurasi ini menambahkan komponen \textit{Context Reranking} setelah proses \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{image/flow-context reranking-2.png}
+    \includegraphics[width=\textwidth]{image/flow-context reranking-5.png}
     \caption{Diagram Alur \textit{Pipeline} Konfigurasi \textit{Context Reranking}}
     \label{fig:flow-cr}
 \end{figure}
@@ -136,7 +138,7 @@ Konfigurasi ini menggabungkan kedua teknik mitigasi sekaligus. \textit{Query} pe
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{image/flow-qr+cr-2.png}
+    \includegraphics[width=\textwidth]{image/flow-qr+cr-5.png}
     \caption{Diagram Alur \textit{Pipeline} Konfigurasi \textit{Query Rewriting} dan \textit{Context Reranking}}
     \label{fig:flow-qr-cr}
 \end{figure}

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<title>Prompt Variation Eksperimen — Ricky Wijaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; background:#1a1a1a; font-family:'Poppins',sans-serif; overflow:hidden; }
+
+  /* 16:9 slide stage */
+  .stage {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:min(95vw, calc(95vh * 16 / 9));
+    aspect-ratio:16/9;
+    background:#fff;
+    box-shadow:0 30px 90px rgba(0,0,0,0.5);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .slide {
+    width:100%; height:100%; padding:48px 64px;
+    display:none; flex-direction:column;
+    color:#1a1a1a;
+  }
+  .slide.active { display:flex; }
+  .slide h1 {
+    font-size:34px; font-weight:700; letter-spacing:-0.5px;
+    margin-bottom:6px;
+  }
+  .slide h2.sub {
+    font-size:14px; font-weight:400; color:#666;
+    letter-spacing:1.2px; text-transform:uppercase;
+    margin-bottom:24px;
+  }
+  .divider { height:3px; width:60px; background:#1a1a1a; margin-bottom:18px; }
+
+  /* Navigation */
+  .nav {
+    position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; align-items:center; gap:14px;
+    background:rgba(255,255,255,0.08); backdrop-filter:blur(8px);
+    padding:8px 16px; border-radius:30px;
+    z-index:10;
+  }
+  .nav button {
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; width:32px; height:32px; border-radius:50%;
+    font-size:14px; cursor:pointer; transition:all 0.15s;
+  }
+  .nav button:hover:not(:disabled) { background:rgba(255,255,255,0.25); }
+  .nav button:disabled { opacity:0.3; cursor:not-allowed; }
+  .nav .counter {
+    color:#fff; font-size:13px; font-weight:500; min-width:44px; text-align:center;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .dots { display:flex; gap:6px; }
+  .dot {
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.15s;
+  }
+  .dot.active { background:#fff; width:22px; border-radius:4px; }
+
+  /* === SLIDE 1: Overview cards === */
+  .overview-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+    flex:1; margin-top:8px;
+  }
+  .ov-card {
+    border:2px solid #e5e5e5; border-radius:8px; padding:22px 22px;
+    display:flex; flex-direction:column; gap:12px;
+    transition:all 0.2s;
+  }
+  .ov-card .badge {
+    display:inline-block; font-size:11px; font-weight:600; letter-spacing:1px;
+    text-transform:uppercase; padding:3px 10px; border-radius:20px;
+    background:#1a1a1a; color:#fff; width:fit-content;
+  }
+  .ov-card.p1 .badge { background:#5B9BD5; }
+  .ov-card.p3 .badge { background:#70AD47; }
+  .ov-card .name {
+    font-size:22px; font-weight:700; line-height:1.2;
+  }
+  .ov-card .desc { font-size:13px; color:#555; line-height:1.55; }
+  .ov-card .features { margin-top:auto; display:flex; flex-direction:column; gap:6px; font-size:12px; }
+  .ov-card .features div { display:flex; align-items:center; gap:6px; }
+  .ov-card .check { color:#1B7F3A; font-weight:700; }
+  .ov-card .cross { color:#C00000; font-weight:700; }
+  .ov-card .stat {
+    margin-top:8px; padding:10px; border-radius:6px; background:#f7f7f7;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+  }
+  .ov-card .stat .pct { font-size:18px; font-weight:700; color:#1a1a1a; }
+  .ov-card.win { border-color:#1B7F3A; background:#f5fbf6; }
+
+  /* === Prompt detail slides === */
+  .detail-grid {
+    display:grid; grid-template-columns:1.05fr 1fr; gap:28px;
+    flex:1; min-height:0; margin-top:6px;
+  }
+  .panel {
+    border:1.5px solid #e0e0e0; border-radius:8px; padding:16px 18px;
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .panel .label {
+    font-size:10.5px; font-weight:700; letter-spacing:1.3px; text-transform:uppercase;
+    color:#888; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel .label::after {
+    content:''; flex:1; height:1px; background:#eee;
+  }
+  .prompt-box {
+    flex:1; font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    line-height:1.65; color:#222; white-space:pre-wrap; overflow-y:auto;
+    background:#fafafa; padding:14px; border-radius:6px;
+  }
+  .prompt-box .rule { background:#FFE7E7; padding:1px 3px; border-radius:3px; font-weight:600; color:#7a0000; }
+  .prompt-box .var  { background:#E7F0FF; padding:1px 3px; border-radius:3px; font-weight:600; color:#003a7a; }
+  .prompt-box .ex   { background:#E7F5E0; padding:1px 3px; border-radius:3px; font-weight:600; color:#1B5F12; }
+  .prompt-box .rubric { background:#FFF3CD; padding:1px 3px; border-radius:3px; font-weight:600; color:#5a4500; }
+
+  .output-question {
+    background:#1a1a1a; color:#fff; padding:10px 12px; border-radius:6px;
+    font-size:12px; margin-bottom:10px; line-height:1.45;
+  }
+  .output-question b { color:#FFC000; }
+  .output-box {
+    flex:1; font-family:'Poppins',sans-serif; font-size:12.5px; line-height:1.6;
+    background:#fafafa; padding:14px; border-radius:6px; overflow-y:auto;
+    color:#222;
+  }
+  .output-box .reason { color:#444; }
+  .output-box .final {
+    display:inline-block; margin-top:10px; padding:5px 16px;
+    background:#1B7F3A; color:#fff; font-weight:700; font-size:14px;
+    border-radius:4px; letter-spacing:0.5px;
+  }
+  .output-box .final.wrong { background:#C00000; }
+  .output-box .label { color:#888; font-weight:600; text-transform:uppercase; font-size:10.5px; letter-spacing:1.2px; margin-top:8px; display:block; }
+
+  /* === Chart slides === */
+  .chart-container {
+    flex:1; display:flex; flex-direction:column; min-height:0;
+    margin-top:8px;
+  }
+  .chart-wrap { flex:1; position:relative; min-height:0; }
+  .chart-note {
+    margin-top:10px; font-size:11.5px; color:#666; line-height:1.5;
+    display:flex; gap:32px;
+  }
+  .chart-note .key { display:flex; align-items:center; gap:6px; }
+  .chart-note .swatch { width:14px; height:14px; border-radius:3px; }
+
+  /* === Summary slide === */
+  .summary-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:24px;
+    flex:1; margin-top:8px;
+  }
+  .sm-card {
+    border-left:4px solid #1a1a1a; padding:14px 18px;
+    background:#fafafa; border-radius:0 6px 6px 0;
+  }
+  .sm-card.win { border-color:#1B7F3A; background:#f5fbf6; }
+  .sm-card.warn { border-color:#FFC000; background:#fffbf0; }
+  .sm-card.fail { border-color:#C00000; background:#fff5f5; }
+  .sm-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .sm-card p { font-size:12px; color:#444; line-height:1.5; }
+  .sm-card .num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:#1a1a1a; margin-bottom:4px; }
+
+  /* footer */
+  .footer {
+    position:absolute; bottom:14px; right:24px;
+    font-size:10px; color:#aaa; letter-spacing:1.2px; text-transform:uppercase;
+    font-weight:500;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ========== SLIDE 1: Overview ========== -->
+  <div class="slide active" id="s1">
+    <h2 class="sub">Eksperimen Prompt Variation — PubMedQA</h2>
+    <h1>Tiga Prompt yang Diuji</h1>
+    <div class="divider"></div>
+
+    <div class="overview-grid">
+      <div class="ov-card win">
+        <span class="badge">Prompt #1</span>
+        <div class="name">Default<br/>(Baseline)</div>
+        <div class="desc">Instruksi singkat: jawab yes/no/maybe. Ada anti-maybe bias ringan supaya LLM lebih commit.</div>
+        <div class="features">
+          <div><span class="cross">✗</span> Grounding rules eksplisit</div>
+          <div><span class="cross">✗</span> Few-shot examples</div>
+          <div><span class="cross">✗</span> Chain-of-thought</div>
+          <div><span class="check">✓</span> Decision rubric ringkas</div>
+        </div>
+        <div class="stat">Best overall accuracy<br/><span class="pct">69.2% – 74.8%</span></div>
+      </div>
+
+      <div class="ov-card p1">
+        <span class="badge">Prompt #2 — P1</span>
+        <div class="name">Strict<br/>Grounding</div>
+        <div class="desc">Grounding rules eksplisit + rubrik keputusan terurut. Tujuan: kurangi hallucination & lebih agresif jawab maybe.</div>
+        <div class="features">
+          <div><span class="check">✓</span> Grounding rules (3 aturan)</div>
+          <div><span class="cross">✗</span> Few-shot examples</div>
+          <div><span class="cross">✗</span> Chain-of-thought</div>
+          <div><span class="check">✓</span> Decision rubric terurut</div>
+        </div>
+        <div class="stat">Overall accuracy<br/><span class="pct">52.4% – 62.0%</span></div>
+      </div>
+
+      <div class="ov-card p3">
+        <span class="badge">Prompt #3 — P3</span>
+        <div class="name">Few-Shot<br/>CoT</div>
+        <div class="desc">3 demo biomedical (aspirin, vitamin C, statins) + reasoning step sebelum jawaban final.</div>
+        <div class="features">
+          <div><span class="cross">✗</span> Grounding rules eksplisit</div>
+          <div><span class="check">✓</span> 3 few-shot examples</div>
+          <div><span class="check">✓</span> Chain-of-thought eksplisit</div>
+          <div><span class="cross">✗</span> Decision rubric formal</div>
+        </div>
+        <div class="stat">Overall accuracy<br/><span class="pct">59.8% – 65.2%</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========== SLIDE 2: Prompt #1 detail ========== -->
+  <div class="slide" id="s2">
+    <h2 class="sub">Prompt #1</h2>
+    <h1>Default / Baseline Prompt</h1>
+    <div class="divider"></div>
+
+    <div class="detail-grid">
+      <div class="panel">
+        <div class="label">Template Prompt</div>
+        <div class="prompt-box">You are a medical research assistant. Answer a biomedical yes/no/maybe question based solely on the provided scientific abstracts.
+
+Context from medical literature:
+<span class="var">{context}</span>
+
+Question: <span class="var">{question}</span>
+
+<span class="rule">Instructions:</span>
+- Carefully read the context and assess whether it supports or refutes the question.
+- Provide a brief explanation (2-3 sentences) using ONLY the information above.
+- End your response with EXACTLY ONE of these words on its own line: yes, no, or maybe.
+  - yes   : the evidence supports the hypothesis, even if not perfectly conclusive
+  - no    : the evidence refutes or does not support the hypothesis
+  - maybe : ONLY if the evidence is directly contradictory, or if the context contains no relevant information at all
+<span class="rule">- IMPORTANT: If the evidence leans in one direction, even partially, choose yes or no.
+  Do NOT use maybe simply because the evidence is limited or not 100% certain.</span>
+
+Answer:</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Contoh — Pertanyaan Aspirin</div>
+        <div class="output-question">
+          <b>Q:</b> Does aspirin reduce the risk of recurrent myocardial infarction?<br/>
+          <b>Context:</b> [1] (RESULTS) Daily aspirin use was associated with a 22% reduction in recurrent MI (RR 0.78, 95% CI 0.71-0.85, p&lt;0.001).
+        </div>
+        <div class="output-box">
+          <span class="label">Output LLM</span>
+          The provided abstract reports a statistically significant 22% reduction in recurrent myocardial infarction with daily aspirin use (RR 0.78, p&lt;0.001). The evidence supports the hypothesis.
+          <br/><br/>
+          <span class="final">yes</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Slide 2 / 8 — Default Prompt</div>
+  </div>
+
+
+  <!-- ========== SLIDE 3: P1 detail ========== -->
+  <div class="slide" id="s3">
+    <h2 class="sub">Prompt #2 — P1</h2>
+    <h1>Strict Grounding</h1>
+    <div class="divider"></div>
+
+    <div class="detail-grid">
+      <div class="panel">
+        <div class="label">Template Prompt</div>
+        <div class="prompt-box">You are a medical research assistant evaluating biomedical evidence.
+
+<span class="rule">GROUNDING RULES (strict):
+1. Use ONLY the information in the provided abstracts. Do NOT use any external medical knowledge, common sense, or assumptions.
+2. If the abstracts do not contain enough information to answer, you MUST say so.
+3. Do not infer beyond what is explicitly stated.</span>
+
+Context from medical literature:
+<span class="var">{context}</span>
+
+Question: <span class="var">{question}</span>
+
+<span class="rubric">Decision rubric (apply in order):
+- Answer "yes"   : abstracts clearly and consistently support the claim
+- Answer "no"    : abstracts clearly refute the claim, or report no significant effect
+- Answer "maybe" : (a) findings are mixed or context-dependent, OR
+                   (b) abstracts are inconclusive, OR
+                   (c) abstracts do not directly address the question</span>
+
+Response format:
+- One short paragraph (2-3 sentences) citing the specific evidence from the abstracts.
+- Then a final line containing only one word: yes, no, or maybe.
+
+Answer:</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Contoh — Pertanyaan Aspirin</div>
+        <div class="output-question">
+          <b>Q:</b> Does aspirin reduce the risk of recurrent myocardial infarction?<br/>
+          <b>Context:</b> [1] (RESULTS) Daily aspirin use was associated with a 22% reduction in recurrent MI (RR 0.78, 95% CI 0.71-0.85, p&lt;0.001).
+        </div>
+        <div class="output-box">
+          <span class="label">Output LLM</span>
+          According to the abstract, daily aspirin use was associated with a 22% reduction in recurrent myocardial infarction (RR 0.78, 95% CI 0.71-0.85, p&lt;0.001) in patients with prior MI. The cited evidence clearly and consistently supports the claim that aspirin reduces recurrent MI risk.
+          <br/><br/>
+          <span class="final">yes</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Slide 3 / 8 — P1 Strict Grounding</div>
+  </div>
+
+
+  <!-- ========== SLIDE 4: P3 detail ========== -->
+  <div class="slide" id="s4">
+    <h2 class="sub">Prompt #3 — P3</h2>
+    <h1>Few-Shot Chain-of-Thought</h1>
+    <div class="divider"></div>
+
+    <div class="detail-grid">
+      <div class="panel">
+        <div class="label">Template Prompt</div>
+        <div class="prompt-box">You are a medical research assistant. Answer biomedical yes/no/maybe questions using only the provided abstracts.
+
+<span class="ex">Here are three examples of how to reason and answer:
+
+--- Example 1 ---
+Context: [1] (RESULTS) Daily aspirin use was associated with a 22% reduction in recurrent MI (RR 0.78, p&lt;0.001)…
+Question: Does aspirin reduce the risk of recurrent MI?
+Reasoning: The abstract directly reports a statistically significant 22% reduction…
+Final answer:
+yes
+
+--- Example 2 ---
+Context: [1] Vitamin C did not significantly reduce cold symptoms (p=0.42).
+Question: Does vitamin C reduce duration of cold symptoms?
+Reasoning: Explicitly reports no significant effect (p=0.42)…
+Final answer:
+no
+
+--- Example 3 ---
+Context: [1] Statin therapy reduced events aged 50-70 (HR 0.72) but not aged 75+ (HR 0.96)…
+Question: Do statins reduce CV events in elderly?
+Reasoning: Evidence is subgroup-dependent. Mixed findings…
+Final answer:
+maybe
+
+--- End of examples ---</span>
+
+Now answer the following question using the same format:
+
+Context from medical literature:
+<span class="var">{context}</span>
+
+Question: <span class="var">{question}</span>
+
+Reasoning:</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Contoh — Pertanyaan Aspirin</div>
+        <div class="output-question">
+          <b>Q:</b> Does aspirin reduce the risk of recurrent myocardial infarction?<br/>
+          <b>Context:</b> [1] (RESULTS) Daily aspirin use was associated with a 22% reduction in recurrent MI (RR 0.78, 95% CI 0.71-0.85, p&lt;0.001).
+        </div>
+        <div class="output-box">
+          <span class="label">Output LLM</span>
+          <span class="reason"><b>Reasoning:</b> The abstract directly reports a statistically significant 22% reduction in recurrent MI with daily aspirin use (RR 0.78, 95% CI 0.71-0.85, p&lt;0.001). The effect is consistent across the cohort and clinically meaningful with strong statistical significance.</span>
+          <br/><br/>
+          <b>Final answer:</b><br/>
+          <span class="final">yes</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Slide 4 / 8 — P3 Few-Shot CoT</div>
+  </div>
+
+
+  <!-- ========== SLIDE 5: Chart - BM25 hybrid 3 prompts ========== -->
+  <div class="slide" id="s5">
+    <h2 class="sub">Hasil — Original BM25 Hybrid</h2>
+    <h1>Accuracy Antar Prompt (Baseline Retriever, n=500)</h1>
+    <div class="divider"></div>
+
+    <div class="chart-container">
+      <div class="chart-wrap"><canvas id="chart-bm25"></canvas></div>
+      <div class="chart-note">
+        <div class="key"><div class="swatch" style="background:#A5A5A5"></div><span>Pipeline: BM25 + Chroma dense + RRF (tanpa QR/CR)</span></div>
+        <div class="key"><span style="color:#1B7F3A;font-weight:700;">Default prompt menang</span> — variation prompt menurunkan accuracy</div>
+      </div>
+    </div>
+    <div class="footer">Slide 5 / 8 — Original BM25</div>
+  </div>
+
+
+  <!-- ========== SLIDE 6: Method × Prompt 12-bar ========== -->
+  <div class="slide" id="s6">
+    <h2 class="sub">Hasil — Method × Prompt</h2>
+    <h1>4 Method × 3 Prompt (Original BM25, n=500)</h1>
+    <div class="divider"></div>
+
+    <div class="chart-container">
+      <div class="chart-wrap"><canvas id="chart-method"></canvas></div>
+      <div class="chart-note">
+        <div class="key"><div class="swatch" style="background:#1a1a1a"></div><span>Default</span></div>
+        <div class="key"><div class="swatch" style="background:#5B9BD5"></div><span>P1 Strict Grounding</span></div>
+        <div class="key"><div class="swatch" style="background:#70AD47"></div><span>P3 Few-Shot CoT</span></div>
+        <div class="key"><span style="color:#1B7F3A;font-weight:700;">Best: Default + QR = 70.8%</span></div>
+      </div>
+    </div>
+    <div class="footer">Slide 6 / 8 — Method × Prompt Matrix</div>
+  </div>
+
+
+  <!-- ========== SLIDE 7: SH BM25 3 prompts ========== -->
+  <div class="slide" id="s7">
+    <h2 class="sub">Hasil — Schwartz-Hearst BM25 Expansion</h2>
+    <h1>Accuracy Antar Prompt (Baseline Retriever, n=500)</h1>
+    <div class="divider"></div>
+
+    <div class="chart-container">
+      <div class="chart-wrap"><canvas id="chart-sh"></canvas></div>
+      <div class="chart-note">
+        <div class="key"><div class="swatch" style="background:#70AD47"></div><span>Pipeline: SH BM25 + Chroma SH + RRF</span></div>
+        <div class="key"><span style="color:#1B7F3A;font-weight:700;">SH lift +4–9pp di semua prompt</span> vs Original BM25</div>
+      </div>
+    </div>
+    <div class="footer">Slide 7 / 8 — SH Expansion</div>
+  </div>
+
+
+  <!-- ========== SLIDE 8: Summary ========== -->
+  <div class="slide" id="s8">
+    <h2 class="sub">Take-Home</h2>
+    <h1>Ringkasan Eksperimen Prompt Variation</h1>
+    <div class="divider"></div>
+
+    <div class="summary-grid">
+      <div class="sm-card win">
+        <div class="num">74.8%</div>
+        <h3>Konfigurasi Terbaik</h3>
+        <p>SH BM25 + QR + CR + Default prompt. Default prompt = sweet spot universal — bukan CoT, bukan strict.</p>
+      </div>
+      <div class="sm-card warn">
+        <div class="num">−16.4pp</div>
+        <h3>P1 Strict Tidak Worth</h3>
+        <p>P1 mengangkat kelas maybe (4.5%→57.6%) tapi menjatuhkan yes/no. Net accuracy drop 16pp dari default.</p>
+      </div>
+      <div class="sm-card win">
+        <div class="num">+4–9pp</div>
+        <h3>SH Bekerja Universal</h3>
+        <p>SH expansion memberi lift konsisten di semua prompt (Default, P1, P3). Gain di level retrieval, independen dari prompt.</p>
+      </div>
+      <div class="sm-card fail">
+        <div class="num">Maybe</div>
+        <h3>Bottleneck Struktural</h3>
+        <p>Kelas maybe tidak bisa diatasi prompt engineering tanpa mengorbankan yes/no. Butuh solusi struktural (medical NLI / threshold reasoning).</p>
+      </div>
+    </div>
+    <div class="footer">Slide 8 / 8 — Conclusion</div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button id="prev">‹</button>
+  <div class="dots" id="dots"></div>
+  <button id="next">›</button>
+  <div class="counter" id="counter">1 / 8</div>
+</div>
+
+<script>
+// ===== Navigation =====
+const slides = document.querySelectorAll('.slide');
+const dotsEl = document.getElementById('dots');
+const counterEl = document.getElementById('counter');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+let current = 0;
+const total = slides.length;
+
+slides.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.onclick = () => goTo(i);
+  dotsEl.appendChild(dot);
+});
+
+function update() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === current));
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  counterEl.textContent = `${current + 1} / ${total}`;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === total - 1;
+}
+function goTo(i) { current = Math.max(0, Math.min(total - 1, i)); update(); }
+prevBtn.onclick = () => goTo(current - 1);
+nextBtn.onclick = () => goTo(current + 1);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') goTo(current + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') goTo(current - 1);
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End') goTo(total - 1);
+});
+
+// ===== Chart.js global setup =====
+Chart.defaults.font.family = "'Poppins', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#333';
+
+const labelInsideBar = {
+  id: 'labelInsideBar',
+  afterDatasetsDraw(chart, args, opts) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((ds, i) => {
+      const meta = chart.getDatasetMeta(i);
+      meta.data.forEach((el, idx) => {
+        const v = ds.data[idx];
+        if (v == null) return;
+        ctx.save();
+        ctx.font = '600 12px Poppins';
+        ctx.textAlign = 'center';
+        // value above bar
+        ctx.fillStyle = '#1a1a1a';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(v.toFixed(1) + '%', el.x, el.y - 4);
+        ctx.restore();
+      });
+    });
+  }
+};
+
+// ===== Chart 1: BM25 hybrid - 3 prompts (baseline retriever) =====
+new Chart(document.getElementById('chart-bm25'), {
+  type: 'bar',
+  data: {
+    labels: ['Default', 'P1 Strict Grounding', 'P3 Few-Shot CoT'],
+    datasets: [{
+      data: [69.2, 52.8, 60.0],
+      backgroundColor: ['#1a1a1a', '#5B9BD5', '#70AD47'],
+      borderColor: ['#000','#3a7eb8','#56883a'],
+      borderWidth: 1.5,
+      borderRadius: 4,
+      barThickness: 100,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+    scales: {
+      y: { min: 0, max: 85, ticks: { callback: v => v + '%' }, grid: { color: '#eee' } },
+      x: { grid: { display: false }, ticks: { font: { size: 13, weight: '600' } } }
+    }
+  },
+  plugins: [labelInsideBar]
+});
+
+// ===== Chart 2: Method × Prompt 12-bar =====
+new Chart(document.getElementById('chart-method'), {
+  type: 'bar',
+  data: {
+    labels: ['Baseline', 'QR', 'CR', 'QR + CR'],
+    datasets: [
+      { label: 'Default',            data: [69.2, 70.8, 69.8, 70.0], backgroundColor: '#1a1a1a', borderRadius: 3, barPercentage: 0.85, categoryPercentage: 0.78 },
+      { label: 'P1 Strict Grounding',data: [52.8, 52.4, 54.6, 54.4], backgroundColor: '#5B9BD5', borderRadius: 3, barPercentage: 0.85, categoryPercentage: 0.78 },
+      { label: 'P3 Few-Shot CoT',    data: [60.0, 60.8, 59.8, 61.8], backgroundColor: '#70AD47', borderRadius: 3, barPercentage: 0.85, categoryPercentage: 0.78 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}%` } } },
+    scales: {
+      y: { min: 40, max: 85, ticks: { callback: v => v + '%' }, grid: { color: '#eee' } },
+      x: { grid: { display: false }, ticks: { font: { size: 13, weight: '600' } } }
+    }
+  },
+  plugins: [labelInsideBar]
+});
+
+// ===== Chart 3: SH BM25 - 3 prompts (baseline retriever) =====
+new Chart(document.getElementById('chart-sh'), {
+  type: 'bar',
+  data: {
+    labels: ['Default', 'P1 Strict Grounding', 'P3 Few-Shot CoT'],
+    datasets: [{
+      data: [73.2, 62.0, 65.2],
+      backgroundColor: ['#1a1a1a', '#5B9BD5', '#70AD47'],
+      borderColor: ['#000','#3a7eb8','#56883a'],
+      borderWidth: 1.5,
+      borderRadius: 4,
+      barThickness: 100,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+    scales: {
+      y: { min: 0, max: 85, ticks: { callback: v => v + '%' }, grid: { color: '#eee' } },
+      x: { grid: { display: false }, ticks: { font: { size: 13, weight: '600' } } }
+    }
+  },
+  plugins: [labelInsideBar]
+});
+
+update();
+</script>
+</body>
+</html>

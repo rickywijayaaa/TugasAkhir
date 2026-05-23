@@ -1,0 +1,1572 @@
+{
+  "original": {
+    "aggregate": {
+      "hit@5": 0.99,
+      "precision@5": 0.5167999999999991,
+      "recall@5": 0.786549206349207,
+      "mrr": 0.9727333333333332,
+      "ndcg@5": 0.8308009055415067,
+      "map@5": 0.7531845634920639
+    },
+    "per_section": {
+      "BACKGROUND": {
+        "attempts": 190,
+        "hits": 184,
+        "rate": 0.968421052631579
+      },
+      "RESULTS": {
+        "attempts": 464,
+        "hits": 333,
+        "rate": 0.7176724137931034
+      },
+      "PATIENTS AND METHODS": {
+        "attempts": 18,
+        "hits": 13,
+        "rate": 0.7222222222222222
+      },
+      "CASE REPORTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "PURPOSE": {
+        "attempts": 56,
+        "hits": 55,
+        "rate": 0.9821428571428571
+      },
+      "METHODS": {
+        "attempts": 318,
+        "hits": 246,
+        "rate": 0.7735849056603774
+      },
+      "DESIGN": {
+        "attempts": 51,
+        "hits": 12,
+        "rate": 0.23529411764705882
+      },
+      "PARTICIPANTS": {
+        "attempts": 16,
+        "hits": 5,
+        "rate": 0.3125
+      },
+      "INTERVENTION": {
+        "attempts": 8,
+        "hits": 3,
+        "rate": 0.375
+      },
+      "MAIN OUTCOME": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "AIMS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "OBJECTIVE": {
+        "attempts": 143,
+        "hits": 138,
+        "rate": 0.965034965034965
+      },
+      "OBJECTIVES": {
+        "attempts": 50,
+        "hits": 47,
+        "rate": 0.94
+      },
+      "CONTEXT": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SUMMARY BACKGROUND DATA": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "INTRODUCTION": {
+        "attempts": 29,
+        "hits": 29,
+        "rate": 1.0
+      },
+      "MATERIAL AND METHODS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "DISCUSSION": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MATERIALS AND METHODS": {
+        "attempts": 30,
+        "hits": 25,
+        "rate": 0.8333333333333334
+      },
+      "SETTING": {
+        "attempts": 37,
+        "hits": 6,
+        "rate": 0.16216216216216217
+      },
+      "PATIENTS": {
+        "attempts": 19,
+        "hits": 10,
+        "rate": 0.5263157894736842
+      },
+      "MAIN OUTCOME MEASURES": {
+        "attempts": 21,
+        "hits": 8,
+        "rate": 0.38095238095238093
+      },
+      "LIMITATIONS": {
+        "attempts": 8,
+        "hits": 2,
+        "rate": 0.25
+      },
+      "STUDY DESIGN": {
+        "attempts": 23,
+        "hits": 9,
+        "rate": 0.391304347826087
+      },
+      "DATA EXTRACTION": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PRINCIPAL FINDINGS": {
+        "attempts": 3,
+        "hits": 2,
+        "rate": 0.6666666666666666
+      },
+      "BACKGROUND AND OBJECTIVES": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "ICU LOS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "BACKGROUND AND PURPOSE": {
+        "attempts": 6,
+        "hits": 6,
+        "rate": 1.0
+      },
+      "METHOD": {
+        "attempts": 28,
+        "hits": 20,
+        "rate": 0.7142857142857143
+      },
+      "MAIN OUTCOME MEASURE": {
+        "attempts": 4,
+        "hits": 2,
+        "rate": 0.5
+      },
+      "UNLABELLED": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRIMARY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN AND METHODS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MAIN RESULTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "MEASUREMENTS": {
+        "attempts": 8,
+        "hits": 4,
+        "rate": 0.5
+      },
+      "OBJECTIVE AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "PURPOSE OF INVESTIGATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY OBJECTIVE": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTINGS": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND MATERIALS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "PATIENTS AND METHOD": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "CASE PRESENTATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND RESULTS": {
+        "attempts": 3,
+        "hits": 2,
+        "rate": 0.6666666666666666
+      },
+      "RESULT": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "MEASUREMENT AND RESULTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN, SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUMMARY OF BACKGROUND DATA": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "DATA SOURCES": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "STUDY SELECTION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DATA SYNTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUBJECTS": {
+        "attempts": 5,
+        "hits": 2,
+        "rate": 0.4
+      },
+      "POPULATION": {
+        "attempts": 5,
+        "hits": 1,
+        "rate": 0.2
+      },
+      "MAIN OUTCOME MEASUREMENTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIMS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTING AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTERVENTIONS": {
+        "attempts": 12,
+        "hits": 6,
+        "rate": 0.5
+      },
+      "AIMS AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN OF STUDY": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DESIGN, SETTING, AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "FINDINGS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CONTEXT AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "SUBJECTS AND METHODS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTRODUCTION AND HYPOTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "OBSERVATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PURPOSES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CASE DESCRIPTION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE AND OBJECTIVES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "BACKGROUND AND OBJECTIVE": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODOLOGY": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "KEY RESULTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND MAIN RESULTS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRESENTATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "CLINICAL TRIAL REGISTRATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "KEY LIMITATIONS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOME": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "HYPOTHESIS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PROBANDS AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOMES MEASURED": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "METHOD AND MATERIAL": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "RESULTS AND LIMITATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OBJECT": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIM": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND RESULTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "SUMMARY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN AND SETTING": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PATIENTS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "BACKGROUND AND AIM OF THE STUDY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MAIN MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "DATA SOURCE": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "RESULTS AND DISCUSSION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SETTINGS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY DESIGN AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESCRIPTION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "INTERVENTIONS AND OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND STUDY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      }
+    },
+    "n_queries": 500
+  },
+  "v1_naive": {
+    "aggregate": {
+      "hit@5": 0.986,
+      "precision@5": 0.542,
+      "recall@5": 0.8255992063492075,
+      "mrr": 0.9728333333333331,
+      "ndcg@5": 0.8647268553601724,
+      "map@5": 0.7988086111111117
+    },
+    "per_section": {
+      "BACKGROUND": {
+        "attempts": 190,
+        "hits": 183,
+        "rate": 0.9631578947368421
+      },
+      "RESULTS": {
+        "attempts": 464,
+        "hits": 363,
+        "rate": 0.7823275862068966
+      },
+      "PATIENTS AND METHODS": {
+        "attempts": 18,
+        "hits": 17,
+        "rate": 0.9444444444444444
+      },
+      "CASE REPORTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "PURPOSE": {
+        "attempts": 56,
+        "hits": 55,
+        "rate": 0.9821428571428571
+      },
+      "METHODS": {
+        "attempts": 318,
+        "hits": 269,
+        "rate": 0.8459119496855346
+      },
+      "DESIGN": {
+        "attempts": 51,
+        "hits": 12,
+        "rate": 0.23529411764705882
+      },
+      "PARTICIPANTS": {
+        "attempts": 16,
+        "hits": 6,
+        "rate": 0.375
+      },
+      "INTERVENTION": {
+        "attempts": 8,
+        "hits": 3,
+        "rate": 0.375
+      },
+      "MAIN OUTCOME": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "AIMS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "OBJECTIVE": {
+        "attempts": 143,
+        "hits": 136,
+        "rate": 0.951048951048951
+      },
+      "OBJECTIVES": {
+        "attempts": 50,
+        "hits": 47,
+        "rate": 0.94
+      },
+      "CONTEXT": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SUMMARY BACKGROUND DATA": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "INTRODUCTION": {
+        "attempts": 29,
+        "hits": 28,
+        "rate": 0.9655172413793104
+      },
+      "MATERIAL AND METHODS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "DISCUSSION": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MATERIALS AND METHODS": {
+        "attempts": 30,
+        "hits": 25,
+        "rate": 0.8333333333333334
+      },
+      "SETTING": {
+        "attempts": 37,
+        "hits": 6,
+        "rate": 0.16216216216216217
+      },
+      "PATIENTS": {
+        "attempts": 19,
+        "hits": 11,
+        "rate": 0.5789473684210527
+      },
+      "MAIN OUTCOME MEASURES": {
+        "attempts": 21,
+        "hits": 9,
+        "rate": 0.42857142857142855
+      },
+      "LIMITATIONS": {
+        "attempts": 8,
+        "hits": 2,
+        "rate": 0.25
+      },
+      "STUDY DESIGN": {
+        "attempts": 23,
+        "hits": 10,
+        "rate": 0.43478260869565216
+      },
+      "DATA EXTRACTION": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PRINCIPAL FINDINGS": {
+        "attempts": 3,
+        "hits": 2,
+        "rate": 0.6666666666666666
+      },
+      "BACKGROUND AND OBJECTIVES": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "ICU LOS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND PURPOSE": {
+        "attempts": 6,
+        "hits": 6,
+        "rate": 1.0
+      },
+      "METHOD": {
+        "attempts": 28,
+        "hits": 21,
+        "rate": 0.75
+      },
+      "MAIN OUTCOME MEASURE": {
+        "attempts": 4,
+        "hits": 2,
+        "rate": 0.5
+      },
+      "UNLABELLED": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRIMARY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN AND METHODS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MAIN RESULTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "MEASUREMENTS": {
+        "attempts": 8,
+        "hits": 4,
+        "rate": 0.5
+      },
+      "OBJECTIVE AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "PURPOSE OF INVESTIGATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY OBJECTIVE": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTINGS": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND MATERIALS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "PATIENTS AND METHOD": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "CASE PRESENTATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND RESULTS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "RESULT": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "MEASUREMENT AND RESULTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN, SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUMMARY OF BACKGROUND DATA": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "DATA SOURCES": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "STUDY SELECTION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DATA SYNTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUBJECTS": {
+        "attempts": 5,
+        "hits": 1,
+        "rate": 0.2
+      },
+      "POPULATION": {
+        "attempts": 5,
+        "hits": 1,
+        "rate": 0.2
+      },
+      "MAIN OUTCOME MEASUREMENTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIMS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTING AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTERVENTIONS": {
+        "attempts": 12,
+        "hits": 6,
+        "rate": 0.5
+      },
+      "AIMS AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN OF STUDY": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DESIGN, SETTING, AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "FINDINGS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CONTEXT AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUBJECTS AND METHODS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTRODUCTION AND HYPOTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "OBSERVATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PURPOSES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CASE DESCRIPTION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE AND OBJECTIVES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "BACKGROUND AND OBJECTIVE": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODOLOGY": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "KEY RESULTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND MAIN RESULTS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRESENTATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "CLINICAL TRIAL REGISTRATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "KEY LIMITATIONS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOME": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "HYPOTHESIS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PROBANDS AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOMES MEASURED": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "METHOD AND MATERIAL": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESULTS AND LIMITATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OBJECT": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIM": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND RESULTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "SUMMARY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN AND SETTING": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "PATIENTS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIM OF THE STUDY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MAIN MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "DATA SOURCE": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "RESULTS AND DISCUSSION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SETTINGS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY DESIGN AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESCRIPTION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "INTERVENTIONS AND OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND STUDY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      }
+    },
+    "n_queries": 500
+  },
+  "v2_sh": {
+    "aggregate": {
+      "hit@5": 0.986,
+      "precision@5": 0.5575999999999999,
+      "recall@5": 0.8495849206349216,
+      "mrr": 0.9724999999999999,
+      "ndcg@5": 0.8844603124467758,
+      "map@5": 0.8247376587301591
+    },
+    "per_section": {
+      "BACKGROUND": {
+        "attempts": 190,
+        "hits": 183,
+        "rate": 0.9631578947368421
+      },
+      "RESULTS": {
+        "attempts": 464,
+        "hits": 385,
+        "rate": 0.8297413793103449
+      },
+      "PATIENTS AND METHODS": {
+        "attempts": 18,
+        "hits": 15,
+        "rate": 0.8333333333333334
+      },
+      "CASE REPORTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "PURPOSE": {
+        "attempts": 56,
+        "hits": 55,
+        "rate": 0.9821428571428571
+      },
+      "METHODS": {
+        "attempts": 318,
+        "hits": 277,
+        "rate": 0.8710691823899371
+      },
+      "DESIGN": {
+        "attempts": 51,
+        "hits": 13,
+        "rate": 0.2549019607843137
+      },
+      "PARTICIPANTS": {
+        "attempts": 16,
+        "hits": 6,
+        "rate": 0.375
+      },
+      "INTERVENTION": {
+        "attempts": 8,
+        "hits": 3,
+        "rate": 0.375
+      },
+      "MAIN OUTCOME": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "AIMS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "OBJECTIVE": {
+        "attempts": 143,
+        "hits": 137,
+        "rate": 0.958041958041958
+      },
+      "OBJECTIVES": {
+        "attempts": 50,
+        "hits": 48,
+        "rate": 0.96
+      },
+      "CONTEXT": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SUMMARY BACKGROUND DATA": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "INTRODUCTION": {
+        "attempts": 29,
+        "hits": 28,
+        "rate": 0.9655172413793104
+      },
+      "MATERIAL AND METHODS": {
+        "attempts": 10,
+        "hits": 10,
+        "rate": 1.0
+      },
+      "DISCUSSION": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MATERIALS AND METHODS": {
+        "attempts": 30,
+        "hits": 27,
+        "rate": 0.9
+      },
+      "SETTING": {
+        "attempts": 37,
+        "hits": 6,
+        "rate": 0.16216216216216217
+      },
+      "PATIENTS": {
+        "attempts": 19,
+        "hits": 12,
+        "rate": 0.631578947368421
+      },
+      "MAIN OUTCOME MEASURES": {
+        "attempts": 21,
+        "hits": 9,
+        "rate": 0.42857142857142855
+      },
+      "LIMITATIONS": {
+        "attempts": 8,
+        "hits": 2,
+        "rate": 0.25
+      },
+      "STUDY DESIGN": {
+        "attempts": 23,
+        "hits": 12,
+        "rate": 0.5217391304347826
+      },
+      "DATA EXTRACTION": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PRINCIPAL FINDINGS": {
+        "attempts": 3,
+        "hits": 2,
+        "rate": 0.6666666666666666
+      },
+      "BACKGROUND AND OBJECTIVES": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "ICU LOS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND PURPOSE": {
+        "attempts": 6,
+        "hits": 6,
+        "rate": 1.0
+      },
+      "METHOD": {
+        "attempts": 28,
+        "hits": 20,
+        "rate": 0.7142857142857143
+      },
+      "MAIN OUTCOME MEASURE": {
+        "attempts": 4,
+        "hits": 2,
+        "rate": 0.5
+      },
+      "UNLABELLED": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRIMARY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN AND METHODS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MAIN RESULTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MEASUREMENTS": {
+        "attempts": 8,
+        "hits": 4,
+        "rate": 0.5
+      },
+      "OBJECTIVE AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "PURPOSE OF INVESTIGATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY OBJECTIVE": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTINGS": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND MATERIALS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "PATIENTS AND METHOD": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "CASE PRESENTATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHODS AND RESULTS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "RESULT": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MEASUREMENT AND RESULTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN, SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUMMARY OF BACKGROUND DATA": {
+        "attempts": 3,
+        "hits": 2,
+        "rate": 0.6666666666666666
+      },
+      "DATA SOURCES": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "STUDY SELECTION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DATA SYNTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUBJECTS": {
+        "attempts": 5,
+        "hits": 1,
+        "rate": 0.2
+      },
+      "POPULATION": {
+        "attempts": 5,
+        "hits": 1,
+        "rate": 0.2
+      },
+      "MAIN OUTCOME MEASUREMENTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIMS": {
+        "attempts": 5,
+        "hits": 5,
+        "rate": 1.0
+      },
+      "SETTING AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTERVENTIONS": {
+        "attempts": 12,
+        "hits": 8,
+        "rate": 0.6666666666666666
+      },
+      "AIMS AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN OF STUDY": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "DESIGN, SETTING, AND PARTICIPANTS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "FINDINGS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CONTEXT AND OBJECTIVES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SUBJECTS AND METHODS": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "INTRODUCTION AND HYPOTHESIS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESEARCH DESIGN": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "OBSERVATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "PURPOSES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "CASE DESCRIPTION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE AND OBJECTIVES": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "BACKGROUND AND OBJECTIVE": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "SETTING AND PATIENTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "METHODOLOGY": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "KEY RESULTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND MAIN RESULTS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PRESENTATION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "CLINICAL TRIAL REGISTRATION": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "KEY LIMITATIONS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOME": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "HYPOTHESIS": {
+        "attempts": 3,
+        "hits": 3,
+        "rate": 1.0
+      },
+      "PROBANDS AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "OUTCOMES MEASURED": {
+        "attempts": 2,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "METHOD AND MATERIAL": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RESULTS AND LIMITATIONS": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "OBJECT": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIM": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MEASUREMENTS AND RESULTS": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "SUMMARY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESIGN AND SETTING": {
+        "attempts": 2,
+        "hits": 1,
+        "rate": 0.5
+      },
+      "PATIENTS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND AIM OF THE STUDY": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "MAIN MEASURES": {
+        "attempts": 2,
+        "hits": 2,
+        "rate": 1.0
+      },
+      "DATA SOURCE": {
+        "attempts": 1,
+        "hits": 0,
+        "rate": 0.0
+      },
+      "RESULTS AND DISCUSSION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "SETTINGS AND PARTICIPANTS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "STUDY DESIGN AND METHODS": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "DESCRIPTION": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "INTERVENTIONS AND OUTCOME MEASURES": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "BACKGROUND AND STUDY OBJECTIVE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      },
+      "RATIONALE": {
+        "attempts": 1,
+        "hits": 1,
+        "rate": 1.0
+      }
+    },
+    "n_queries": 500
+  },
+  "common_sections": [
+    "RESULTS",
+    "METHODS",
+    "BACKGROUND",
+    "OBJECTIVE",
+    "PURPOSE",
+    "DESIGN",
+    "OBJECTIVES",
+    "SETTING",
+    "MATERIALS AND METHODS",
+    "INTRODUCTION",
+    "METHOD",
+    "STUDY DESIGN",
+    "MAIN OUTCOME MEASURES"
+  ],
+  "top_k": 5
+}
