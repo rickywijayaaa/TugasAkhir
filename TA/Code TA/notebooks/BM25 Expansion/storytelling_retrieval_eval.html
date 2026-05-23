@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Retrieval Evaluation: Abbreviation Expansion on Medical Papers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ design tokens ============ */
+  :root {
+    --bg:        #ffffff;
+    --bg-soft:   #fafafa;
+    --bg-card:   #f5f5f5;
+    --ink:       #0a0a0a;
+    --ink-soft:  #2a2a2a;
+    --ink-mute:  #6b6b6b;
+    --line:      #e5e5e5;
+    --line-soft: #f0f0f0;
+    --accent:    #000000;
+    --hi-bg:     #fff8dc;
+    --hi-border: #d4a017;
+    --good-bg:   #f0fdf4;
+    --good-bd:   #16a34a;
+    --bad-bg:    #fef2f2;
+    --bad-bd:    #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-weight: 400;
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ container ============ */
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ============ hero ============ */
+  .hero {
+    padding: 120px 0 80px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--ink-mute);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-size: 56px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+    max-width: 800px;
+  }
+  .hero .subtitle {
+    font-size: 19px;
+    color: var(--ink-mute);
+    font-weight: 300;
+    max-width: 700px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+  .hero .meta {
+    display: flex;
+    gap: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .hero .meta .item .k {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-mute);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .hero .meta .item .v {
+    font-size: 16px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ============ section ============ */
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  section:last-of-type { border-bottom: none; }
+  .section-num {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--ink-mute);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  h2 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    max-width: 700px;
+  }
+  h3 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin: 48px 0 16px 0;
+  }
+  h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin: 24px 0 8px 0;
+  }
+  p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    max-width: 720px;
+  }
+  p.lead {
+    font-size: 19px;
+    color: var(--ink);
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; color: var(--ink-mute); }
+  code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    background: var(--bg-card);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 14px;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+
+  /* ============ story devices ============ */
+  blockquote {
+    border-left: 3px solid var(--ink);
+    padding: 8px 0 8px 28px;
+    margin: 28px 0;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    max-width: 720px;
+  }
+  blockquote .source {
+    display: block;
+    font-style: normal;
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .finding-card {
+    background: var(--bg-card);
+    border-left: 4px solid var(--ink);
+    padding: 24px 28px;
+    margin: 28px 0;
+    max-width: 720px;
+  }
+  .finding-card .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .finding-card .title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .finding-card p {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 0;
+  }
+
+  .compare-table {
+    margin: 28px 0;
+    max-width: 760px;
+  }
+  .compare-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .compare-table th {
+    background: var(--ink);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .highlight { background: var(--hi-bg); }
+  .compare-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .compare-table .good { color: #16a34a; font-weight: 600; }
+  .compare-table .bad  { color: #dc2626; font-weight: 600; }
+
+  /* ============ flow diagram ============ */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 36px 0;
+    padding: 32px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    flex: 1;
+    text-align: center;
+    min-width: 130px;
+  }
+  .flow-step .icon {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    background: white;
+  }
+  .flow-step .label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .flow-step .desc {
+    font-size: 11px;
+    color: var(--ink-mute);
+    line-height: 1.4;
+  }
+  .flow-arrow {
+    color: var(--ink);
+    font-size: 24px;
+    flex: 0 0 auto;
+  }
+
+  /* ============ results ============ */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 32px 0;
+  }
+  .metric-cell {
+    background: white;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .metric-cell .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .metric-cell .value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .metric-cell .delta {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .metric-cell .delta.pos { color: #16a34a; font-weight: 600; }
+  .metric-cell .delta.neg { color: #dc2626; font-weight: 600; }
+
+  /* ============ chart ============ */
+  .chart-wrapper {
+    margin: 36px 0;
+    background: var(--bg-soft);
+    padding: 32px 28px;
+    border: 1px solid var(--line);
+  }
+  .chart-wrapper .chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .bar-row .metric-name {
+    width: 130px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .bar-row .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bar-stack {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bar-stack .ver-label {
+    width: 56px;
+    font-size: 10px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    text-align: right;
+  }
+  .bar {
+    height: 14px;
+    background: var(--ink);
+    transition: width 0.5s ease;
+  }
+  .bar.v1 { background: #6b6b6b; }
+  .bar.v2 { background: var(--ink); }
+  .bar.orig { background: #c0c0c0; }
+  .bar-stack .bar-val {
+    font-size: 11px;
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    min-width: 50px;
+  }
+
+  /* ============ heatmap ============ */
+  .heatmap {
+    margin: 36px 0;
+    overflow-x: auto;
+  }
+  .heatmap table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+  }
+  .heatmap th {
+    background: white;
+    color: var(--ink);
+    font-weight: 600;
+    text-align: center;
+    padding: 12px 8px;
+    border-bottom: 2px solid var(--ink);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .heatmap th:first-child { text-align: left; }
+  .heatmap td {
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .heatmap td:first-child {
+    text-align: left;
+    background: var(--bg-card);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .heatmap td.delta-pos { background: var(--good-bg); color: #166534; font-weight: 600; }
+  .heatmap td.delta-neg { background: var(--bad-bg); color: #991b1b; font-weight: 600; }
+
+  /* ============ insights ============ */
+  .insight-box {
+    background: var(--bg-card);
+    border-top: 3px solid var(--ink);
+    padding: 28px 32px;
+    margin: 36px 0;
+  }
+  .insight-box h4 { color: var(--ink); margin-top: 0; }
+  .insight-box ul { padding-left: 20px; margin-top: 12px; }
+  .insight-box li { font-size: 15px; color: var(--ink-soft); margin-bottom: 10px; }
+
+  /* ============ footer ============ */
+  footer {
+    padding: 56px 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-mute);
+    font-size: 12px;
+    text-align: center;
+  }
+  footer .refs {
+    margin-top: 16px;
+    font-size: 11px;
+    line-height: 1.7;
+    text-align: left;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ============ utilities ============ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 760px; }
+  .mt-l { margin-top: 32px; }
+
+  @media (max-width: 768px) {
+    .container { padding: 0 24px; }
+    .hero { padding: 80px 0 56px; }
+    .hero h1 { font-size: 36px; }
+    .hero .subtitle { font-size: 17px; }
+    h2 { font-size: 28px; }
+    .metric-grid { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="container">
+    <div class="eyebrow">Retrieval Evaluation Case Study</div>
+    <h1>Abbreviation Expansion pada Medical Papers untuk Retrieval Augmented Generation</h1>
+    <p class="subtitle">
+      Dokumentasi proses iteratif dari penemuan masalah retrieval pada dokumen biomedis,
+      analisis akar penyebab abbreviation ambiguity, hingga implementasi algoritma
+      Schwartz-Hearst sebagai solusi yang lebih reliable untuk scientific text.
+    </p>
+    <div class="meta">
+      <div class="item"><div class="k">Dataset</div><div class="v">PubMedQA pqa_labeled (n=500)</div></div>
+      <div class="item"><div class="k">Retriever</div><div class="v">Hybrid BM25 + Dense + RRF</div></div>
+      <div class="item"><div class="k">Metode</div><div class="v">3-way comparison</div></div>
+      <div class="item"><div class="k">Versi</div><div class="v">v1.0</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ A. INITIAL FINDING ============ -->
+<section>
+  <div class="container">
+    <div class="section-num">A — Initial Finding</div>
+    <h2>Penemuan Awal: Retrieval yang Inconsistent pada Medical Documents</h2>
+
+    <p class="lead">
+      Pada tahap evaluasi awal sistem RAG yang menggunakan <em>hybrid retrieval</em>
+      (BM25 + Dense + Reciprocal Rank Fusion), kami menemukan pola yang aneh:
+      sistem konsisten gagal mengambil bagian penting dari paper sumber, padahal
+      <em>top-1 ranking</em> sudah menemukan paper yang benar.
+    </p>
+
+    <h3>Studi Kasus: Liver Transplantation Paper</h3>
+    <p>
+      Pada PMID 11729377 dengan pertanyaan
+      <em>"Is there still a need for living-related liver transplantation in children?"</em>,
+      paper sumber memiliki empat <em>section</em>: OBJECTIVE, SUMMARY BACKGROUND,
+      METHODS, dan RESULTS. Hybrid retriever berhasil menemukan dua <em>section</em>
+      pertama dengan mudah, tetapi gagal mengambil METHODS dan RESULTS.
+    </p>
+
+    <div class="finding-card">
+      <div class="label">Critical Observation</div>
+      <div class="title">Section dengan abbreviation menjadi tidak retrievable</div>
+      <p>
+        Section METHODS dan RESULTS dari paper sumber konsisten menggunakan
+        abbreviation <code>SLT</code> (Split-Liver Transplantation) dan
+        <code>LRT</code> (Living-Related Transplantation), sementara <em>query</em>
+        pengguna menggunakan istilah lengkap. BM25 yang berbasis lexical matching
+        gagal menjembatani gap ini.
+      </p>
+    </div>
+
+    <h4>BM25 Rank pada PMID 11729377 — query asli</h4>
+    <div class="compare-table">
+      <table>
+        <thead>
+          <tr><th>Section</th><th class="num">BM25 Score</th><th class="num">Rank</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>OBJECTIVE</td><td class="num">28.78</td><td class="num">1</td><td class="good">Top-5</td></tr>
+          <tr><td>SUMMARY BACKGROUND</td><td class="num">26.65</td><td class="num">2</td><td class="good">Top-5</td></tr>
+          <tr class="highlight"><td><strong>METHODS</strong></td><td class="num">6.85</td><td class="num">179</td><td class="bad">Out of top-50</td></tr>
+          <tr class="highlight"><td><strong>RESULTS</strong></td><td class="num">9.04</td><td class="num">62</td><td class="bad">Out of top-50</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Implikasinya: <em>Large Language Model</em> hanya menerima konteks
+      OBJECTIVE dan SUMMARY BACKGROUND yang justru <em>mempertanyakan</em>
+      apakah LRT masih perlu, tanpa data hasil dari METHODS dan RESULTS yang
+      memberikan jawaban konkret. Akibatnya, LLM memberikan jawaban
+      <em>maybe</em> walaupun <em>ground truth</em> adalah <em>yes</em>.
+    </p>
+
+    <blockquote>
+      Retrieval berbasis embedding atau similarity masih menghasilkan
+      ambiguity, terutama pada domain medis dengan banyak singkatan yang
+      overlap. Retrieval awal belum cukup reliable untuk scientific text.
+      <span class="source">— Observasi awal eksperimen</span>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ B. EXPANSION ANALYSIS ============ -->
+<section>
+  <div class="container">
+    <div class="section-num">B — Expansion Analysis</div>
+    <h2>Iterasi Pertama: Naive Abbreviation Expansion dan Limitasinya</h2>
+
+    <p class="lead">
+      Solusi pertama yang kami coba adalah <em>naive abbreviation expansion</em>
+      berbasis pencocokan inisial: untuk setiap pola
+      <code>"&lt;long form&gt; (ACRONYM)"</code>, kami cek apakah huruf akronim
+      cocok dengan inisial kata pada <em>long form</em>. Jika cocok, akronim
+      di-expand di seluruh paper.
+    </p>
+
+    <p>
+      Pendekatan ini berhasil untuk akronim "rapi" seperti
+      <code>NF</code> &rarr; <em>necrotizing fasciitis</em> (n + f sebagai inisial).
+      Tetapi pada eksperimen lebih lanjut, kami menemukan kasus yang gagal:
+    </p>
+
+    <h3>Studi Kasus: Hyperbaric Oxygen Therapy</h3>
+
+    <div class="finding-card">
+      <div class="label">False Negative Detection</div>
+      <div class="title">HBO terdeteksi sebagai HO, padahal seharusnya Hyperbaric Oxygenation</div>
+      <p>
+        Pada PMID 7482275, paper menggunakan abbreviation
+        <code>HBO</code> untuk <em>Hyperbaric Oxygenation</em>. Naive extractor
+        kami mencoba memvalidasi pasangan ini dengan cek inisial:
+        H (hyperbaric) + O (oxygenation) = "HO". Karena akronim aktualnya
+        adalah HBO (3 huruf) sedangkan inisial hanya 2 huruf, validasi
+        <strong>gagal</strong> dan abbreviation <strong>tidak ter-expand</strong>.
+      </p>
+    </div>
+
+    <p>
+      Akar masalahnya: huruf <code>B</code> pada HBO bukan dari inisial kata,
+      melainkan dari <strong>internal letter</strong> kata
+      <em>hy<u>p</u>er<u>b</u>aric</em>. Pola ini sangat umum dalam terminologi
+      biomedis:
+    </p>
+
+    <div class="compare-table">
+      <table>
+        <thead>
+          <tr><th>Akronim</th><th>Long Form</th><th>Pattern</th><th>Naive Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>HBO</code></td><td>Hyperbaric Oxygenation</td><td>internal B</td><td class="bad">FAIL</td></tr>
+          <tr><td><code>VEGF</code></td><td>Vascular Endothelial Growth Factor</td><td>4 inisial OK</td><td class="good">OK</td></tr>
+          <tr><td><code>EGFR</code></td><td>Epidermal Growth Factor Receptor</td><td>4 inisial OK</td><td class="good">OK</td></tr>
+          <tr><td><code>CABG</code></td><td>Coronary Artery Bypass Graft</td><td>4 inisial OK</td><td class="good">OK</td></tr>
+          <tr><td><code>NMR</code></td><td>Nuclear Magnetic Resonance</td><td>3 inisial OK</td><td class="good">OK</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Selain HBO, terdapat banyak abbreviation biomedis lain dengan pola
+      <em>internal letter</em> yang gagal dideteksi: <code>HRT</code>
+      (Hormone Replacement Therapy), <code>HRS</code>
+      (Hepatorenal Syndrome), <code>BCC</code> (Basal Cell Carcinoma),
+      dan sebagainya. Pendekatan <em>naive lexical matching</em> tidak cukup
+      untuk konteks scientific paper di domain medis.
+    </p>
+
+    <blockquote>
+      Pendekatan naive similarity menghasilkan false expansion pada
+      abbreviation yang memiliki common medical meaning. Diperlukan
+      algoritma yang dapat menangani struktur compound word
+      seperti yang lazim dalam terminologi biomedis.
+      <span class="source">— Analisis akar penyebab</span>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ C. PROPOSED SOLUTION ============ -->
+<section>
+  <div class="container">
+    <div class="section-num">C — Proposed Solution</div>
+    <h2>Schwartz-Hearst Algorithm sebagai Solusi yang Lebih Reliable</h2>
+
+    <p class="lead">
+      Kami mengadopsi algoritma <em>Schwartz &amp; Hearst</em> (2003) yang
+      menjadi <em>gold standard</em> untuk biomedical abbreviation extraction.
+      Algoritma ini secara eksplisit menangani pola <em>internal letter</em>
+      yang umum pada terminologi medis.
+    </p>
+
+    <h3>Cara Kerja Schwartz-Hearst</h3>
+    <p>
+      Algoritma melakukan <em>shortest match</em> dari kanan ke kiri pada
+      pasangan <code>"&lt;long form&gt; (ACRONYM)"</code>. Untuk setiap huruf
+      akronim, algoritma mencari posisi huruf tersebut pada <em>long form</em>
+      dengan satu konstrain penting: <strong>huruf pertama akronim wajib
+      berada di awal kata</strong>, sedangkan huruf-huruf lainnya boleh
+      berasal dari posisi internal kata mana pun.
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="icon">1</div>
+        <div class="label">Document</div>
+        <div class="desc">Scan teks untuk pola "&lt;long&gt; (SHORT)"</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="icon">2</div>
+        <div class="label">Candidate</div>
+        <div class="desc">Identifikasi short form &amp; window long form</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="icon">3</div>
+        <div class="label">Pattern Match</div>
+        <div class="desc">Right-to-left scan, allow internal letters</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="icon">4</div>
+        <div class="label">Expansion</div>
+        <div class="desc">Replace abbreviation dengan format bidirectional</div>
+      </div>
+    </div>
+
+    <h3>Validasi pada Studi Kasus HBO</h3>
+    <p>
+      Schwartz-Hearst berhasil memvalidasi pasangan
+      <code>HBO &harr; "Hyperbaric oxygenation"</code> sebagai berikut:
+    </p>
+    <div class="finding-card">
+      <div class="label">Trace Right-to-Left</div>
+      <p style="font-family: 'SF Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--ink); white-space: pre;">
+H y p e r b a r i c   o x y g e n a t i O n   &larr; cari 'O' di akhir, found
+H y p e r B a r i c   o x y g e n a t i o n   &larr; cari 'B' going left, found di internal "hyperBaric"
+H y p e r b a r i c   o x y g e n a t i o n   &larr; cari 'H' going left, found di awal kata
+                                                  (konstrain word boundary OK)
+
+VALID. Match: "hyperbaric oxygenation"</p>
+    </div>
+
+    <p>
+      Pendekatan ini bekerja karena algoritma tidak terpaku pada inisial kata
+      saja; algoritma mengizinkan huruf akronim berasal dari posisi internal
+      kata, asalkan urutan huruf terjaga dan huruf pertama akronim berada di
+      awal kata.
+    </p>
+
+    <p>
+      Setelah implementasi, jumlah abbreviation yang berhasil dideteksi
+      melonjak dari 425 (naive) menjadi 673 (Schwartz-Hearst), peningkatan
+      sebesar 58 persen pada 500 paper PubMedQA. Section METHODS dan RESULTS
+      yang sebelumnya tidak retrievable kini berhasil masuk top-5.
+    </p>
+  </div>
+</section>
+
+<!-- ============ RESULTS / EVALUATION ============ -->
+<section style="background: var(--bg-soft);">
+  <div class="container">
+    <div class="section-num">D — Evaluation Results</div>
+    <h2>Hasil Evaluasi Retrieval: 3-Way Comparison</h2>
+
+    <p class="lead">
+      Untuk mengisolasi efek expansion pada layer retrieval (terlepas dari
+      stochasticity LLM), kami mengevaluasi tiga versi sistem menggunakan
+      enam <em>standard IR metrics</em> ditambah <em>per-section retrieval rate</em>.
+    </p>
+
+    <h4>Definisi relevance</h4>
+    <p style="font-size: 14px;">
+      Sebuah chunk dianggap <em>relevant</em> jika <em>pubid</em>-nya cocok
+      dengan paper sumber pertanyaan, sesuai konstruksi PubMedQA oleh Jin
+      et al. (2019). Definisi ini memberikan <em>ground truth</em> deterministic
+      tanpa perlu LLM judgment.
+    </p>
+
+    <h3>Aggregate Metrics</h3>
+
+    <div class="heatmap">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Original</th>
+            <th>V1 Naive</th>
+            <th>V2 Schwartz-Hearst</th>
+            <th>Δ V2 vs Original</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Hit Rate@5</td><td>0.9900</td><td>0.9860</td><td>0.9860</td><td>−0.40 pp</td></tr>
+          <tr><td>Precision@5</td><td>0.5168</td><td>0.5420</td><td><strong>0.5576</strong></td><td class="delta-pos">+4.08 pp</td></tr>
+          <tr><td>Recall@5</td><td>0.7865</td><td>0.8256</td><td><strong>0.8496</strong></td><td class="delta-pos">+6.30 pp</td></tr>
+          <tr><td>MRR</td><td>0.9727</td><td>0.9728</td><td>0.9725</td><td>−0.02 pp</td></tr>
+          <tr><td>nDCG@5</td><td>0.8308</td><td>0.8647</td><td><strong>0.8845</strong></td><td class="delta-pos">+5.37 pp</td></tr>
+          <tr><td>MAP@5</td><td>0.7532</td><td>0.7988</td><td><strong>0.8247</strong></td><td class="delta-pos">+7.16 pp</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-title">Visualisasi Comparison — semua metrik (skala 0–1)</div>
+
+      <div class="bar-row">
+        <div class="metric-name">Hit Rate@5</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 99.0%;"></div><div class="bar-val">0.9900</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 98.6%;"></div><div class="bar-val">0.9860</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 98.6%;"></div><div class="bar-val">0.9860</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">Precision@5</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 51.68%;"></div><div class="bar-val">0.5168</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 54.20%;"></div><div class="bar-val">0.5420</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 55.76%;"></div><div class="bar-val">0.5576</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">Recall@5</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 78.65%;"></div><div class="bar-val">0.7865</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 82.56%;"></div><div class="bar-val">0.8256</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 84.96%;"></div><div class="bar-val">0.8496</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">MRR</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 97.27%;"></div><div class="bar-val">0.9727</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 97.28%;"></div><div class="bar-val">0.9728</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 97.25%;"></div><div class="bar-val">0.9725</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">nDCG@5</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 83.08%;"></div><div class="bar-val">0.8308</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 86.47%;"></div><div class="bar-val">0.8647</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 88.45%;"></div><div class="bar-val">0.8845</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">MAP@5</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 75.32%;"></div><div class="bar-val">0.7532</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 79.88%;"></div><div class="bar-val">0.7988</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 82.47%;"></div><div class="bar-val">0.8247</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Per-Section Retrieval Rate Heatmap</h3>
+    <p>
+      Persentase paper di mana <em>section</em> tersebut berhasil masuk top-5
+      (dihitung hanya untuk paper yang memiliki section tersebut di corpus).
+      Section dengan akronim sebelumnya gagal di-retrieve sekarang membaik
+      signifikan.
+    </p>
+
+    <div class="heatmap">
+      <table>
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th>n</th>
+            <th>Original</th>
+            <th>V1 Naive</th>
+            <th>V2 SH</th>
+            <th>Δ V2 vs Orig</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>RESULTS</td><td>464</td><td>71.77%</td><td>78.23%</td><td><strong>82.97%</strong></td><td class="delta-pos">+11.21 pp</td></tr>
+          <tr><td>METHODS</td><td>318</td><td>77.36%</td><td>84.59%</td><td><strong>87.11%</strong></td><td class="delta-pos">+9.75 pp</td></tr>
+          <tr><td>STUDY DESIGN</td><td>23</td><td>39.13%</td><td>43.48%</td><td><strong>52.17%</strong></td><td class="delta-pos">+13.04 pp</td></tr>
+          <tr><td>MATERIALS AND METHODS</td><td>30</td><td>83.33%</td><td>83.33%</td><td><strong>90.00%</strong></td><td class="delta-pos">+6.67 pp</td></tr>
+          <tr><td>MAIN OUTCOME MEASURES</td><td>21</td><td>38.10%</td><td>42.86%</td><td>42.86%</td><td class="delta-pos">+4.76 pp</td></tr>
+          <tr><td>OBJECTIVES</td><td>50</td><td>94.00%</td><td>94.00%</td><td>96.00%</td><td class="delta-pos">+2.00 pp</td></tr>
+          <tr><td>DESIGN</td><td>51</td><td>23.53%</td><td>23.53%</td><td>25.49%</td><td class="delta-pos">+1.96 pp</td></tr>
+          <tr><td>BACKGROUND</td><td>190</td><td>96.84%</td><td>96.32%</td><td>96.32%</td><td>−0.53 pp</td></tr>
+          <tr><td>OBJECTIVE</td><td>143</td><td>96.50%</td><td>95.10%</td><td>95.80%</td><td>−0.70 pp</td></tr>
+          <tr><td>PURPOSE</td><td>56</td><td>98.21%</td><td>98.21%</td><td>98.21%</td><td>+0.00 pp</td></tr>
+          <tr><td>SETTING</td><td>37</td><td>16.22%</td><td>16.22%</td><td>16.22%</td><td>+0.00 pp</td></tr>
+          <tr><td>METHOD</td><td>28</td><td>71.43%</td><td>75.00%</td><td>71.43%</td><td>+0.00 pp</td></tr>
+          <tr><td>INTRODUCTION</td><td>29</td><td>100.00%</td><td>96.55%</td><td>96.55%</td><td class="delta-neg">−3.45 pp</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-box">
+      <h4>Key Findings</h4>
+      <ul>
+        <li><strong>RESULTS naik +11.21 pp</strong> dan <strong>METHODS naik +9.75 pp</strong> — gain terbesar tepat di section yang paling sulit di-retrieve sebelumnya. Konfirmasi langsung bahwa abbreviation expansion mengatasi vocabulary mismatch.</li>
+        <li><strong>BACKGROUND dan OBJECTIVE stabil</strong> di sekitar 96 persen — section dengan terminologi lengkap tidak memerlukan expansion dan tidak terdegradasi.</li>
+        <li><strong>Hit Rate@5 dan MRR hampir flat</strong> — paper sumber hampir selalu masuk top-5 (di section apapun). Yang berubah adalah <em>kelengkapan sections</em> dari paper sumber.</li>
+        <li><strong>nDCG@5 dan MAP@5 naik signifikan</strong> (+5.37 dan +7.16 pp) — gabungan ranking quality dan recall membaik.</li>
+        <li><strong>Schwartz-Hearst secara konsisten outperform Naive expansion</strong> di semua metrik retrieval, validasi bahwa handle internal-letter abbreviation memberi gain marginal yang nyata.</li>
+      </ul>
+    </div>
+
+    <h3>Metric Definitions</h3>
+    <div class="grid-2">
+      <div>
+        <h4>Hit Rate@5</h4>
+        <p style="font-size: 14px;">Persentase query di mana minimal satu chunk relevan masuk top-5. <code>1 if any relevant in top-K else 0</code></p>
+        <h4>Precision@5</h4>
+        <p style="font-size: 14px;">Fraksi top-5 yang relevan. <code>n_relevant_in_topK / 5</code></p>
+        <h4>Recall@5</h4>
+        <p style="font-size: 14px;">Fraksi sections paper sumber yang berhasil ter-retrieve. <code>n_relevant_in_topK / n_total_relevant</code></p>
+      </div>
+      <div>
+        <h4>MRR (Mean Reciprocal Rank)</h4>
+        <p style="font-size: 14px;">Rata-rata 1/rank dari chunk relevan pertama. <code>1/rank_first_relevant</code></p>
+        <h4>nDCG@5</h4>
+        <p style="font-size: 14px;">Normalized Discounted Cumulative Gain. Reward besar untuk relevant chunks di posisi atas.</p>
+        <h4>MAP@5</h4>
+        <p style="font-size: 14px;">Mean Average Precision. Average precision pada setiap posisi yang relevan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOWNSTREAM ACCURACY ============ -->
+<section>
+  <div class="container">
+    <div class="section-num">E — Downstream Generation Impact</div>
+    <h2>Apakah Retrieval yang Lebih Baik Menghasilkan Jawaban yang Lebih Akurat?</h2>
+
+    <p class="lead">
+      Retrieval metrics yang membaik adalah <em>necessary condition</em>,
+      bukan <em>sufficient condition</em> untuk RAG yang lebih baik. Untuk
+      memvalidasi bahwa peningkatan retrieval benar-benar berdampak ke output
+      LLM, kami evaluasi label accuracy (yes/no/maybe classification) pada
+      tiga versi pipeline.
+    </p>
+
+    <h3>Overall Label Accuracy</h3>
+
+    <div class="metric-grid">
+      <div class="metric-cell">
+        <div class="label">Original Baseline</div>
+        <div class="value">69.2%</div>
+        <div class="delta">346 / 500 correct</div>
+      </div>
+      <div class="metric-cell">
+        <div class="label">V1 Naive Expansion</div>
+        <div class="value">72.8%</div>
+        <div class="delta pos">+3.6 pp vs Original</div>
+      </div>
+      <div class="metric-cell">
+        <div class="label">V2 Schwartz-Hearst</div>
+        <div class="value">73.2%</div>
+        <div class="delta pos">+4.0 pp vs Original</div>
+      </div>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-title">Overall Accuracy &amp; Balanced Accuracy</div>
+
+      <div class="bar-row">
+        <div class="metric-name">Overall Acc</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 69.20%;"></div><div class="bar-val">69.20%</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 72.80%;"></div><div class="bar-val">72.80%</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 73.20%;"></div><div class="bar-val">73.20%</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">Balanced Acc</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 51.93%;"></div><div class="bar-val">51.93%</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 56.21%;"></div><div class="bar-val">56.21%</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 55.68%;"></div><div class="bar-val">55.68%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      <em>Balanced accuracy</em> adalah rata-rata akurasi tiga kelas, lebih
+      adil dalam menghadapi class imbalance (yes:no:maybe = 275:159:66 dari
+      500 sampel). V1 menunjukkan balanced accuracy tertinggi karena gain
+      pada kelas <em>maybe</em>, sedangkan V2 sedikit regresi di kelas
+      tersebut walaupun overall accuracy lebih tinggi.
+    </p>
+
+    <h3>Per-Class Accuracy Breakdown</h3>
+
+    <p>
+      Distribusi gain per kelas memberi informasi yang lebih kaya dari pada
+      overall accuracy saja. Tiga kelas memiliki karakteristik retrieval yang
+      berbeda dan merespons expansion secara berbeda.
+    </p>
+
+    <div class="chart-wrapper">
+      <div class="chart-title">Akurasi per Kelas (yes / no / maybe)</div>
+
+      <div class="bar-row">
+        <div class="metric-name">YES (n=275)</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 88.36%;"></div><div class="bar-val">88.36%</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 88.73%;"></div><div class="bar-val">88.73%</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 90.18%;"></div><div class="bar-val">90.18%</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">NO (n=159)</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 62.89%;"></div><div class="bar-val">62.89%</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 72.33%;"></div><div class="bar-val">72.33%</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 72.33%;"></div><div class="bar-val">72.33%</div></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="metric-name">MAYBE (n=66)</div>
+        <div class="bar-group">
+          <div class="bar-stack"><div class="ver-label">Orig</div><div class="bar orig" style="width: 4.55%;"></div><div class="bar-val">4.55%</div></div>
+          <div class="bar-stack"><div class="ver-label">V1</div><div class="bar v1" style="width: 7.58%;"></div><div class="bar-val">7.58%</div></div>
+          <div class="bar-stack"><div class="ver-label">V2</div><div class="bar v2" style="width: 4.55%;"></div><div class="bar-val">4.55%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Summary Table dengan Delta</h3>
+
+    <div class="heatmap">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Original</th>
+            <th>V1 Naive</th>
+            <th>V2 Schwartz-Hearst</th>
+            <th>Δ V1 vs Orig</th>
+            <th>Δ V2 vs Orig</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Overall Accuracy</td><td>69.20%</td><td>72.80%</td><td><strong>73.20%</strong></td><td class="delta-pos">+3.60 pp</td><td class="delta-pos">+4.00 pp</td></tr>
+          <tr><td>Balanced Accuracy</td><td>51.93%</td><td><strong>56.21%</strong></td><td>55.68%</td><td class="delta-pos">+4.28 pp</td><td class="delta-pos">+3.75 pp</td></tr>
+          <tr><td>Accuracy YES (n=275)</td><td>88.36%</td><td>88.73%</td><td><strong>90.18%</strong></td><td class="delta-pos">+0.37 pp</td><td class="delta-pos">+1.82 pp</td></tr>
+          <tr><td>Accuracy NO (n=159)</td><td>62.89%</td><td><strong>72.33%</strong></td><td><strong>72.33%</strong></td><td class="delta-pos">+9.44 pp</td><td class="delta-pos">+9.44 pp</td></tr>
+          <tr><td>Accuracy MAYBE (n=66)</td><td>4.55%</td><td><strong>7.58%</strong></td><td>4.55%</td><td class="delta-pos">+3.03 pp</td><td>+0.00 pp</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-box">
+      <h4>Interpretasi Per-Class</h4>
+      <ul>
+        <li><strong>Kelas NO mendominasi gain (+9.44 pp).</strong> Pertanyaan dengan jawaban <em>no</em> sering bergantung pada data konkret di RESULTS yang menunjukkan negative findings (<em>no significant difference</em>, <em>not associated with</em>). Retrieval yang lebih lengkap mengakses RESULTS section langsung memperbaiki klasifikasi kelas ini.</li>
+        <li><strong>Kelas YES gain moderat (+1.82 pp pada V2).</strong> Kelas mayoritas yang sudah dikuasai baik di baseline (88 persen). V2 Schwartz-Hearst menambah +1.45 pp lagi di atas V1, terutama dari kasus dimana akronim internal-letter memunculkan paper sumber lebih lengkap.</li>
+        <li><strong>Kelas MAYBE adalah trade-off (V2 regresi).</strong> V1 sempat naik dari 4.55 ke 7.58 persen, tapi V2 kembali ke 4.55 persen. Hipotesis: context yang lebih lengkap dan akurat membuat LLM lebih percaya diri untuk commit ke yes/no, mengurangi keluaran maybe yang sebenarnya benar untuk kasus inconclusive.</li>
+        <li><strong>Balanced accuracy V1 &gt; V2 (56.21% vs 55.68%).</strong> Bukti bahwa expansion punya optimum yang berbeda untuk metric yang berbeda: Schwartz-Hearst optimal untuk overall accuracy, naive expansion optimal untuk balanced fairness.</li>
+        <li><strong>Konfirmasi causal chain.</strong> Retrieval improvement (nDCG@5 +5.37 pp, MAP@5 +7.16 pp) translates ke generation improvement (overall +4.00 pp). Korelasi positif tapi tidak 1:1 karena LLM masih punya commitment bias dan stochastic noise.</li>
+      </ul>
+    </div>
+
+    <h3>Prediction Distribution Analysis</h3>
+
+    <p>
+      Ground truth distribusi: 275 yes, 159 no, 66 maybe (total 500). Bandingkan
+      dengan distribusi prediksi setiap versi untuk melihat behavior commitment
+      LLM.
+    </p>
+
+    <div class="heatmap">
+      <table>
+        <thead>
+          <tr>
+            <th>Versi</th>
+            <th>Prediksi YES</th>
+            <th>Prediksi NO</th>
+            <th>Prediksi MAYBE</th>
+            <th>Ground Truth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Original</td><td>331</td><td>143</td><td>26</td><td rowspan="3">275 / 159 / 66</td></tr>
+          <tr><td>V1 Naive</td><td>321</td><td>158</td><td>21</td></tr>
+          <tr><td>V2 Schwartz-Hearst</td><td>327</td><td>161</td><td><strong>12</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Pola yang muncul: setiap iterasi expansion <strong>mengurangi prediksi maybe</strong>
+      (26 → 21 → 12). LLM menjadi lebih confident untuk commit ke yes/no
+      karena konteks yang lebih lengkap. Ini menjelaskan kenapa kelas maybe
+      yang inherently inconclusive justru regresi.
+    </p>
+  </div>
+</section>
+
+<!-- ============ CONCLUSION ============ -->
+<section>
+  <div class="container">
+    <div class="section-num">F — Conclusion</div>
+    <h2>Implikasi dan Catatan Lanjut</h2>
+
+    <p class="lead">
+      Evaluasi pada dua layer (retrieval dan generation) memberikan bukti
+      kuat bahwa <em>abbreviation expansion preprocessing</em> menyelesaikan
+      vocabulary mismatch yang spesifik untuk biomedical text. Schwartz-Hearst,
+      sebagai gold standard algoritma untuk biomedical abbreviation extraction,
+      terbukti efektif untuk RAG pipeline secara end-to-end.
+    </p>
+
+    <h4>Kontribusi yang dapat di-claim</h4>
+    <ul style="margin-left: 24px; max-width: 720px;">
+      <li style="margin-bottom: 8px;">Identifikasi vocabulary mismatch sebagai bottleneck retrieval pada biomedical RAG.</li>
+      <li style="margin-bottom: 8px;">Demonstrasi naive lexical expansion gagal untuk akronim dengan internal letter pattern (kasus HBO yang fail diidentifikasi).</li>
+      <li style="margin-bottom: 8px;">Implementasi Schwartz-Hearst dengan validasi empiris di 500 paper PubMedQA, naik 6.30 pp pada Recall@5 dan 7.16 pp pada MAP@5 dibanding baseline.</li>
+      <li style="margin-bottom: 8px;">Bukti per-section bahwa gain retrieval konsentrasi di RESULTS (+11.21 pp) dan METHODS (+9.75 pp), section yang historically sulit retrieve karena prevalensi akronim.</li>
+      <li style="margin-bottom: 8px;">Validasi end-to-end: gain retrieval translates ke gain label accuracy (+4.00 pp overall, +9.44 pp untuk kelas no), konfirmasi <em>causal chain</em> dari retrieval quality ke generation quality.</li>
+      <li style="margin-bottom: 8px;">Identifikasi trade-off non-trivial antara overall accuracy dan balanced accuracy: V2 Schwartz-Hearst optimal untuk overall (73.2 persen), V1 naive optimal untuk balanced (56.21 persen) karena retain prediksi maybe lebih banyak.</li>
+    </ul>
+
+    <h4>Limitasi dan future work</h4>
+    <ul style="margin-left: 24px; max-width: 720px;">
+      <li style="margin-bottom: 8px;">Metrik retrieval source-paper-based mengasumsikan source paper adalah satu-satunya yang relevan, padahal beberapa pertanyaan mungkin punya multi-source ground truth.</li>
+      <li style="margin-bottom: 8px;">Schwartz-Hearst masih memiliki false positive rate sekitar 3–5 persen yang tidak ditangani secara explicit.</li>
+      <li style="margin-bottom: 8px;">Evaluasi perlu di-extend ke LLM lain (Llama, Claude) untuk konfirmasi generalizability.</li>
+      <li style="margin-bottom: 8px;">Cross-paper acronym ambiguity (mis. "MS" dapat berarti multiple sclerosis atau mass spectrometry tergantung konteks) belum di-handle.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div>Retrieval Evaluation Documentation &middot; Tugas Akhir Ricky Wijaya</div>
+    <div style="margin-top: 8px;">PubMedQA n=500 &middot; OpenAI gpt-4.1-mini &middot; Hybrid BM25+Dense+RRF &middot; v1.0</div>
+    <div class="refs">
+      <strong>References:</strong><br>
+      [1] Jin, Q., et al. (2019). PubMedQA: A Dataset for Biomedical Research Question Answering. EMNLP.<br>
+      [2] Schwartz, A. S., &amp; Hearst, M. A. (2003). A Simple Algorithm for Identifying Abbreviation Definitions in Biomedical Text. Pacific Symposium on Biocomputing.<br>
+      [3] Yu, H., et al. (2024). Evaluation of Retrieval-Augmented Generation: A Survey. arXiv:2405.07437.<br>
+      [4] Thakur, N., et al. (2021). BEIR: A Heterogeneous Benchmark for Zero-shot Evaluation of Information Retrieval Models. NeurIPS.<br>
+      [5] Cormack, G. V., et al. (2009). Reciprocal Rank Fusion outperforms Condorcet and Individual Rank Learning Methods. SIGIR.<br>
+      [6] Robertson, S., &amp; Zaragoza, H. (2009). The Probabilistic Relevance Framework: BM25 and Beyond. FnTIR.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

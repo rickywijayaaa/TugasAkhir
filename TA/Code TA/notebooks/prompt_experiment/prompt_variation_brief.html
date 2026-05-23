@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Brief: Eksperimen Variasi Prompt RAG-LLM PubMedQA</title>
+<style>
+  /* ============ design tokens ============ */
+  :root {
+    --navy:       #0f2c4d;
+    --navy-dark:  #081d36;
+    --gold:       #b8985a;
+    --gold-soft:  #f3edda;
+    --cream:      #fafaf7;
+    --paper:      #ffffff;
+    --ink:        #1c1c1c;
+    --muted:      #6b7280;
+    --border:     #e5e5e5;
+    --accent-red: #b94a3b;
+    --accent-grn: #2f6b4f;
+    --slide-w: 1280px;
+    --slide-h: 720px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: #1a1a1a;
+    color: var(--ink);
+    font-family: 'Georgia', 'Charter', serif;
+    line-height: 1.45;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ============ deck shell ============ */
+  .deck-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 40px;
+    background: var(--navy-dark);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 50;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .deck-header .brand {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .deck-header .title {
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    flex: 1;
+    margin: 0 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .deck-header .counter {
+    font-size: 12px;
+    color: rgba(255,255,255,0.9);
+    font-variant-numeric: tabular-nums;
+  }
+  .deck-progress {
+    position: fixed;
+    top: 40px;
+    left: 0; right: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    z-index: 49;
+  }
+  .deck-progress .bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .deck-stage {
+    position: fixed;
+    top: 42px;
+    left: 0; right: 0;
+    bottom: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  /* ============ slides 16:9 ============ */
+  .slide {
+    width: var(--slide-w);
+    height: var(--slide-h);
+    background: var(--paper);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    border-top: 6px solid var(--navy);
+    padding: 40px 56px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(var(--scale, 1));
+    transform-origin: center center;
+    position: absolute;
+  }
+  .slide.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .deck-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--navy-dark);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 50;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .deck-nav button {
+    background: var(--navy);
+    color: white;
+    border: 1px solid var(--gold);
+    padding: 8px 18px;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .deck-nav button:hover:not(:disabled) { background: var(--gold); color: var(--navy-dark); }
+  .deck-nav button:disabled {
+    background: transparent;
+    color: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.15);
+    cursor: not-allowed;
+  }
+  .deck-nav .dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 60%;
+    justify-content: center;
+  }
+  .deck-nav .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .deck-nav .dot.active {
+    background: var(--gold);
+    transform: scale(1.4);
+  }
+  .deck-nav .dot:hover { background: white; }
+  .deck-nav .shortcuts {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ============ typography ============ */
+  h1, h2, h3, h4 { font-family: 'Georgia', serif; color: var(--navy); margin-top: 0; }
+  h1 { font-size: 42px; line-height: 1.15; margin-bottom: 8px; letter-spacing: -0.5px; }
+  h2 { font-size: 28px; margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border); line-height: 1.2; }
+  h3 { font-size: 18px; margin: 20px 0 6px 0; }
+  h4 { font-size: 13px; margin: 12px 0 4px 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  p { margin: 6px 0 10px 0; font-size: 15px; }
+  .sans { font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  .tiny  { font-size: 11.5px; }
+
+  .slide-body {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* ============ cover ============ */
+  .cover-slide {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    color: white;
+    padding: 60px 64px;
+    border-top: 6px solid var(--gold);
+    justify-content: space-between;
+  }
+  .cover-slide .tag {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cover-slide h1 { color: white; font-size: 52px; line-height: 1.1; margin-bottom: 14px; }
+  .cover-slide .sub { color: rgba(255,255,255,0.85); font-size: 21px; font-style: italic; margin-bottom: 36px; }
+  .cover-slide .meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 24px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin-top: 24px;
+  }
+  .cover-slide .meta .k { color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; margin-bottom: 4px; }
+  .cover-slide .meta .v { color: white; font-size: 15px; }
+
+  /* ============ callouts ============ */
+  .callout {
+    background: var(--gold-soft);
+    border-left: 4px solid var(--gold);
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .callout .label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .insight-red { background: #fbeeec; border-left: 4px solid var(--accent-red); }
+  .insight-red .label { color: var(--accent-red); }
+  .insight-grn { background: #ebf3ee; border-left: 4px solid var(--accent-grn); }
+  .insight-grn .label { color: var(--accent-grn); }
+
+  /* ============ stat grid ============ */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .stat {
+    background: var(--cream);
+    padding: 16px 14px;
+    border-top: 3px solid var(--navy);
+  }
+  .stat .num {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat .lbl {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ============ table ============ */
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12.5px; }
+  thead th {
+    background: var(--navy);
+    color: white;
+    text-align: left;
+    padding: 7px 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 10.5px;
+  }
+  tbody td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) td { background: #fcfcfa; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ============ prompt cards ============ */
+  .prompt-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .prompt-card .head {
+    background: var(--navy);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .prompt-card .head .pid {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .prompt-card .head .name { font-size: 18px; font-weight: 600; font-family: 'Georgia', serif; }
+  .prompt-card .head .meta { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10.5px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+  .prompt-card .body { padding: 16px 22px; flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+  pre.prompt {
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 14px 18px;
+    border-radius: 3px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    margin: 8px 0 0 0;
+    border-left: 3px solid var(--gold);
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+  pre.prompt.full {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  pre.prompt .placeholder { color: var(--gold); font-weight: 600; }
+
+  /* ============ placeholder ============ */
+  .placeholder-box {
+    background: repeating-linear-gradient(
+      135deg, var(--cream), var(--cream) 10px,
+      #f0eee8 10px, #f0eee8 20px
+    );
+    border: 1px dashed var(--muted);
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+    margin: 8px 0;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* ============ source ============ */
+  .src {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin: 8px 0;
+    padding-left: 22px;
+    text-indent: -22px;
+  }
+  .src .id { color: var(--gold); font-weight: 600; margin-right: 6px; }
+  .src a { color: var(--navy); text-decoration: none; border-bottom: 1px dotted var(--navy); word-break: break-all; }
+  .src a:hover { background: var(--gold-soft); }
+
+  /* ============ secnum ============ */
+  .secnum {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  /* ============ utility ============ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  ul.clean { padding-left: 18px; margin: 4px 0; }
+  ul.clean li { margin-bottom: 4px; font-size: 14px; }
+
+  /* ============ TOC ============ */
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .toc-item {
+    background: rgba(255,255,255,0.08);
+    padding: 8px 12px;
+    border-left: 3px solid var(--gold);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .toc-item:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateX(2px);
+  }
+  .toc-item .num {
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .toc-item .title {
+    font-size: 12px;
+    color: white;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* ============ print ============ */
+  @media print {
+    body { background: white; overflow: visible; }
+    .deck-header, .deck-nav, .deck-progress { display: none; }
+    .deck-stage { position: static; padding: 0; display: block; }
+    .slide {
+      display: flex !important;
+      page-break-after: always;
+      box-shadow: none;
+      transform: none !important;
+      position: relative !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 100vh;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck-header">
+  <div class="brand">Prompt Variation Brief</div>
+  <div class="title" id="slide-title">Cover</div>
+  <div class="counter"><span id="cur">1</span> / <span id="total">27</span></div>
+</div>
+<div class="deck-progress"><div class="bar" id="progress-bar"></div></div>
+
+<div class="deck-stage" id="stage">
+
+<!-- ====================== SLIDE 1: COVER ====================== -->
+<section class="slide cover-slide active" data-title="Cover">
+  <div>
+    <div class="tag">Brief Eksperimen Tugas Akhir</div>
+    <h1>Eksperimen Variasi Prompt<br>untuk Mitigasi Halusinasi RAG-LLM</h1>
+    <div class="sub">Mencari bentuk prompt generator yang paling efektif pada konteks PubMedQA</div>
+    <div class="meta">
+      <div><div class="k">Mahasiswa</div><div class="v">Ricky Wijaya</div></div>
+      <div><div class="k">Dataset</div><div class="v">PubMedQA pqa_labeled</div></div>
+      <div><div class="k">LLM</div><div class="v">GPT-4.1-mini (OpenAI)</div></div>
+    </div>
+  </div>
+  <div>
+    <div class="tag" style="font-size: 10px; margin-bottom: 8px;">Daftar Isi (klik untuk loncat)</div>
+    <div class="toc-grid">
+      <div class="toc-item" onclick="show(1)"><div class="num">02</div><div class="title">Ringkasan Eksekutif</div></div>
+      <div class="toc-item" onclick="show(2)"><div class="num">03</div><div class="title">Konteks Baseline</div></div>
+      <div class="toc-item" onclick="show(3)"><div class="num">04</div><div class="title">Mengapa Prompt</div></div>
+      <div class="toc-item" onclick="show(4)"><div class="num">05</div><div class="title">Hipotesis H1-H2</div></div>
+      <div class="toc-item" onclick="show(5)"><div class="num">06</div><div class="title">Hipotesis H3-H4</div></div>
+      <div class="toc-item" onclick="show(6)"><div class="num">07</div><div class="title">Desain Setup</div></div>
+      <div class="toc-item" onclick="show(7)"><div class="num">08</div><div class="title">Matriks Biaya</div></div>
+      <div class="toc-item" onclick="show(8)"><div class="num">09</div><div class="title">P0 Rationale</div></div>
+      <div class="toc-item" onclick="show(10)"><div class="num">11</div><div class="title">P1 Rationale</div></div>
+      <div class="toc-item" onclick="show(12)"><div class="num">13</div><div class="title">P2 Rationale</div></div>
+      <div class="toc-item" onclick="show(14)"><div class="num">15</div><div class="title">P3 Rationale</div></div>
+      <div class="toc-item" onclick="show(17)"><div class="num">18</div><div class="title">P4 Rationale</div></div>
+      <div class="toc-item" onclick="show(19)"><div class="num">20</div><div class="title">Hasil (Placeholder)</div></div>
+      <div class="toc-item" onclick="show(21)"><div class="num">22</div><div class="title">Timeline</div></div>
+      <div class="toc-item" onclick="show(22)"><div class="num">23</div><div class="title">Apendiks</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 2: TL;DR ====================== -->
+<section class="slide" data-title="I · Ringkasan Eksekutif">
+  <div class="secnum">I &middot; Ringkasan Eksekutif</div>
+  <h2>TL;DR</h2>
+  <div class="slide-body">
+    <div class="callout">
+      <div class="label">Inti Eksperimen</div>
+      Kita uji lima varian <em>prompt generator</em> pada empat metode RAG (baseline, QR, CR, QR+CR) menggunakan GPT-4.1-mini di 100 sampel pertama PubMedQA. Tujuan: menemukan bentuk prompt yang paling baik untuk metode tertentu, terutama untuk meningkatkan akurasi kelas <strong>maybe</strong> yang saat ini hanya 4.5 persen.
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">5</div><div class="lbl">Varian Prompt</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">Metode RAG</div></div>
+      <div class="stat"><div class="num">100</div><div class="lbl">Sampel Pilot</div></div>
+      <div class="stat"><div class="num">~$14</div><div class="lbl">Estimasi Biaya</div></div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h4>Yang akan dijawab</h4>
+        <ul class="clean">
+          <li>Apakah <em>strict grounding</em> tanpa larangan eksplisit terhadap "maybe" memperbaiki akurasi kelas maybe?</li>
+          <li>Apakah <em>chain-of-thought</em> meningkatkan <em>faithfulness</em>?</li>
+          <li>Apakah <em>few-shot demonstrations</em> lebih efektif dari zero-shot CoT?</li>
+          <li>Apakah <em>structured causal reasoning</em> ala MedCoT-RAG bersinergi dengan Context Reranking?</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Output yang diharapkan</h4>
+        <ul class="clean">
+          <li>Rekomendasi prompt terbaik per metrik.</li>
+          <li>Rekomendasi pasangan prompt-metode paling sinergis.</li>
+          <li>Analisis mengapa prompt tertentu lebih efektif di setting biomedis tertutup.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 3: KONTEKS BASELINE ====================== -->
+<section class="slide" data-title="II · Konteks Hasil Baseline">
+  <div class="secnum">II &middot; Latar Belakang</div>
+  <h2>Konteks dari Eksperimen Sebelumnya</h2>
+  <div class="slide-body">
+    <p>Pada eksperimen utama TA (baseline OpenAI, 500 sampel), label accuracy mencapai <strong>69.2 persen</strong> dengan distribusi per kelas yang sangat tidak seimbang.</p>
+    <table>
+      <thead><tr><th>Kelas</th><th class="num">Akurasi</th><th class="num">Jumlah Sampel</th><th class="num">Prediksi Sistem</th></tr></thead>
+      <tbody>
+        <tr><td>yes</td><td class="num">88.4%</td><td class="num">275</td><td class="num">331 (66%)</td></tr>
+        <tr><td>no</td><td class="num">62.9%</td><td class="num">159</td><td class="num">143 (29%)</td></tr>
+        <tr><td><strong>maybe</strong></td><td class="num"><strong>4.5%</strong></td><td class="num">66</td><td class="num"><strong>26 (5%)</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="callout insight-red">
+      <div class="label">Temuan Kritis</div>
+      Hanya 3 dari 66 sampel kelas <em>maybe</em> yang berhasil diprediksi benar. Penyebab utama: prompt baseline menulis "<em>Do NOT use maybe simply because the evidence is limited</em>". Instruksi ini menekan model menjauh dari kelas maybe walaupun bukti memang tidak konklusif.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 4: MENGAPA PROMPT ====================== -->
+<section class="slide" data-title="II · Mengapa Prompt">
+  <div class="secnum">II &middot; Latar Belakang</div>
+  <h2>Mengapa Prompt Generator yang Divariasi</h2>
+  <div class="slide-body">
+    <p>Pada pipeline RAG terdapat tiga prompt yang bisa di-engineer: <em>query rewriting</em>, <em>generator</em>, dan <em>evaluator</em>. Eksperimen ini fokus ke <strong>generator prompt</strong> karena tiga alasan utama.</p>
+    <div class="grid-3" style="margin-top: 24px;">
+      <div class="callout">
+        <div class="label">Alasan 1</div>
+        <h4 style="color: var(--navy); margin-top: 0;">Dampak Terbesar</h4>
+        <p class="small">Literatur menyebut sekitar 80 persen kegagalan RAG di produksi berasal dari desain <em>prompt generator</em>, bukan kualitas <em>retrieval</em>.</p>
+      </div>
+      <div class="callout">
+        <div class="label">Alasan 2</div>
+        <h4 style="color: var(--navy); margin-top: 0;">Paling Cepat</h4>
+        <p class="small">Tidak perlu rebuild index BM25 atau ChromaDB. Tidak perlu ganti model embedding atau LLM. Cukup ubah string template.</p>
+      </div>
+      <div class="callout">
+        <div class="label">Alasan 3</div>
+        <h4 style="color: var(--navy); margin-top: 0;">Hipotesis Spesifik</h4>
+        <p class="small">Setiap varian punya prediksi konkret terhadap metrik tertentu (akurasi, faithfulness, recall maybe). Bisa di-isolasi dampaknya.</p>
+      </div>
+    </div>
+    <div class="callout insight-grn" style="margin-top: 20px;">
+      <div class="label">Klaim Utama</div>
+      Variasi pada <em>prompt generator</em> adalah <strong>intervensi paling cost-effective</strong> untuk mitigasi halusinasi pada konfigurasi RAG kita yang sudah ada.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 5: HIPOTESIS H1-H2 ====================== -->
+<section class="slide" data-title="II · Hipotesis H1-H2">
+  <div class="secnum">II &middot; Latar Belakang</div>
+  <h2>Empat Hipotesis Utama (1 dari 2)</h2>
+  <div class="slide-body">
+    <p>Setiap varian prompt dirancang untuk menguji satu hipotesis spesifik.</p>
+    <div class="callout">
+      <div class="label">H1 &middot; Anti-Maybe Bias</div>
+      <p style="margin: 4px 0;">Prompt yang menghapus larangan eksplisit terhadap "maybe" akan meningkatkan <strong>recall kelas maybe</strong> tanpa menurunkan akurasi yes dan no secara signifikan.</p>
+      <p class="tiny muted" style="margin-top: 8px;">Diuji oleh varian <strong>P1 (Strict Grounding + Balanced Maybe)</strong>. Metrik kunci: akurasi maybe.</p>
+    </div>
+    <div class="callout">
+      <div class="label">H2 &middot; Chain-of-Thought</div>
+      <p style="margin: 4px 0;">Prompt dengan langkah <em>reasoning</em> eksplisit akan meningkatkan <strong>faithfulness</strong> karena model dipaksa menyebutkan bukti sebelum menyimpulkan.</p>
+      <p class="tiny muted" style="margin-top: 8px;">Diuji oleh varian <strong>P2 (Zero-shot CoT)</strong>. Metrik kunci: faithfulness, context recall.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 6: HIPOTESIS H3-H4 ====================== -->
+<section class="slide" data-title="II · Hipotesis H3-H4">
+  <div class="secnum">II &middot; Latar Belakang</div>
+  <h2>Empat Hipotesis Utama (2 dari 2)</h2>
+  <div class="slide-body">
+    <div class="callout">
+      <div class="label">H3 &middot; Few-shot Anchoring</div>
+      <p style="margin: 4px 0;">Demonstrasi 3 contoh (yes, no, maybe) akan menstabilkan format jawaban dan memperbaiki kasus borderline lebih baik daripada zero-shot CoT.</p>
+      <p class="tiny muted" style="margin-top: 8px;">Diuji oleh varian <strong>P3 (Few-shot CoT)</strong>. Metrik kunci: per-label accuracy, terutama maybe.</p>
+    </div>
+    <div class="callout">
+      <div class="label">H4 &middot; Sinergi Prompt-Metode</div>
+      <p style="margin: 4px 0;">Prompt <em>structured CoT</em> ala MedCoT-RAG akan memberi gain paling besar saat dipasangkan dengan <strong>Context Reranking</strong> karena rerank menjamin kualitas konteks yang lebih tinggi.</p>
+      <p class="tiny muted" style="margin-top: 8px;">Diuji oleh kombinasi <strong>P4 + CR</strong>. Metrik kunci: delta accuracy P4+CR vs P0+CR.</p>
+    </div>
+    <div class="callout insight-grn">
+      <div class="label">Kontribusi</div>
+      Hasil eksperimen ini akan memberi panduan empiris tentang mana pola prompt engineering dari literatur umum yang ter-generalize ke domain biomedis tertutup PubMedQA.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 7: DESAIN SETUP ====================== -->
+<section class="slide" data-title="III · Desain Setup">
+  <div class="secnum">III &middot; Desain Eksperimen</div>
+  <h2>Setup dan Variabel Kontrol</h2>
+  <div class="slide-body">
+    <table>
+      <thead><tr><th>Komponen</th><th>Nilai</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td>LLM</td><td>gpt-4.1-mini</td><td>OpenAI API, biaya rendah, performa baik</td></tr>
+        <tr><td>Embedder</td><td>text-embedding-3-small</td><td>1536 dimensi, sama dengan eksperimen utama</td></tr>
+        <tr><td>Retriever</td><td>BM25 top-50 + Dense top-50</td><td>Hybrid via Reciprocal Rank Fusion</td></tr>
+        <tr><td>Reranker (CR)</td><td>ms-marco-MiniLM-L-6-v2</td><td>CrossEncoder, ~22 MB, CPU-friendly</td></tr>
+        <tr><td>Sampel</td><td>100 (pilot) / 500 (full)</td><td>Sampel 0 sampai N-1 dari PubMedQA</td></tr>
+        <tr><td>Temperature</td><td>0.0</td><td>Deterministik, untuk reproducibility</td></tr>
+        <tr><td>Seed</td><td>42</td><td>Konstan untuk semua eksperimen</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top: 14px;">
+      <div class="label">Variabel yang berubah</div>
+      Hanya <strong>satu</strong>: template <em>prompt generator</em>. Semua komponen lain dikunci agar perbedaan hasil bisa diatribusikan ke prompt.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 8: MATRIKS BIAYA ====================== -->
+<section class="slide" data-title="III · Matriks & Biaya">
+  <div class="secnum">III &middot; Desain Eksperimen</div>
+  <h2>Matriks Eksperimen dan Estimasi Biaya</h2>
+  <div class="slide-body">
+    <p>Total <strong>5 prompt</strong> x <strong>4 metode</strong> x <strong>1 LLM</strong> = <strong>20 konfigurasi</strong> per <em>sample size</em>. Mode pilot fokus baseline saja untuk screening cepat.</p>
+    <table>
+      <thead><tr><th>Mode</th><th>Prompt</th><th>Metode</th><th class="num">Sampel</th><th class="num">Total Calls</th><th class="num">Biaya</th></tr></thead>
+      <tbody>
+        <tr><td>Pilot (hari 1-2)</td><td>5</td><td>1 (baseline)</td><td class="num">100</td><td class="num">~1.000</td><td class="num">~$1.10</td></tr>
+        <tr><td>Full (hari 3-5)</td><td>3 terbaik</td><td>4 (all)</td><td class="num">500</td><td class="num">~12.000</td><td class="num">~$13.00</td></tr>
+        <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td class="num"><strong>~13.000</strong></td><td class="num"><strong>~$14.10</strong></td></tr>
+      </tbody>
+    </table>
+    <h4>Metrik evaluasi</h4>
+    <div class="stats">
+      <div class="stat"><div class="num">1</div><div class="lbl">Label Accuracy</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">RAGAS-like Metrics</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Per-label Accuracy</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">Prompt Variants</div></div>
+    </div>
+    <p class="small muted" style="margin-top: 8px;">Custom 4-metric: <em>faithfulness</em>, <em>context recall</em>, <em>answer relevancy</em>, <em>context precision</em>.</p>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 9: P0 RATIONALE ====================== -->
+<section class="slide" data-title="IV · P0 Rationale">
+  <div class="secnum">IV &middot; Varian 1 dari 5</div>
+  <h2>P0 Baseline (Control)</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Tujuan</h4>
+        <p>Kontrol eksperimen. Prompt ini sama persis dengan yang dipakai di eksperimen utama TA. Hasilnya jadi titik bandingan untuk semua varian lain.</p>
+        <h4>Karakteristik utama</h4>
+        <ul class="clean small">
+          <li>Single-step instruction tanpa <em>reasoning chain</em></li>
+          <li>Definisi maybe yang restriktif</li>
+          <li>Larangan eksplisit terhadap maybe</li>
+          <li>max_tokens output: 300</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ekspektasi hasil</h4>
+        <p>Mereplikasi hasil baseline yang sudah ada:</p>
+        <ul class="clean small">
+          <li>Akurasi total ~69 persen</li>
+          <li>Akurasi yes ~88 persen</li>
+          <li>Akurasi no ~63 persen</li>
+          <li><strong>Akurasi maybe ~5 persen</strong> (target perbaikan untuk P1-P4)</li>
+        </ul>
+        <h4>Diuji untuk hipotesis</h4>
+        <p class="small">Tidak menguji hipotesis. Berperan sebagai baseline pembanding.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="label">Lihat Slide Berikutnya</div>
+      Prompt verbatim P0 ditampilkan di slide selanjutnya.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 10: P0 VERBATIM ====================== -->
+<section class="slide" data-title="IV · P0 Verbatim">
+  <div class="secnum">IV &middot; Varian 1 dari 5 (Verbatim)</div>
+  <h2>P0 Baseline (Prompt Lengkap)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P0 &middot; Control</div><div class="name">Baseline</div></div>
+        <div class="meta">max_tokens 300</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">You are a medical research assistant. Answer a biomedical yes/no/maybe question based solely on the provided scientific abstracts.
+
+Context from medical literature:
+<span class="placeholder">{context}</span>
+
+Question: <span class="placeholder">{question}</span>
+
+Instructions:
+- Carefully read the context and assess whether it supports or refutes the question.
+- Provide a brief explanation (2-3 sentences) using ONLY the information above.
+- End your response with EXACTLY ONE of these words on its own line: yes, no, or maybe.
+  - yes   : the evidence supports the hypothesis, even if not perfectly conclusive
+  - no    : the evidence refutes or does not support the hypothesis
+  - maybe : ONLY if the evidence is directly contradictory (some findings say yes,
+            others say no), or if the context contains no relevant information at all
+- IMPORTANT: If the evidence leans in one direction, even partially, choose yes or no.
+  Do NOT use maybe simply because the evidence is limited or not 100% certain.
+
+Answer:</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 11: P1 RATIONALE ====================== -->
+<section class="slide" data-title="IV · P1 Rationale">
+  <div class="secnum">IV &middot; Varian 2 dari 5</div>
+  <h2>P1 Strict Grounding + Balanced Maybe</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Tujuan</h4>
+        <p>Memperbaiki bias anti-maybe di P0 dengan tetap menjaga <em>grounding</em> yang ketat. Definisi maybe diperjelas dengan tiga kondisi konkret.</p>
+        <h4>Perbedaan vs P0</h4>
+        <ul class="clean small">
+          <li>Aturan grounding ditulis bernomor dan eksplisit (3 aturan)</li>
+          <li>Maybe diberi 3 kondisi (mixed, inconclusive, no direct evidence)</li>
+          <li>Larangan terhadap maybe <strong>DIHAPUS</strong></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ekspektasi hasil</h4>
+        <ul class="clean small">
+          <li>Akurasi maybe naik signifikan (target dari 5% jadi >15%)</li>
+          <li>Akurasi yes/no stabil atau turun sedikit</li>
+          <li>Faithfulness sedikit naik karena grounding lebih eksplisit</li>
+        </ul>
+        <h4>Diuji untuk hipotesis</h4>
+        <p class="small"><strong>H1 (Anti-Maybe Bias)</strong> — apakah menghapus larangan eksplisit memperbaiki recall maybe?</p>
+      </div>
+    </div>
+    <div class="callout insight-grn">
+      <div class="label">Intuisi Desain</div>
+      Kalau LLM "diijinkan" memilih maybe untuk kasus inconclusive, akurasi keseluruhan bisa naik karena banyak kasus di PubMedQA memang inconclusive secara legitimate.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 12: P1 VERBATIM ====================== -->
+<section class="slide" data-title="IV · P1 Verbatim">
+  <div class="secnum">IV &middot; Varian 2 dari 5 (Verbatim)</div>
+  <h2>P1 Strict Grounding (Prompt Lengkap)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P1 &middot; H1</div><div class="name">Strict Grounding + Balanced Maybe</div></div>
+        <div class="meta">max_tokens 300</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">You are a medical research assistant evaluating biomedical evidence.
+
+GROUNDING RULES (strict):
+1. Use ONLY the information in the provided abstracts below. Do NOT use any external medical knowledge, common sense, or assumptions.
+2. If the abstracts do not contain enough information to answer, you MUST say so.
+3. Do not infer beyond what is explicitly stated.
+
+Context from medical literature:
+<span class="placeholder">{context}</span>
+
+Question: <span class="placeholder">{question}</span>
+
+Decision rubric (apply in order):
+- Answer "yes"   : the abstracts clearly and consistently support the claim in the question.
+- Answer "no"    : the abstracts clearly refute the claim, or report no significant effect.
+- Answer "maybe" : (a) findings are mixed or context-dependent (e.g. effect appears in subgroup A but not subgroup B), OR (b) the abstracts are inconclusive, OR (c) the abstracts do not directly address the question.
+
+Response format:
+- One short paragraph (2-3 sentences) citing the specific evidence from the abstracts.
+- Then a final line containing only one word: yes, no, or maybe.
+
+Answer:</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 13: P2 RATIONALE ====================== -->
+<section class="slide" data-title="IV · P2 Rationale">
+  <div class="secnum">IV &middot; Varian 3 dari 5</div>
+  <h2>P2 Zero-shot Chain-of-Thought</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Tujuan</h4>
+        <p>Memaksa model menampilkan rantai reasoning eksplisit sebelum keputusan final. Meningkatkan <em>faithfulness</em> karena model harus menyebutkan bukti.</p>
+        <h4>Struktur reasoning (4 step)</h4>
+        <ul class="clean small">
+          <li><strong>Step 1 Evidence</strong>: kutip temuan dari abstrak</li>
+          <li><strong>Step 2 Direction</strong>: support, refute, mixed</li>
+          <li><strong>Step 3 Strength</strong>: conclusive, partial, weak</li>
+          <li><strong>Step 4 Decision</strong>: pilih yes, no, maybe</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ekspektasi hasil</h4>
+        <ul class="clean small">
+          <li>Faithfulness naik (target +3-5%)</li>
+          <li>Label accuracy stabil atau sedikit naik</li>
+          <li>Step 3 (Strength) khusus didesain fix bias maybe</li>
+        </ul>
+        <h4>Trade-off</h4>
+        <p class="small">Token output naik ~70 persen (300 → 500). Biaya output cost naik proporsional.</p>
+        <h4>Diuji untuk hipotesis</h4>
+        <p class="small"><strong>H2 (Chain-of-Thought)</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 14: P2 VERBATIM ====================== -->
+<section class="slide" data-title="IV · P2 Verbatim">
+  <div class="secnum">IV &middot; Varian 3 dari 5 (Verbatim)</div>
+  <h2>P2 Zero-shot CoT (Prompt Lengkap)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P2 &middot; H2</div><div class="name">Zero-shot Chain-of-Thought</div></div>
+        <div class="meta">max_tokens 500</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">You are a medical research assistant. Answer a biomedical yes/no/maybe question using only the provided abstracts.
+
+Context from medical literature:
+<span class="placeholder">{context}</span>
+
+Question: <span class="placeholder">{question}</span>
+
+Reason step by step before deciding. Use this exact structure:
+
+Step 1 (Evidence): List the specific findings from the abstracts that are relevant to the question. Quote or paraphrase briefly.
+Step 2 (Direction): Determine whether the evidence supports, refutes, or is mixed about the claim in the question.
+Step 3 (Strength): Note whether the evidence is conclusive, partial, or weak.
+Step 4 (Decision): Based on steps 1-3, choose yes, no, or maybe.
+  - yes   if evidence consistently supports the claim
+  - no    if evidence consistently refutes the claim or shows no effect
+  - maybe if evidence is mixed, subgroup-dependent, inconclusive, or absent
+
+End your response with a final line containing only one word: yes, no, or maybe.
+
+Answer:</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 15: P3 RATIONALE ====================== -->
+<section class="slide" data-title="IV · P3 Rationale">
+  <div class="secnum">IV &middot; Varian 4 dari 5</div>
+  <h2>P3 Few-shot Chain-of-Thought</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Tujuan</h4>
+        <p>Reasoning approach sama dengan P2, tapi dengan tiga demonstrasi seimbang (1 yes, 1 no, 1 maybe). Contoh "maybe" menggunakan <em>subgroup-dependent finding</em>.</p>
+        <h4>Karakteristik demonstrasi</h4>
+        <ul class="clean small">
+          <li><strong>Ex1 (yes)</strong>: aspirin dan recurrent MI, p&lt;0.001</li>
+          <li><strong>Ex2 (no)</strong>: vitamin C dan common cold, p=0.42</li>
+          <li><strong>Ex3 (maybe)</strong>: statins di elderly, subgroup-dependent</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ekspektasi hasil</h4>
+        <ul class="clean small">
+          <li>Format consistency lebih baik dari P2</li>
+          <li>Akurasi maybe naik paling tinggi karena contoh konkret</li>
+          <li>Performa keseluruhan paling stabil</li>
+        </ul>
+        <h4>Trade-off</h4>
+        <p class="small">Prompt ~3x lebih panjang dari P0. Input token cost naik (tapi cache prompt OpenAI bisa mitigate).</p>
+        <h4>Diuji untuk hipotesis</h4>
+        <p class="small"><strong>H3 (Few-shot Anchoring)</strong></p>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="label">Catatan</div>
+      Prompt P3 panjang sehingga verbatim-nya dipecah jadi 2 slide: bagian demonstrasi dan bagian task.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 16: P3 VERBATIM PART 1 ====================== -->
+<section class="slide" data-title="IV · P3 Verbatim (1/2)">
+  <div class="secnum">IV &middot; Varian 4 dari 5 (Verbatim 1 dari 2)</div>
+  <h2>P3 Few-shot CoT (Bagian Demonstrasi)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P3 &middot; H3</div><div class="name">Few-shot Chain-of-Thought (3 demonstrasi)</div></div>
+        <div class="meta">max_tokens 500</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">You are a medical research assistant. Answer biomedical yes/no/maybe questions using only the provided abstracts.
+
+Here are three examples of how to reason and answer:
+
+--- Example 1 ---
+Context: [1] (RESULTS) Daily aspirin use was associated with a 22% reduction in recurrent myocardial infarction (RR 0.78, 95% CI 0.71-0.85, p<0.001) in patients with prior MI over a 5-year follow-up.
+Question: Does aspirin reduce the risk of recurrent myocardial infarction?
+Reasoning: The abstract directly reports a statistically significant 22% reduction in recurrent MI with aspirin. The effect is consistent and clinically meaningful.
+Final answer:
+yes
+
+--- Example 2 ---
+Context: [1] (RESULTS) Vitamin C supplementation (1000 mg/day) did not significantly reduce the duration or severity of common cold symptoms compared to placebo (p=0.42).
+Question: Does vitamin C reduce the duration of common cold symptoms?
+Reasoning: The abstract explicitly reports no significant effect of vitamin C on cold duration. The p-value (0.42) indicates no statistically significant difference.
+Final answer:
+no
+
+--- Example 3 ---
+Context: [1] (RESULTS) In our cohort, statin therapy reduced cardiovascular events in patients aged 50-70 (HR 0.72) but showed no significant benefit in patients over 75 (HR 0.96, 95% CI 0.81-1.14).
+Question: Do statins reduce cardiovascular events in elderly patients?
+Reasoning: The evidence is subgroup-dependent. Statins help patients aged 50-70, but not those over 75. Since "elderly" can include both groups, the evidence is mixed.
+Final answer:
+maybe</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 17: P3 VERBATIM PART 2 ====================== -->
+<section class="slide" data-title="IV · P3 Verbatim (2/2)">
+  <div class="secnum">IV &middot; Varian 4 dari 5 (Verbatim 2 dari 2)</div>
+  <h2>P3 Few-shot CoT (Bagian Task)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P3 &middot; H3 (lanjutan)</div><div class="name">Bagian Task setelah Demonstrasi</div></div>
+        <div class="meta">max_tokens 500</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">--- End of examples ---
+
+Now answer the following question using the same format:
+
+Context from medical literature:
+<span class="placeholder">{context}</span>
+
+Question: <span class="placeholder">{question}</span>
+
+Reasoning:</pre>
+        <div class="callout" style="margin-top: 16px;">
+          <div class="label">Format Output</div>
+          <p class="small" style="margin: 4px 0;">Model akan menghasilkan reasoning paragraph, lalu "Final answer:" di baris baru, lalu satu kata (yes/no/maybe) di baris terakhir. Fungsi <code>extract_label()</code> sudah robust menangani format ini.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 18: P4 RATIONALE ====================== -->
+<section class="slide" data-title="IV · P4 Rationale">
+  <div class="secnum">IV &middot; Varian 5 dari 5</div>
+  <h2>P4 Clinical Persona + Causal CoT</h2>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div>
+        <h4>Tujuan</h4>
+        <p>Diadaptasi dari <em>MedCoT-RAG</em> (Wang et al., 2024). Memberi persona "clinical evidence reviewer" dan memaksa workflow 4 tahap yang meniru proses diagnostik klinis.</p>
+        <h4>4-Stage Workflow</h4>
+        <ul class="clean small">
+          <li><strong>(A) Identify Findings</strong>: study design + effect size</li>
+          <li><strong>(B) Assess Quality</strong>: direct vs indirect, caveats</li>
+          <li><strong>(C) Weigh Evidence</strong>: support, contradict, partial</li>
+          <li><strong>(D) Final Decision</strong>: yes, no, maybe</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ekspektasi hasil</h4>
+        <ul class="clean small">
+          <li>Faithfulness paling tinggi di antara semua varian</li>
+          <li>Performa optimal saat dipasangkan dengan Context Reranking</li>
+        </ul>
+        <h4>Risiko</h4>
+        <p class="small">Prompt sangat ketat sehingga model lebih sering memilih maybe (over-cautious). Gain di binary yes/no di paper asli cuma +1.2 poin.</p>
+        <h4>Diuji untuk hipotesis</h4>
+        <p class="small"><strong>H4 (Sinergi Prompt-Metode)</strong> via kombinasi P4 + CR.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 19: P4 VERBATIM ====================== -->
+<section class="slide" data-title="IV · P4 Verbatim">
+  <div class="secnum">IV &middot; Varian 5 dari 5 (Verbatim)</div>
+  <h2>P4 Clinical Persona (Prompt Lengkap)</h2>
+  <div class="slide-body">
+    <div class="prompt-card">
+      <div class="head">
+        <div><div class="pid">P4 &middot; H4</div><div class="name">Clinical Persona + Structured Causal CoT</div></div>
+        <div class="meta">max_tokens 500</div>
+      </div>
+      <div class="body">
+<pre class="prompt full">You are a clinical evidence reviewer with expertise in biomedical research methodology and critical appraisal of scientific abstracts. Your role is to evaluate whether the provided scientific evidence supports a given research claim.
+
+Context from medical literature:
+<span class="placeholder">{context}</span>
+
+Research question: <span class="placeholder">{question}</span>
+
+Apply the following clinical reasoning workflow strictly in order:
+
+(A) IDENTIFY FINDINGS
+    List the key empirical findings from the abstracts that relate to the question. Note the study design (RCT, cohort, cross-sectional, etc.) and any reported effect sizes, confidence intervals, or p-values when available.
+
+(B) ASSESS EVIDENCE QUALITY
+    Briefly note: Is the evidence direct or indirect? Is it consistent across the abstracts? Are there subgroup differences or important caveats?
+
+(C) WEIGH EVIDENCE AGAINST CLAIM
+    Compare the findings to the specific claim in the question. Does the evidence support, contradict, or partially address the claim?
+
+(D) FINAL DECISION
+    Choose exactly one:
+    - "yes"   : evidence consistently and clearly supports the claim
+    - "no"    : evidence consistently refutes the claim, or reports no effect
+    - "maybe" : evidence is mixed, subgroup-dependent, inconclusive, or does not directly address the claim
+
+IMPORTANT: Base your decision only on the abstracts provided. Do not introduce outside medical knowledge.
+
+End your response with a final line containing exactly one word: yes, no, or maybe.
+
+Clinical review:</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 20: HASIL TABEL ====================== -->
+<section class="slide" data-title="V · Hasil Tabel">
+  <div class="secnum">V &middot; Hasil Eksperimen</div>
+  <h2>Hasil dan Analisis (Tabel)</h2>
+  <div class="slide-body">
+    <div class="callout">
+      <div class="label">Status</div>
+      Eksperimen belum dijalankan saat dokumen ini disusun. Placeholder di bawah menunjukkan struktur output yang diharapkan.
+    </div>
+    <h3>Tabel ringkasan: prompt vs metrik (baseline method)</h3>
+    <table>
+      <thead><tr>
+        <th>Prompt</th>
+        <th class="num">Acc</th><th class="num">Faith</th><th class="num">CR</th><th class="num">AR</th><th class="num">CP</th>
+        <th class="num">Acc yes</th><th class="num">Acc no</th><th class="num">Acc maybe</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>P0 baseline</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td></tr>
+        <tr><td>P1 strict</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td></tr>
+        <tr><td>P2 zero-shot CoT</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td></tr>
+        <tr><td>P3 few-shot CoT</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td></tr>
+        <tr><td>P4 clinical persona</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td><td class="num muted">TBD</td></tr>
+      </tbody>
+    </table>
+    <p class="small muted">Acc = Label Accuracy. Faith = Faithfulness. CR = Context Recall. AR = Answer Relevancy. CP = Context Precision.</p>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 21: HASIL CHARTS ====================== -->
+<section class="slide" data-title="V · Hasil Visual">
+  <div class="secnum">V &middot; Hasil Eksperimen</div>
+  <h2>Visualisasi Hasil (Placeholder)</h2>
+  <div class="slide-body">
+    <div class="grid-2" style="height: 100%;">
+      <div>
+        <h4>5.1 Per-label accuracy</h4>
+        <div class="placeholder-box" style="height: 200px; display: flex; align-items: center; justify-content: center;">Bar chart per prompt menunjukkan akurasi yes, no, maybe.<br>Sumbu Y: akurasi. Sumbu X: 5 prompts.</div>
+        <h4>5.3 Trade-off Faith vs Recall</h4>
+        <div class="placeholder-box" style="height: 180px; display: flex; align-items: center; justify-content: center;">Scatter plot per prompt-metode.<br>Sumbu Y: faithfulness. Sumbu X: context recall.</div>
+      </div>
+      <div>
+        <h4>5.2 Heatmap prompt vs metode</h4>
+        <div class="placeholder-box" style="height: 200px; display: flex; align-items: center; justify-content: center;">Heatmap 5x4 menunjukkan label accuracy untuk semua kombinasi prompt-metode.</div>
+        <h4>5.4 Diskusi temuan</h4>
+        <div class="placeholder-box" style="height: 180px; display: flex; align-items: center; justify-content: center;">Analisis kualitatif: prompt mana paling baik untuk metode tertentu, dan mengapa.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 22: TIMELINE ====================== -->
+<section class="slide" data-title="VI · Timeline">
+  <div class="secnum">VI &middot; Rencana Tindak Lanjut</div>
+  <h2>Timeline 1 Minggu dan Risiko</h2>
+  <div class="slide-body">
+    <table>
+      <thead><tr><th>Hari</th><th>Aktivitas</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Pilot run 5 prompt pada baseline, 100 sampel</td><td>5 file hasil di folder prompt_experiment</td></tr>
+        <tr><td>2</td><td>Analisis pilot, pilih 3 prompt terbaik</td><td>Tabel ranking + visualisasi awal</td></tr>
+        <tr><td>3-5</td><td>Full run 3 prompt terpilih pada 4 metode, 500 sampel</td><td>12 file hasil dan analisis statistik</td></tr>
+        <tr><td>6</td><td>Visualisasi final dan analisis kualitatif</td><td>Chart final dan analisis per-label</td></tr>
+        <tr><td>7</td><td>Draft narasi untuk laporan TA</td><td>Update bab Evaluasi</td></tr>
+      </tbody>
+    </table>
+    <div class="grid-2" style="margin-top: 12px;">
+      <div class="callout insight-grn">
+        <div class="label">Kriteria Sukses</div>
+        Pilot run sukses jika minimal 1 prompt non-baseline menunjukkan peningkatan akurasi maybe dari 5% ke minimal 15% tanpa menurunkan akurasi total di bawah 65%.
+      </div>
+      <div class="callout insight-red">
+        <div class="label">Risiko Utama</div>
+        Budget habis atau hasil flat. Mitigasi: full run hanya untuk 3 prompt terbaik, hard cap di API dashboard. Negative result tetap valid sebagai temuan.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 23: APENDIKS LIT 1 ====================== -->
+<section class="slide" data-title="VII · Apendiks Lit 1-3">
+  <div class="secnum">VII &middot; Apendiks</div>
+  <h2>Literatur Akademik (1 dari 2)</h2>
+  <div class="slide-body">
+    <p class="src">
+      <span class="id">[1]</span>
+      Wang, Z., Khatibi, E., dan Rahmani, A. M. (2024). <em>MedCoT-RAG: Causal Chain-of-Thought RAG for Medical Question Answering.</em> University of California, Irvine. Sumber utama untuk varian P4 <em>structured causal CoT</em>.
+      <br><a href="https://openreview.net/pdf?id=kXzTSnaQrB" target="_blank">openreview.net/pdf?id=kXzTSnaQrB</a>
+    </p>
+    <p class="src">
+      <span class="id">[2]</span>
+      Ma, X., Gong, Y., He, P., Zhao, H., dan Duan, N. (2023). <em>Query Rewriting for Retrieval-Augmented Large Language Models.</em> arXiv:2305.14283. Referensi untuk metode Query Rewriting di pipeline TA.
+      <br><a href="https://arxiv.org/abs/2305.14283" target="_blank">arxiv.org/abs/2305.14283</a>
+    </p>
+    <p class="src">
+      <span class="id">[3]</span>
+      Liévin, V., Hother, C. E., Motzfeldt, A. G., dan Winther, O. (2024). <em>Can large language models reason about medical questions?</em> arXiv:2207.08143v9. Bukti empiris bahwa few-shot CoT mengungguli zero-shot pada medical QA.
+      <br><a href="https://arxiv.org/html/2403.04890v3" target="_blank">arxiv.org/html/2403.04890v3</a>
+    </p>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 24: APENDIKS LIT 2 ====================== -->
+<section class="slide" data-title="VII · Apendiks Lit 4-5">
+  <div class="secnum">VII &middot; Apendiks</div>
+  <h2>Literatur Akademik (2 dari 2)</h2>
+  <div class="slide-body">
+    <p class="src">
+      <span class="id">[4]</span>
+      P-RAG team (2024). <em>P-RAG: Prompt-Enhanced Parametric RAG with LoRA and Selective CoT for Biomedical and Multi-Hop QA.</em> arXiv:2602.15874. Menunjukkan gain 10.47 poin F1 di PubMedQA dengan kombinasi CoT prompting dan LoRA.
+      <br><a href="https://arxiv.org/abs/2602.15874" target="_blank">arxiv.org/abs/2602.15874</a>
+    </p>
+    <p class="src">
+      <span class="id">[5]</span>
+      MedBioLM team (2025). <em>MedBioLM: Optimizing Medical and Biological QA with Fine-Tuned Large Language Models and Retrieval-Augmented Generation.</em> arXiv:2502.03004.
+      <br><a href="https://arxiv.org/html/2502.03004v1" target="_blank">arxiv.org/html/2502.03004v1</a>
+    </p>
+    <div class="callout">
+      <div class="label">Catatan Kritis tentang MedCoT-RAG</div>
+      <p class="small" style="margin: 4px 0;">Paper MedCoT-RAG asli diuji di MedQA-US (USMLE multiple-choice), MMLU-Med, dan BioASQ-Y/N. Pada BioASQ-Y/N (binary yes/no, paling mirip PubMedQA), gain MedCoT-RAG hanya <strong>+1.2 poin absolut</strong> dibanding +5.8 poin di MedQA-US.</p>
+      <p class="small" style="margin: 4px 0;">Implikasi: pada pertanyaan binary/ternary tertutup seperti PubMedQA, manfaat structured causal CoT mungkin terbatas. Varian P4 di TA ini menguji apakah pola ini terkonfirmasi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 25: APENDIKS ARTIKEL ====================== -->
+<section class="slide" data-title="VII · Artikel & Dataset">
+  <div class="secnum">VII &middot; Apendiks</div>
+  <h2>Artikel, Tool, dan Dataset</h2>
+  <div class="slide-body">
+    <p class="src">
+      <span class="id">[6]</span>
+      Olumide, S. (2024). <em>Prompt Engineering Patterns for Successful RAG Implementations.</em> Medium. Referensi utama untuk 8 pola prompt engineering RAG umum.
+      <br><a href="https://shittuolumide.medium.com/prompt-engineering-patterns-for-successful-rag-implementations-b2707103ab56" target="_blank">shittuolumide.medium.com</a>
+    </p>
+    <p class="src">
+      <span class="id">[7]</span>
+      Prompt Engineering Guide (2024). <em>Retrieval Augmented Generation (RAG) for LLMs.</em>
+      <br><a href="https://www.promptingguide.ai/research/rag" target="_blank">promptingguide.ai/research/rag</a>
+    </p>
+    <p class="src">
+      <span class="id">[8]</span>
+      DeepEval (2024). <em>Faithfulness Metric Documentation.</em>
+      <br><a href="https://deepeval.com/docs/metrics-faithfulness" target="_blank">deepeval.com/docs/metrics-faithfulness</a>
+    </p>
+    <p class="src">
+      <span class="id">[9]</span>
+      APX ML (2024). <em>Structuring Prompts for RAG Systems.</em>
+      <br><a href="https://apxml.com/courses/getting-started-rag/chapter-4-rag-generation-augmentation/structuring-rag-prompts" target="_blank">apxml.com</a>
+    </p>
+    <p class="src">
+      <span class="id">[10]</span>
+      Jin, Q., dkk. (2019). <em>PubMedQA: A Dataset for Biomedical Research Question Answering.</em> EMNLP 2019.
+      <br><a href="https://huggingface.co/datasets/qiaojin/PubMedQA" target="_blank">huggingface.co/datasets/qiaojin/PubMedQA</a>
+    </p>
+    <p class="src">
+      <span class="id">[11]</span>
+      PubMed, National Library of Medicine.
+      <br><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank">pubmed.ncbi.nlm.nih.gov</a>
+    </p>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 26: APENDIKS POLA ====================== -->
+<section class="slide" data-title="VII · Pola Adopsi">
+  <div class="secnum">VII &middot; Apendiks</div>
+  <h2>Pola Prompt yang Direferensikan</h2>
+  <div class="slide-body">
+    <p>Dari 8 pola prompt RAG umum (Olumide 2024), berikut yang diadopsi di setiap varian P0-P4.</p>
+    <table>
+      <thead><tr><th>Pola</th><th>Diadopsi di</th><th>Cara adopsi</th></tr></thead>
+      <tbody>
+        <tr><td>Strict Grounding</td><td>P1, P2, P3, P4</td><td>"use ONLY context" eksplisit di semua varian non-baseline</td></tr>
+        <tr><td>Chain-of-Thought</td><td>P2, P3, P4</td><td>Step-by-step reasoning eksplisit dengan stage-stage berlabel</td></tr>
+        <tr><td>Context Enrichment (Persona)</td><td>P4</td><td>Persona "Clinical evidence reviewer with expertise in biomedical research"</td></tr>
+        <tr><td>Instruction-Tuning</td><td>P0, P1, P2, P3, P4</td><td>Format output "yes/no/maybe" di baris terakhir, ekstraksi via regex robust</td></tr>
+        <tr><td>Error Handling / Uncertainty</td><td>P1</td><td>3 kondisi maybe eksplisit (mixed, inconclusive, no direct evidence)</td></tr>
+        <tr><td>Few-Shot Examples</td><td>P3</td><td>3 demonstrasi seimbang (yes/no/maybe), salah satunya subgroup-dependent</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <div class="label">Tidak Diadopsi</div>
+      <p class="small" style="margin: 4px 0;">Pola <em>Multi-Pass Query Refinement</em> dan <em>Persona-Based</em> untuk audiens awam tidak diadopsi karena tidak relevan untuk konteks akademik biomedis.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== SLIDE 27: APENDIKS GLOSSARY ====================== -->
+<section class="slide" data-title="VII · Glossary">
+  <div class="secnum">VII &middot; Apendiks</div>
+  <h2>Glossary Singkat</h2>
+  <div class="slide-body">
+    <table>
+      <thead><tr><th>Istilah</th><th>Definisi</th></tr></thead>
+      <tbody>
+        <tr><td>RAG</td><td>Retrieval-Augmented Generation. Sistem yang mengambil dokumen relevan lalu menggunakannya sebagai konteks untuk LLM.</td></tr>
+        <tr><td>QR</td><td>Query Rewriting. Menulis ulang pertanyaan pengguna sebelum retrieval untuk meningkatkan kualitas hasil.</td></tr>
+        <tr><td>CR</td><td>Context Reranking. Mengurutkan ulang konteks hasil retrieval menggunakan model CrossEncoder.</td></tr>
+        <tr><td>BM25</td><td>Sparse retrieval berbasis frekuensi kata. Cocok untuk pencocokan kata kunci eksak.</td></tr>
+        <tr><td>RRF</td><td>Reciprocal Rank Fusion. Metode menggabungkan ranking dari beberapa retriever menjadi satu ranking final.</td></tr>
+        <tr><td>CoT</td><td>Chain-of-Thought. Prompting yang memaksa model menampilkan langkah reasoning sebelum jawaban akhir.</td></tr>
+        <tr><td>Faithfulness</td><td>Seberapa setia jawaban LLM terhadap konteks yang diberikan. Tinggi = klaim di jawaban terdukung konteks.</td></tr>
+        <tr><td>Context Recall</td><td>Seberapa lengkap konteks mencakup informasi referensi (ground truth).</td></tr>
+        <tr><td>Context Precision</td><td>Seberapa tepat konteks dalam mendukung jawaban yang benar. Tinggi = konteks tidak berisi noise.</td></tr>
+        <tr><td>PubMedQA pqa_labeled</td><td>Subset PubMedQA yang dianotasi expert, 1000 artikel biomedis, label yes/no/maybe.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top: 16px;">
+      <div class="label">Terima Kasih</div>
+      <p class="small" style="margin: 4px 0;">Dokumen ini dirancang untuk diskusi awal dengan pembimbing. Versi finalnya akan diperbarui setelah pilot eksperimen selesai dijalankan dan hasil dianalisis. Untuk pertanyaan atau masukan, silakan diskusikan pada sesi bimbingan berikutnya.</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /deck-stage -->
+
+<div class="deck-nav">
+  <button id="prev-btn" onclick="prev()">&larr; Prev</button>
+  <div class="dots" id="dots"></div>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <div class="shortcuts">&larr; &rarr; arrow keys</div>
+    <button id="next-btn" onclick="next()">Next &rarr;</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let current  = 0;
+
+  document.getElementById('total').textContent = total;
+  const dotsContainer = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => show(i);
+    dot.title = slides[i].dataset.title || ('Slide ' + (i + 1));
+    dotsContainer.appendChild(dot);
+  }
+
+  function show(i) {
+    if (i < 0 || i >= total) return;
+    slides[current].classList.remove('active');
+    slides[i].classList.add('active');
+    dotsContainer.children[current].classList.remove('active');
+    dotsContainer.children[i].classList.add('active');
+    current = i;
+    document.getElementById('cur').textContent = i + 1;
+    document.getElementById('slide-title').textContent = slides[i].dataset.title || '';
+    document.getElementById('progress-bar').style.width = ((i + 1) / total * 100) + '%';
+    document.getElementById('prev-btn').disabled = (i === 0);
+    document.getElementById('next-btn').disabled = (i === total - 1);
+    history.replaceState(null, '', '#slide-' + (i + 1));
+  }
+  function next() { show(current + 1); }
+  function prev() { show(current - 1); }
+
+  // Scale slide to fit viewport (16:9)
+  function fitSlide() {
+    const stage = document.getElementById('stage');
+    const availW = stage.clientWidth - 32;
+    const availH = stage.clientHeight - 32;
+    const slideW = 1280;
+    const slideH = 720;
+    const scale = Math.min(availW / slideW, availH / slideH, 1);
+    document.documentElement.style.setProperty('--scale', scale);
+  }
+
+  window.addEventListener('resize', fitSlide);
+  window.addEventListener('load', () => {
+    fitSlide();
+    const m = window.location.hash.match(/^#slide-(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1]) - 1;
+      if (n >= 0 && n < total) show(n);
+    } else {
+      document.getElementById('progress-bar').style.width = (1 / total * 100) + '%';
+      document.getElementById('prev-btn').disabled = true;
+    }
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    switch (e.key) {
+      case 'ArrowRight':
+      case ' ':
+      case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft':
+      case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End':  e.preventDefault(); show(total - 1); break;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# === Jupyter ===
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# === Vector DB / ML artifacts (large binaries) ===
+pubmedqa_chroma/
+pubmedqa_chroma_*/
+**/chroma.sqlite3
+*.pkl.bak
+
+# === Secrets ===
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
+
+# === OS / Editor ===
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# === Temp / backup ===
+~$*
+*.tmp
+*.bak
+*.swp
