@@ -190,11 +190,11 @@
 \setlength{\cftchapindent}{0em}
 \setlength{\cftchapnumwidth}{1.8em}
 \setlength{\cftsecindent}{1.8em}
-\setlength{\cftsecnumwidth}{2.4em}
-\setlength{\cftsubsecindent}{4.2em}
-\setlength{\cftsubsecnumwidth}{2.8em}
-\setlength{\cftsubsubsecindent}{7.0em}
-\setlength{\cftsubsubsecnumwidth}{3.2em}
+\setlength{\cftsecnumwidth}{3.0em}
+\setlength{\cftsubsecindent}{4.8em}
+\setlength{\cftsubsecnumwidth}{3.9em}
+\setlength{\cftsubsubsecindent}{8.7em}
+\setlength{\cftsubsubsecnumwidth}{5.0em}
 
 % --- Ubah nama bulan ke Bahasa Indonesia ---
 \renewcommand*{\DTMbahasaimonthname}[1]{%
@@ -331,6 +331,24 @@
 \setlist[enumerate]{nosep, topsep=-10pt} % mengurangi spasi antar item dan atas bawah daftar
 \setlist[itemize]{nosep, topsep=-10pt} % mengurangi spasi antar item dan atas bawah daftar
 
+% --- Perbaikan line-breaking: cegah kata terpotong tidak rapi (misal "biome-dis", "Me-an") ---
+\emergencystretch=3em % beri TeX ruang stretch ekstra agar tidak memaksa hyphenation buruk
+\hyphenpenalty=1000   % kurangi keinginan TeX untuk memotong kata
+\exhyphenpenalty=1000
+\tolerance=2000
+\hbadness=10000       % suppress underfull hbox warnings yang non-kritis
+
+% Hint hyphenation eksplisit untuk istilah Indonesia + Inggris yang sering tampil
+% Untuk kata Inggris (italic) yang TIDAK boleh dipotong, tulis tanpa tanda hubung
+\hyphenation{
+  bio-me-dis bio-me-di-kal ha-lu-si-na-si mi-ti-ga-si
+  re-tri-e-val re-rank-ing
+  Mean Precision Recall PubMedQA RAGAS
+  faith-ful-ness rel-e-van-cy pre-ci-sion
+  Re-cip-ro-cal Cu-mu-la-tive Dis-count-ed Nor-mal-ized
+  hy-per-pa-ram-e-ter pipe-line gen-er-a-tion
+}
+
 % ==========================================
 % AWAL DOKUMEN
 % ==========================================
@@ -427,6 +445,7 @@
   %\makeatother
 \input{Lampiran-A.tex}
 \input{Lampiran-B.tex}
+\input{Lampiran-C.tex}
 \end{appendices}
 \backmatter
 

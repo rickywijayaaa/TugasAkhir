@@ -1,0 +1,19 @@
+{
+  "pubid": "17113061",
+  "question": "Do mutations causing low HDL-C promote increased
+               carotid intima-media thickness?",
+  "section_label": "BACKGROUND",
+  "text": "Although observational data support an inverse relationship
+           between high-density lipoprotein (HDL (high-density lipoprotein))
+           cholesterol and coronary heart disease (CHD (coronary heart
+           disease)), genetic HDL (high-density lipoprotein) deficiency
+           states often do not correlate with premature CHD (coronary
+           heart disease).",
+  "answer": "Mutations causing low HDL-C levels do not appear to be
+             consistently associated with subclinical atherosclerosis...",
+  "decision": "no",
+  "expanded_acronyms": [
+    {"short": "HDL", "long": "high-density lipoprotein"},
+    {"short": "CHD", "long": "coronary heart disease"}
+  ]
+}

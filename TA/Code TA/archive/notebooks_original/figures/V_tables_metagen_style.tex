@@ -1,0 +1,61 @@
+% Tabel VI.1 - IR Metrics Before/After Schwartz-Hearst
+\begin{table}[H]
+\centering
+\caption{Peningkatan Metrik Retrieval dengan dan Tanpa Ekspansi Akronim Schwartz-Hearst pada Korpus PubMedQA}
+\label{tbl:retrieval-metrics}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Konfigurasi BM25} & \textbf{Recall@5} & \textbf{MAP@5} & \textbf{nDCG@5} \\ \hline
+Tanpa Ekspansi (\textit{baseline}) & 78.65\% & 75.32\% & 83.08\% \\ \hline
+\textbf{Dengan Ekspansi (SH)} & \textbf{84.96\%} & \textbf{82.47\%} & \textbf{88.45\%} \\ \hline
+\textit{Peningkatan absolut} & +6.30 & +7.16 & +5.37 \\ \hline
+\end{tabular}
+\end{table}
+
+% Tabel VI.2 - BM25 vs Hybrid Progressive Boost
+\begin{table}[H]
+\centering
+\caption{Peningkatan \textit{Label Accuracy} dari BM25 ke \textit{Hybrid Retrieval} hingga Penambahan Ekspansi Akronim pada GPT-4.1-mini}
+\label{tbl:bm25-vs-hybrid-progressive}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Konfigurasi} & \textbf{Label Accuracy (\%)} \\ \hline
+BM25-only, tanpa Ekspansi (\textit{baseline}) & 65.4 \\ \hline
+\textit{Hybrid} (BM25 + \textit{Dense}), tanpa Ekspansi & 0.0 \\ \hline
+\textit{Hybrid} + Ekspansi Akronim (SH) & 73.2 \\ \hline
+\textit{Hybrid} + SH + QR & 73.0 \\ \hline
+\textit{Hybrid} + SH + CR & 73.4 \\ \hline
+\textbf{\textit{Hybrid} + SH + QR + CR} & \textbf{74.8} \\ \hline
+\end{tabular}
+\end{table}
+
+% Tabel VI.3 - BM25 vs Hybrid per Technique
+\begin{table}[H]
+\centering
+\caption{Perbandingan \textit{Label Accuracy} antara BM25 Saja dan \textit{Hybrid Retrieval} per Konfigurasi Mitigasi pada GPT-4.1-mini}
+\label{tbl:bm25-vs-hybrid}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Konfigurasi} & \textbf{BM25 saja} & \textbf{Hybrid} & \textbf{\textit{Delta}} \\ \hline
+	extit{Baseline} & 65.4\% & 0.0\% & +-65.4 \\ \hline
++ QR & 65.4\% & 0.0\% & +-65.4 \\ \hline
++ CR & 68.4\% & 0.0\% & +-68.4 \\ \hline
++ QR + CR & 68.2\% & 0.0\% & +-68.2 \\ \hline
+\end{tabular}
+\end{table}
+
+% Tabel VI.4 - Cross-LLM Comparison
+\begin{table}[H]
+\centering
+\caption{Perbandingan \textit{Label Accuracy} Lintas-LLM pada Empat Konfigurasi Mitigasi (Mode \textit{Hybrid}, Tanpa Ekspansi Akronim)}
+\label{tbl:xllm-comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Konfigurasi} & \textbf{Llama 3.2 3B} & \textbf{Claude Haiku 4.5} & \textbf{Llama 3.3 70B} & \textbf{GPT-4.1-mini} \\ \hline
+	extit{Baseline} & 55.0\% & 65.4\% & 69.4\% & 0.0\% \\ \hline
++ QR & 53.4\% & 64.0\% & 68.2\% & 0.0\% \\ \hline
++ CR & 55.2\% & 68.0\% & 70.8\% & 0.0\% \\ \hline
++ QR+CR & 55.0\% & 64.8\% & 71.0\% & 0.0\% \\ \hline
+	extbf{Rata-rata} & 	extbf{54.7\%} & 	extbf{65.5\%} & 	extbf{69.8\%} & 	extbf{0.0\%} \\ \hline
+\end{tabular}
+\end{table}

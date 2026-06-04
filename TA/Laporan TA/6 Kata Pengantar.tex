@@ -1,11 +1,50 @@
 \chapter*{KATA PENGANTAR}
 \addcontentsline{toc}{chapter}{KATA PENGANTAR}
 
-Puji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa karena atas rahmat dan karunia-Nya, saya dapat menyelesaikan penulisan Laporan Tugas Akhir yang berjudul "Implementasi Algoritma XYZ untuk Optimasi Jaringan Komputer". Laporan ini disusun sebagai salah satu syarat untuk menyelesaikan program Sarjana di Sekolah Teknik Elektro dan Informatika, Institut Teknologi Bandung.
-\begin{flushright}
-    Bandung, 20 Mei 2026\\
+Puji syukur penulis panjatkan ke hadirat Tuhan Yang Maha Esa karena atas rahmat dan karunia-Nya, penulis dapat menyelesaikan penulisan Laporan Tugas Akhir yang berjudul \textit{``Mitigasi Halusinasi pada RAG-LLM Biomedis Menggunakan Ekspansi Akronim, Query Rewriting, dan Context Reranking''}. Penyusunan Tugas Akhir ini dilakukan sebagai salah satu syarat untuk memperoleh gelar Sarjana pada Program Studi Sistem dan Teknologi Informasi, Sekolah Teknik Elektro dan Informatika, Institut Teknologi Bandung.
+
+Selama proses penyusunan, penulis memperoleh banyak bantuan, dukungan, bimbingan, serta doa dari berbagai pihak. Oleh karena itu, pada kesempatan ini penulis ingin menyampaikan rasa terima kasih yang sebesar-besarnya kepada:
+
+\begin{enumerate}[1.]
+    \item Tuhan Yesus, terima kasih atas penyertaan-Mu yang tidak pernah berhenti di setiap musim kehidupan penulis. Engkaulah sumber kekuatan dan pengharapan yang selalu menuntun penulis di saat tidak tahu arah. Penulis menyadari sepenuhnya bahwa: \textit{all of this is because of You, thank You Jesus!}
+
+    \item Kedua orang tua penulis, yang telah mendidik dan membesarkan penulis sedari kecil dan selalu menjadi sumber motivasi penulis untuk menyelesaikan tugas akhir ini. Terima kasih atas segala pengorbanannya, doa yang tidak pernah putus, dan kasih sayang yang tidak dapat dibalaskan oleh penulis. Tanpa kehadiran kalian, mungkin langkah penulis takkan pernah sampai sejauh ini.
+
+    \item Dr. Fetty Fitriyanti Lubis, S.T., M.T., selaku dosen pembimbing yang senantiasa meluangkan waktu, memberikan arahan, bimbingan, dan masukan yang tidak ternilai selama proses penyusunan Tugas Akhir ini.
+
+    \item I Gusti Bagus Baskara Nugraha, S.T., M.T., Ph.D., selaku Ketua Program Studi Sistem dan Teknologi Informasi, atas kepemimpinannya sehingga STI dapat menjadi tempat aman untuk mahasiswa berkembang dan belajar.
+
+    \item Dr. Riza Satria Perdana, S.T., M.T., selaku dosen wali penulis, atas perhatian dan ajarannya yang selalu mengingatkan untuk hidup jujur dan berkontribusi bagi bangsa dan negara ini.
+
+    \item Teman-teman dari TPB penulis, David dan Nicolaas, yang selalu menjadi tempat berbagi keluh kesah selama perjalanan 182 ini dan selalu memberikan ilmunya tanpa pamrih sehingga perjalanan yang berat selama di jurusan ini terasa sedikit lebih ringan. Kehadiran kalian telah memberi warna, kekuatan, dan semangat dalam perjalanan panjang ini.
+
+    \item Teman-teman kos penulis, Arvyno dan Bastian, yang selalu menjadi pelarian penulis dengan bermain \textit{Valorant} bersama dan makan nasi goreng dikala sedih dan pusing dalam perkuliahan ini.
+
+    \item \textit{Happy Family}, Nasywaa, Naomi, dan Micky. Terima kasih sudah menjadi teman diskusi, lomba, bermain, begadang, dan kulineran di Bandung. Pengalaman di Kasumba takkan pernah dilupakan oleh penulis.
+
+    \item Teman-teman seperjuangan penulis, Pica, Allesandro, Dedy, Valdi, Harry, Corne, Elen, Thalitha, Tamara, Angie, teman-teman Lab Basis Data --- Yovanka, Anin, Clement, Dama, Jihan, dan teman-teman lain yang telah membersamai perjalanan penulis selama masa perkuliahan. Bersama kalian, hari-hari di kampus berubah menjadi cerita yang layak dikenang.
+
+    \item Velicia Christina Gabriel, yang selalu menjadi pendengar keluh kesah disaat penulis lelah dan memberikan semangat serta dukungan moral kepada penulis. Terima kasih sudah menjadi motivasi penulis untuk menjadi lebih baik setiap harinya.
+
+    \item Adik asuh penulis, Persada, Jennie, dan Izhar. Terima kasih sudah memilih penulis menjadi kakak asuh kandung maupun angkat. Terima kasih sudah menjadi orang yang dapat diandalkan di kala penulis jenuh dan sering memberikan tempat untuk penulis menginap dikala pengerjaan tugas akhir ini.
+
+    \item Teman-teman \textit{orgilers}, teman-teman Tahap Persiapan Bersama (TPB) penulis di tahun pertama. Terima kasih sudah mengajak berkeliling dan kulineran di Bandung serta membuat penulis tidak \textit{homesick} pada awal masa perantauan.
     
-    Penulis \\
-    \vspace{1cm}
-    John Doe
+    \item Sambat, Ghina, Azis, Osamah. Terima kasih sudah menemani penulis dari masa TPB sebagai teman perantauan yang sering mendengarkan cerita walaupun cerita mungkin tidak menarik untuk didengar.
+
+    \item Kak Rian, Kak Ariq, dan Kak Angie. Terima kasih atas bimbingan dan segala macam berkas tugas dan ujian dari kakak-kakak sampai bimbingan karirnya. Kalian bukan sekadar kakak tingkat, tapi bagian dari perjalanan yang akan selalu hidup dalam ingatan penulis.
+
+    \item Seluruh pihak yang tidak dapat penulis sebutkan satu per satu, namun telah memberikan dukungan baik secara langsung maupun tidak langsung hingga laporan ini selesai.
+\end{enumerate}
+
+Penulis menyadari bahwa laporan Tugas Akhir ini masih memiliki berbagai keterbatasan dan belum sepenuhnya sempurna. Oleh karena itu, penulis dengan terbuka menerima segala kritik dan saran yang bersifat membangun sebagai bahan evaluasi dan perbaikan di masa mendatang. Besar harapan penulis agar Tugas Akhir ini dapat memberikan manfaat bagi para pembaca serta memberikan kontribusi, sekecil apa pun, bagi perkembangan ilmu pengetahuan. Akhir kata, penulis mengucapkan terima kasih yang sebesar-besarnya kepada seluruh pihak yang telah memberikan dukungan, bantuan, dan doa selama proses penyusunan Tugas Akhir ini. Semoga segala kebaikan yang telah diberikan mendapatkan balasan yang berlimpah dari Tuhan Yang Maha Esa.
+
+\begin{flushright}
+    Bandung, \today \\
+    \vspace{0.2cm}
+    Penulis, \\
+    \vspace{0.1cm}
+    \includegraphics[width=5cm, trim={0 0 6cm 0}, clip]{image/tandatangan.png} \\
+    \vspace{-0.2cm}
+    Ricky Wijaya
 \end{flushright}

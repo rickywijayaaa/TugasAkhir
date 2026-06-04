@@ -20,10 +20,25 @@ Struktur umum alur kerja sistem RAG saat ini ditunjukkan pada Gambar \ref{fig:ra
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{image/asis.png}
+  \includegraphics[width=0.9\textwidth]{image/flowrag.png}
   \caption{Alur sistem \textit{retrieval augmented generation} (RAG) saat ini}
   \label{fig:rag_as_is}
 \end{figure}
+
+Sebelum sistem RAG dapat menjawab pertanyaan, dokumen sumber terlebih dahulu melalui tahap praproses, yaitu pemotongan dokumen menjadi \textit{chunk}, pengubahan setiap \textit{chunk} menjadi representasi vektor melalui model \textit{embedding}, lalu penyimpanannya ke dalam basis data vektor (\textit{vector database}) yang menjadi sumber pengetahuan (\textit{domain knowledge}) bagi sistem. Pada domain biomedis, tahap praproses inilah yang justru banyak menimbulkan masalah. Dokumen ilmiah biomedis, khususnya abstrak pada basis data PubMed, banyak menuliskan istilah panjang dalam bentuk akronim, misalnya \textit{Hyperbaric Oxygen} yang ditulis HBO atau \textit{Coronary Heart Disease} yang ditulis CHD. Ketika \textit{chunk} yang hanya memuat akronim tersebut langsung diindeks tanpa pengayaan, representasi vektor yang terbentuk tidak memuat bentuk panjang istilahnya. Akibatnya, ketika pengguna mengajukan kueri dengan istilah lengkap, sistem \textit{retrieval} dapat gagal menemukan dokumen yang sebenarnya relevan karena terjadi ketidaksesuaian istilah antara kueri dan isi basis data vektor, fenomena yang dikenal sebagai \textit{vocabulary mismatch}. Kegagalan pada tahap \textit{retrieval} ini kemudian diteruskan ke tahap \textit{generation} dan menjadi salah satu pemicu halusinasi. Tabel~\ref{tbl:retrieval-failure} memperlihatkan beberapa contoh konkret \textit{vocabulary mismatch} tersebut.
+
+\begin{table}[H]
+\centering
+\caption{Contoh \textit{Retrieval Failure} akibat \textit{Vocabulary Mismatch}}
+\label{tbl:retrieval-failure}
+\begin{tabular}{|p{4cm}|p{2cm}|p{6cm}|}
+\hline
+\textbf{Query Pengguna} & \textbf{Istilah di Paper} & \textbf{Retrieval Failure} \\ \hline
+\textit{Hyperbaric Oxygen} & HBO & Gagal menemukan dokumen karena \textit{mismatch} istilah \\ \hline
+\textit{Coronary Heart Disease} & CHD & Dokumen relevan tidak tertarik ke hasil \textit{retrieval} \\ \hline
+\textit{Body Mass Index} & BMI & Akronim pada dokumen tidak tercocokkan dengan kueri \\ \hline
+\end{tabular}
+\end{table}
 
 
 \subsubsection*{3.1.2 Data Understanding}
@@ -34,7 +49,8 @@ Sebagai langkah awal, dilakukan penelusuran terhadap dataset yang digunakan seca
 
 Berikut hasil pemetaan dan perbandingan dataset kandidat dari ketiga domain.
 
-\begin{longtable}{|p{2.2cm}|p{1.5cm}|p{5cm}|p{2.8cm}|}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}p{2.3cm}|>{\raggedright\arraybackslash}p{1.6cm}|>{\raggedright\arraybackslash}p{6cm}|>{\raggedright\arraybackslash}p{2.4cm}|}
 \caption{Perbandingan Dataset Kandidat}
 \label{tbl:dataset_kandidat} \\
 \hline
@@ -110,6 +126,7 @@ $\pm$ 13{,}000 contoh
 \\ \hline
 
 \end{longtable}
+\normalsize
 
 Hasil perbandingan menunjukkan bahwa dataset pada domain hukum dan keuangan memiliki struktur data yang lebih heterogen serta melibatkan beragam bentuk pertanyaan dengan kompleksitas konteks yang tinggi. Pada dataset hukum, pertanyaan sering kali berkaitan dengan preseden yudisial, norma undang-undang, dan proses interpretasi regulasi yang memerlukan pemetaan dokumen lintas kasus. Struktur pertanyaan dan jawaban pada dataset kategori tersebut tidak selalu memiliki keterikatan langsung dengan satu konteks tunggal, sehingga dokumentasi sumber yang relevan bersifat berlapis.
 
@@ -122,6 +139,8 @@ PubMedQA memiliki karakteristik yang mendukung penerapannya pada penelitian ini.
 Kedua, PubMedQA memiliki ukuran data yang proporsional untuk kajian akademik. Dengan total sekitar seribu entri, dataset ini representatif untuk menghasilkan analisis berbasis data tanpa memberikan beban komputasi berlebihan.
 
 Ketiga, pertanyaan dalam PubMedQA bersifat faktual dengan format jawaban yang terstandarisasi \textit{(yes, no, dan maybe)}. Struktur tersebut mendukung pelaksanaan evaluasi berbasis kesesuaian terhadap konteks karena derajat kebenaran jawaban dapat ditelusuri secara langsung.
+
+Keempat, PubMedQA dipilih karena karakteristik bahasanya yang sangat relevan dengan permasalahan yang diangkat pada tugas akhir ini. Abstrak paper biomedis dan kesehatan pada PubMedQA banyak menggunakan akronim atau singkatan untuk menuliskan istilah medis yang panjang, misalnya HBO untuk \textit{Hyperbaric Oxygen} atau CHD untuk \textit{Coronary Heart Disease}. Karakteristik ini menjadikan PubMedQA sebagai kasus uji yang tepat untuk menguji \textit{vocabulary mismatch}, yaitu ketidaksesuaian istilah antara kueri pengguna dan dokumen, sehingga sangat sesuai untuk mengevaluasi efektivitas ekspansi akronim sebagai salah satu teknik mitigasi yang diusulkan.
 
 Selain itu, PubMedQA banyak digunakan dalam penelitian \textit{question answering} dan studi \textit{retrieval augmented generation} pada domain medis. Penggunaannya secara luas dalam publikasi ilmiah menjadikan dataset ini memiliki landasan metodologis yang kuat serta mempermudah pembandingan hasil penelitian dengan studi sebelumnya.
 
@@ -154,13 +173,16 @@ F04 & Sistem dapat melakukan \textit{context reranking} untuk memilih dokumen ya
 
 F05 & Sistem dapat menghasilkan jawaban menggunakan model RAG-LLM berdasarkan konteks yang telah difilter. \\ \hline
 
-F06 & Sistem dapat melakukan \textit{active hallucination detection} untuk mendeteksi bagian keluaran yang berpotensi mengandung halusinasi. \\ \hline
+F06 & Sistem dapat melakukan ekspansi akronim biomedis pada tahap praproses 
+      dokumen untuk mengatasi \textit{vocabulary mismatch}. \\ \hline
 
 F07 & Sistem dapat menandai atau memberi label pada segmen jawaban yang terdeteksi sebagai halusinatif. \\ \hline
 
 F08 & Sistem dapat menghasilkan laporan evaluasi yang mencakup \textit{accuracy}, \textit{context relevancy}, \textit{context recall}, \textit{faithfulness}, \textit{F1 Score}, serta \textit{hallucination rate}. \\ \hline
 
-F09 & Sistem dapat membandingkan keluaran dari beberapa konfigurasi eksperimen, yaitu \textit{baseline}, \textit{query rewriting}, \textit{context reranking}, \textit{active hallucination detection}, dan kombinasi menyeluruh. \\ \hline
+F09 & Sistem dapat membandingkan keluaran dari beberapa konfigurasi eksperimen, 
+      yaitu \textit{baseline}, ekspansi akronim, \textit{query rewriting}, 
+      \textit{context reranking}, dan kombinasi menyeluruh. \\ \hline
 
 \end{tabular}
 \end{table}
@@ -226,17 +248,17 @@ Terakhir, pendekatan \textit{balancing internal and external knowledge} diperluk
 
 Ketiga teknik ini saling melengkapi dalam memperkuat struktur pengambilan keputusan model selama tahap generasi. Dengan memastikan bahwa informasi tengah dapat dimanfaatkan, konteks relevan diprioritaskan, dan pengetahuan internal serta eksternal digunakan secara seimbang, proses generasi menjadi lebih stabil dan berbasis bukti. Hal ini berpotensi signifikan dalam menurunkan \textit{hallucination} yang muncul akibat miskonsepsi, hilangnya konteks penting, atau penggunaan bukti yang keliru.
 
-\subsubsection{Alternatif Solusi III: \textit{Multiple-Phase Mitigation} (\textit{Query Rewriting}, \textit{Context Reranking}, dan \textit{Active Hallucination Detection})}
+\subsubsection{Alternatif Solusi III: \textit{Multiple-Phase Mitigation} (Ekspansi Akronim, \textit{Query Rewriting}, dan \textit{Context Reranking})}
 
-Alternatif ketiga berfokus pada pendekatan mitigasi berlapis (\textit{multiple-phase mitigation}) yang bekerja pada beberapa tahapan dalam alur RAG, mulai dari tahap \textit{retrieval}, pemilihan konteks, hingga validasi keluaran akhir. Pendekatan ini dirancang untuk mengatasi sumber utama \textit{hallucination}, yaitu kesalahan yang berasal dari kurang jelasnya input pengguna serta kesalahan yang muncul selama proses generasi akibat ketidaksesuaian antara jawaban dan konteks. Dengan menerapkan strategi mitigasi di setiap fase, sistem memperoleh perlindungan yang lebih kuat dan menyeluruh.
+Alternatif ketiga berfokus pada pendekatan mitigasi berlapis (\textit{multiple-phase mitigation}) yang bekerja pada beberapa tahapan dalam alur RAG, mulai dari praproses dokumen, tahap \textit{retrieval}, hingga pemilihan konteks akhir sebelum generasi. Pendekatan ini dirancang untuk mengatasi sumber utama \textit{hallucination}, yaitu kegagalan menemukan dokumen yang relevan akibat \textit{vocabulary mismatch} maupun kueri yang kurang jelas, serta masuknya konteks yang kurang relevan pada tahap generasi. Dengan menerapkan strategi mitigasi di setiap fase, sistem memperoleh perlindungan yang lebih kuat dan menyeluruh.
 
-Komponen pertama adalah \textit{query rewriting}, yaitu proses memperjelas maksud pertanyaan pengguna sebelum dokumen dicari. Tanpa perbaikan kueri, banyak sistem RAG gagal mengambil konteks yang tepat karena kueri asli pengguna sering ambigu, kurang spesifik, atau tidak mencerminkan kebutuhan informasi yang sebenarnya. Studi terkini menunjukkan bahwa kueri yang telah ditulis ulang dapat meningkatkan kualitas \textit{retrieval} secara signifikan, memperbaiki presisi dokumen yang ditemukan, serta mengurangi risiko terjadinya \textit{hallucination} yang berasal dari konteks yang kurang relevan. Dengan demikian, \textit{query rewriting} berfungsi sebagai gerbang awal yang memastikan sistem memulai proses dengan representasi pertanyaan yang paling akurat \parencite{wang2024maferw}.
+Komponen pertama adalah ekspansi akronim, yaitu praproses dokumen yang menyisipkan kepanjangan dari akronim biomedis secara langsung pada teks sebelum dokumen diindeks. Pada domain biomedis, banyak istilah panjang yang justru lebih sering ditulis dalam bentuk akronim pada abstrak ilmiah, sehingga kueri pengguna yang memakai istilah lengkap kerap gagal dicocokkan dengan dokumen yang relevan, fenomena yang dikenal sebagai \textit{vocabulary mismatch}. Dengan menambahkan kepanjangan akronim pada setiap dokumen, peluang pencocokan antara kueri dan dokumen meningkat, sehingga dokumen yang relevan lebih mudah ditemukan sejak tahap \textit{retrieval} dan kekosongan konteks yang memicu halusinasi dapat dikurangi.
 
-Komponen kedua adalah \textit{context reranking}, yaitu penataan ulang dokumen yang berhasil diretrieval berdasarkan tingkat relevansinya terhadap pertanyaan. Meskipun sistem berhasil menemukan sejumlah bukti yang benar, tidak semuanya memiliki nilai yang sama. Perbedaan kualitas antardokumen dapat menyebabkan \textit{context conflict} atau \textit{context noise}, di mana bukti yang kurang relevan mengaburkan bukti utama yang diperlukan model. Teknik \textit{reranking} membantu memprioritaskan dokumen dengan dukungan semantik paling kuat dan menempatkannya pada posisi yang lebih mudah diproses model selama tahap generasi. Strategi ini secara langsung mengurangi kemungkinan model menggunakan bukti yang lemah atau bertentangan, khususnya pada skenario multi-dokumen.
+Komponen kedua adalah \textit{query rewriting}, yaitu proses memperjelas maksud pertanyaan pengguna sebelum dokumen dicari. Tanpa perbaikan kueri, banyak sistem RAG gagal mengambil konteks yang tepat karena kueri asli pengguna sering ambigu, kurang spesifik, atau tidak mencerminkan kebutuhan informasi yang sebenarnya. Studi terkini menunjukkan bahwa kueri yang telah ditulis ulang dapat meningkatkan kualitas \textit{retrieval} secara signifikan, memperbaiki presisi dokumen yang ditemukan, serta mengurangi risiko terjadinya \textit{hallucination} yang berasal dari konteks yang kurang relevan. Dengan demikian, \textit{query rewriting} berfungsi sebagai gerbang yang memastikan proses pencarian dimulai dengan representasi pertanyaan yang paling akurat \parencite{wang2024maferw}.
 
-Komponen ketiga adalah \textit{active hallucination detection}, yaitu mekanisme untuk memeriksa keluaran model secara langsung ketika jawaban dihasilkan. Pendekatan ini biasanya memanfaatkan indikator ketidaksesuaian antara jawaban dengan konteks, tingkat keyakinan model, atau verifikasi ulang fakta melalui subkueri. Tidak seperti pemeriksaan pasif, deteksi aktif mengidentifikasi bagian jawaban yang berisiko halusinatif secara dinamis, kemudian menandai atau meminta model mengoreksi bagian tersebut sebelum hasil akhir diberikan kepada pengguna.
+Komponen ketiga adalah \textit{context reranking}, yaitu penataan ulang dokumen yang berhasil diretrieval berdasarkan tingkat relevansinya terhadap pertanyaan. Meskipun sistem berhasil menemukan sejumlah bukti yang benar, tidak semuanya memiliki nilai yang sama. Perbedaan kualitas antardokumen dapat menyebabkan \textit{context conflict} atau \textit{context noise}, di mana bukti yang kurang relevan mengaburkan bukti utama yang diperlukan model. Teknik \textit{reranking} membantu memprioritaskan dokumen dengan dukungan semantik paling kuat dan menempatkannya pada posisi yang lebih mudah diproses model selama tahap generasi. Strategi ini secara langsung mengurangi kemungkinan model menggunakan bukti yang lemah atau bertentangan, khususnya pada skenario multi-dokumen.
 
-Ketiga teknik ini membentuk alur mitigasi bertahap yang saling melengkapi. \textit{Query rewriting} mencegah kesalahan sejak tahap pencarian bukti, \textit{context reranking} memastikan hanya bukti terbaik yang menjadi dasar generasi, dan \textit{active hallucination detection} menjaga integritas keluaran akhir. Dengan perlindungan berlapis, risiko kesalahan dapat ditekan dari hulu hingga hilir, menghasilkan sistem RAG yang lebih akurat, lebih dapat dipercaya, dan lebih tahan terhadap variasi pertanyaan serta kompleksitas konteks.
+Ketiga teknik ini membentuk alur mitigasi bertahap yang saling melengkapi. Ekspansi akronim memperbaiki keterjangkauan dokumen sejak tahap praproses dan pengindeksan, \textit{query rewriting} mencegah kesalahan pada tahap pencarian bukti, dan \textit{context reranking} memastikan hanya bukti terbaik yang menjadi dasar generasi. Dengan perlindungan berlapis pada tahap praproses, \textit{retrieval}, dan pemilihan konteks, risiko kesalahan dapat ditekan dari hulu hingga hilir, menghasilkan sistem RAG yang lebih akurat, lebih dapat dipercaya, dan lebih tahan terhadap variasi pertanyaan serta kompleksitas konteks.
 
 
 
@@ -259,10 +281,10 @@ Tiga alternatif solusi yang dibandingkan dalam tugas akhir ini adalah:
 \begin{enumerate}[1.]
   \item \textbf{Solusi I: Penguatan \textit{retrieval}} (\textit{query rewriting} + \textit{query expansion} + \textit{context reranking}), yang berfokus pada peningkatan kualitas kueri dan seleksi konteks sejak tahap pengambilan informasi.
   \item \textbf{Solusi II: Penguatan \textit{generation}} (\textit{faithfulness prompting} + \textit{attribution prompting} + \textit{chain-of-verification}), yang mengandalkan desain \textit{prompt} dan verifikasi berjenjang untuk menjaga kesetiaan jawaban terhadap konteks.
-  \item \textbf{Solusi III: Solusi tugas akhir} (\textit{query rewriting} + \textit{context reranking} + \textit{active hallucination detection}), yang menggabungkan perbaikan kueri, pemilihan konteks paling relevan, serta deteksi aktif terhadap keluaran berisiko halusinatif.
+  \item \textbf{Solusi III: Solusi tugas akhir} (ekspansi akronim + \textit{query rewriting} + \textit{context reranking}), yang menggabungkan praproses ekspansi akronim untuk mengatasi \textit{vocabulary mismatch}, perbaikan kueri sebelum \textit{retrieval}, serta pemilihan konteks paling relevan sebelum generasi.
 \end{enumerate}
 
-Bobot kriteria yang digunakan dalam skema \textit{weighted scoring} ditetapkan sebagai berikut: efektivitas sebesar 40\%, feasibility sebesar 25\%, biaya komputasi sebesar 20\%, dan fleksibilitas sebesar 15\%. Skor untuk masing-masing alternatif kemudian dihitung dengan mengalikan skor \textit{Likert} dengan bobot kriteria terkait, lalu menjumlahkannya menjadi skor total tertimbang. Ringkasan hasil penilaian disajikan pada Tabel~\ref{tbl:weighted_scoring_solusi}.
+Bobot kriteria yang digunakan dalam skema \textit{weighted scoring} ditetapkan sebagai berikut: efektivitas sebesar 40\%, feasibility sebesar 25\%, biaya komputasi sebesar 20\%, dan fleksibilitas sebesar 15\%. Bobot ini ditentukan berdasarkan prioritas penelitian terhadap efektivitas mitigasi halusinasi sebagai sasaran utama, diikuti kompleksitas implementasi dan efisiensi komputasi sebagai pertimbangan praktis. Skor untuk masing-masing alternatif kemudian dihitung dengan mengalikan skor \textit{Likert} dengan bobot kriteria terkait, lalu menjumlahkannya menjadi skor total tertimbang. Ringkasan hasil penilaian disajikan pada Tabel~\ref{tbl:weighted_scoring_solusi}.
 
 \begin{table}[H]
   \centering
@@ -285,11 +307,11 @@ Bobot kriteria yang digunakan dalam skema \textit{weighted scoring} ditetapkan s
     \hline
 
     \textit{Feasibility} & 25\% &
-    7 & 6 & 8 \\
+    7 & 6 & 9 \\
     \hline
 
     Biaya komputasi & 20\% &
-    7 & 5 & 6 \\
+    7 & 5 & 7 \\
     \hline
 
     Fleksibilitas & 15\% &
@@ -297,19 +319,19 @@ Bobot kriteria yang digunakan dalam skema \textit{weighted scoring} ditetapkan s
     \hline
 
     \multicolumn{2}{|c|}{\textbf{Skor total}} &
-    \textbf{7,45} &
-    \textbf{6,20} &
-    \textbf{7,70} \\
+    \textbf{7,55} &
+    \textbf{6,35} &
+    \textbf{8,45} \\
     \hline
   \end{tabular}
 \end{table}
 
 
 
-Berdasarkan hasil \textit{weighted scoring} pada Tabel~\ref{tbl:weighted_scoring_solusi}, Solusi III memperoleh skor total tertinggi dibandingkan dua alternatif lainnya. Hal ini mencerminkan kombinasi yang seimbang antara efektivitas pengurangan \textit{hallucination}, feasibility implementasi, biaya komputasi yang masih dapat diterima, serta fleksibilitas untuk dikembangkan lebih lanjut. Oleh karena itu, tugas akhir ini memilih Solusi III, yaitu kombinasi \textit{query rewriting}, \textit{context reranking}, dan \textit{active hallucination detection}, sebagai pendekatan utama mitigasi \textit{hallucination} pada sistem RAG–LLM.
+Berdasarkan hasil \textit{weighted scoring} pada Tabel~\ref{tbl:weighted_scoring_solusi}, Solusi III memperoleh skor total tertinggi (8,45) dibandingkan dua alternatif lainnya. Hal ini mencerminkan kombinasi yang seimbang antara efektivitas pengurangan \textit{hallucination}, feasibility implementasi yang tinggi karena ekspansi akronim merupakan praproses sederhana, biaya komputasi yang hemat karena tidak menambah pemanggilan model pada saat \textit{inference}, serta fleksibilitas untuk dikembangkan lebih lanjut. Oleh karena itu, tugas akhir ini memilih Solusi III, yaitu kombinasi ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking}, sebagai pendekatan utama mitigasi \textit{hallucination} pada sistem RAG-LLM.
 
 Selain hasil \textit{weighted scoring}, pemilihan Solusi III juga didukung oleh temuan penelitian yang menunjukkan bahwa penggabungan beberapa teknik mitigasi dalam satu alur kerja dapat meningkatkan performa RAG–LLM secara nyata. Salah satu pendekatan adalah RAG-HAT (\textit{RAG–Hallucination-Aware Tuning}), yang mengintegrasikan deteksi \textit{hallucination}, perbaikan jawaban, dan penyesuaian model melalui \textit{preference optimization}. Penelitian ini melaporkan penurunan \textit{hallucination} hingga 27-44\% dibandingkan RAG standar \parencite{song2024raghat}, menunjukkan bahwa pendekatan multi-tahap efektif meningkatkan performa RAG.
 
 Pendekatan lain yang relevan adalah MEGA-RAG, yang menggabungkan \textit{dense retrieval}, \textit{cross-encoder reranking}, dan penggabungan bukti sebelum proses generasi. Hasilnya, akurasi sistem meningkat sekitar 8-14\% pada berbagai tugas \textit{knowledge-intensive QA} dibandingkan RAG tanpa mekanisme gabungan \parencite{li2023megarag}. Temuan ini memperlihatkan bahwa penggabungan teknik memberikan dampak langsung pada peningkatan kualitas jawaban.
 
-Berdasarkan kedua studi tersebut, terlihat jelas bahwa pendekatan yang menggabungkan beberapa teknik mitigasi pada tahap \textit{retrieval} dan \textit{post-generation} lebih mampu meningkatkan akurasi dan mengurangi \textit{hallucination} secara konsisten. Oleh karena itu, pemilihan Solusi III dalam tugas akhir ini memiliki landasan yang kuat, karena menggabungkan \textit{query rewriting}, \textit{context reranking}, dan \textit{active hallucination detection} yang sejalan dengan arah penelitian terbaru.
+Berdasarkan kedua studi tersebut, terlihat jelas bahwa pendekatan yang menggabungkan beberapa teknik mitigasi pada tahap praproses, \textit{retrieval}, dan pemilihan konteks lebih mampu meningkatkan akurasi dan mengurangi \textit{hallucination} secara konsisten. Oleh karena itu, pemilihan Solusi III dalam tugas akhir ini memiliki landasan yang kuat, karena menggabungkan ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking} yang sejalan dengan arah penelitian terbaru.

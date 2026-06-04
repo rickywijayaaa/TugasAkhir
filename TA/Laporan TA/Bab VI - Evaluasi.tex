@@ -1,798 +1,271 @@
 % ============================================================================================
 % BAB VI EVALUASI
-% MITIGASI HALUSINASI PADA RAG LLM MENGGUNAKAN
-% QUERY REWRITING, CONTEXT RERANKING, DAN ACTIVE HALLUCINATION DETECTION
+% MITIGASI HALUSINASI PADA RAG-LLM UNTUK SISTEM TANYA JAWAB BIOMEDIS
 % ============================================================================================
 
 \cleardoublepage
 \chapter{EVALUASI}
 \label{chap:evaluasi}
 
-Bab ini menyajikan metodologi, hasil, dan pembahasan evaluasi terhadap konfigurasi
-sistem RAG yang telah diimplementasikan pada Bab~\ref{chap:implementasi}. Evaluasi
-dilakukan untuk mengukur sejauh mana setiap teknik mitigasi halusinasi berkontribusi
-terhadap peningkatan kualitas jawaban yang dihasilkan sistem. Penilaian mencakup dua
-dimensi utama, yaitu ketepatan klasifikasi label menggunakan referensi dari dataset
-PubMedQA dan kualitas jawaban berbasis evaluator kustom yang mengukur empat metrik
-turunan RAGAS. Evaluasi dijalankan pada dua model LLM dengan kapasitas yang berbeda,
-yaitu Llama~3.2 (3B parameter) dan GPT-4.1-mini (OpenAI), sehingga pengaruh kapasitas
-model terhadap efektivitas mitigasi halusinasi juga dapat dianalisis.
+Bab ini menyajikan hasil pengujian kuantitatif terhadap sistem mitigasi halusinasi RAG-LLM untuk sistem tanya jawab biomedis yang telah diimplementasikan pada Bab~\ref{chap:implementasi}. Evaluasi bertujuan menelaah dua temuan utama, yaitu (1) perbandingan antara mode \textit{retrieval} BM25 saja dengan \textit{hybrid retrieval}, serta (2) pengaruh praproses ekspansi akronim Schwartz-Hearst, yang keduanya difokuskan pada model GPT-4.1-mini sebagai model acuan. Analisis tambahan mengenai kontribusi \textit{Query Rewriting} (QR) dan \textit{Context Reranking} (CR) pada berbagai pilihan LLM, serta perbandingan kinerja antara model \textit{open-source} lokal Llama 3.2 dengan model berbayar berskala besar, disajikan pada Lampiran~\ref{lamp:evaluasi-lintas-model}. Bagian ini menjelaskan metode evaluasi, hasil pengukuran, dan pembahasan implikasinya.
 
+% =====================================================
+\section{Metode Evaluasi}
+\label{sec:metode-evaluasi}
 
-% ============================================================================================
-\section{Metodologi Evaluasi}
-\label{sec:metodologi-evaluasi}
-% ============================================================================================
+\subsection{Lingkup Evaluasi dan Himpunan Uji}
+\label{subsec:lingkup-evaluasi}
 
-\subsection{Metrik Evaluasi}
-\label{subsec:metrik-evaluasi}
+Evaluasi dilakukan pada 500 pertanyaan dari subset \textit{pqa\_labeled} PubMedQA yang memuat anotasi \textit{expert}, sedangkan korpus dokumen untuk \textit{retriever} dibangun dari seluruh 1.000 paper pada subset tersebut. Subset 500 pertanyaan ini mempertahankan proporsi label yang konsisten dengan keseluruhan dataset, yaitu 275 pertanyaan berlabel \textit{yes} (55\%), 159 pertanyaan berlabel \textit{no} (32\%), dan 66 pertanyaan berlabel \textit{maybe} (13\%). Pemilihan 500 pertanyaan pertama dilakukan untuk menyeimbangkan representativitas distribusi label dengan keterbatasan biaya pemanggilan API model bahasa eksternal pada eksperimen lintas-konfigurasi. Setiap pertanyaan dievaluasi pada seluruh konfigurasi sistem sehingga hasil yang diperoleh dapat dibandingkan secara langsung antar konfigurasi.
 
-Evaluasi kualitas sistem RAG pada penelitian ini menggunakan enam metrik yang terbagi
-dalam dua kelompok, yaitu metrik berbasis label dan metrik berbasis kualitas jawaban.
+\subsection{Metrik Kuantitatif}
+\label{subsec:metrik-kuantitatif}
 
-\subsubsection{Metrik Berbasis Label}
+Evaluasi sistem dilakukan pada dua jalur yang saling melengkapi. Jalur pertama mengukur kualitas \textit{retrieval} menggunakan tiga metrik standar \textit{Information Retrieval} (IR), yaitu \textit{Recall@5}, \textit{Mean Average Precision} (MAP@5), dan \textit{Normalized Discounted Cumulative Gain} (nDCG@5), sebagaimana didefinisikan pada Bab~\ref{chap:studi-literatur}. Jalur kedua mengukur kualitas jawaban yang dihasilkan menggunakan \textit{Label Accuracy} terhadap \textit{ground truth} PubMedQA, serta empat metrik dari kerangka RAGAS, yaitu \textit{faithfulness}, \textit{context recall}, \textit{answer relevancy}, dan \textit{context precision}. Pemisahan dua jalur ini memungkinkan analisis kontribusi setiap teknik secara terpisah pada tahap \textit{retrieval} maupun \textit{generation}.
 
-\begin{enumerate}[1.]
+\subsection{Skema Konfigurasi Pengujian}
+\label{subsec:skema-konfigurasi-pengujian}
 
-  \item \textit{Label Accuracy}
+Pengujian dilakukan pada dua belas konfigurasi sebagaimana telah didefinisikan pada Tabel~\ref{tbl:ringkasan-konfigurasi} pada Bab~\ref{chap:perancangan}, yaitu empat konfigurasi utama (\textit{baseline}, +QR, +CR, +QR+CR) dengan mode \textit{Hybrid} dan ekspansi akronim, empat variasi ablation tanpa ekspansi akronim, serta empat variasi ablation dengan mode BM25 saja. Untuk mengukur kontribusi pilihan LLM, keempat konfigurasi utama tersebut juga dijalankan pada empat model berbeda, yaitu GPT-4.1-mini (OpenAI), Claude Haiku 4.5 (Anthropic), Llama 3.3 70B Instruct (OpenRouter), serta Llama 3.2 3B yang dijalankan lokal melalui Ollama. Keluaran setiap konfigurasi disimpan pada berkas JSON terpisah agar reproduksibilitas pengujian tetap terjaga.
 
-  \textit{Label accuracy} mengukur proporsi jawaban LLM yang label prediksinya
-  (\textit{yes}, \textit{no}, atau \textit{maybe}) sesuai dengan label referensi
-  \textit{final\_decision} dalam dataset PubMedQA. Metrik ini mencerminkan kemampuan
-  sistem secara keseluruhan dalam menjawab pertanyaan biomedis secara tepat.
+% =====================================================
+\section{Hasil Evaluasi}
+\label{sec:hasil-evaluasi}
 
-  \begin{equation}
-    \text{Accuracy} = \frac{|\text{prediksi yang sesuai label referensi}|}{|\text{jumlah total sampel}|}
-    \label{eq:accuracy}
-  \end{equation}
-  \eqcaption{Formula \textit{label accuracy}}
+\subsection{Akurasi Retrieval}
+\label{subsec:hasil-retrieval}
 
-
-  \item \textit{Hallucination Rate}
-
-  \textit{Hallucination rate} didefinisikan sebagai komplemen dari \textit{label accuracy},
-  yakni proporsi sampel di mana sistem memberikan jawaban yang tidak sesuai dengan label
-  referensi. Ketidaksesuaian ini mengindikasikan bahwa sistem gagal memahami konteks yang
-  diberikan atau menghasilkan kesimpulan yang tidak didukung oleh bukti dalam dokumen.
-
-  \begin{equation}
-    \text{Hallucination Rate} = 1 - \text{Accuracy}
-    \label{eq:hallucination-rate}
-  \end{equation}
-  \eqcaption{Formula \textit{hallucination rate}}
-
-\end{enumerate}
-
-
-\subsubsection{Metrik Berbasis Kualitas Jawaban}
-
-Empat metrik berikut diadaptasi dari \textit{framework} RAGAS dan diimplementasikan
-menggunakan evaluator kustom (Subbab~\ref{subsec:evaluator-kustom}) untuk menjamin
-seluruh nilai berada dalam rentang 0{,}0 hingga 1{,}0 tanpa kemungkinan \textit{NaN}.
-
-\begin{enumerate}[1.]
-
-  \item \textit{Faithfulness}
-
-  \textit{Faithfulness} mengukur konsistensi faktual antara jawaban yang dihasilkan LLM
-  dan konteks yang diberikan. Metrik ini menilai sejauh mana setiap pernyataan dalam
-  jawaban dapat didukung oleh bukti dalam konteks. Semakin tinggi nilai \textit{faithfulness},
-  semakin kecil peluang jawaban mengandung informasi yang tidak terdapat dalam konteks
-  atau bertentangan dengan konteks.
-
-  \begin{equation}
-    F = \frac{|\text{pernyataan dalam jawaban yang didukung konteks}|}
-             {|\text{jumlah total pernyataan dalam jawaban}|}
-    \label{eq:faithfulness}
-  \end{equation}
-  \eqcaption{Formula \textit{faithfulness}}
-
-
-  \item \textit{Context Recall}
-
-  \textit{Context recall} mengukur seberapa banyak informasi dari jawaban referensi yang
-  berhasil tercakup dalam konteks yang diambil oleh \textit{retriever}. Metrik ini
-  mengevaluasi kelengkapan proses \textit{retrieval} dalam menyediakan informasi yang
-  diperlukan untuk menyusun jawaban yang benar.
-
-  \begin{equation}
-    \text{Context Recall} = \frac{|\text{klaim referensi yang tercakup dalam konteks}|}
-                                  {|\text{jumlah total klaim dalam referensi}|}
-    \label{eq:context-recall}
-  \end{equation}
-  \eqcaption{Formula \textit{context recall}}
-
-
-  \item \textit{Answer Relevancy}
-
-  \textit{Answer relevancy} mengukur sejauh mana jawaban yang dihasilkan LLM relevan
-  terhadap pertanyaan yang diajukan. Metrik ini mendeteksi apabila jawaban menyimpang
-  dari topik pertanyaan atau mengandung informasi yang tidak diminta.
-
-  \begin{equation}
-    \text{Answer Relevancy} = \frac{|\text{pernyataan jawaban yang relevan dengan pertanyaan}|}
-                                    {|\text{jumlah total pernyataan dalam jawaban}|}
-    \label{eq:answer-relevancy}
-  \end{equation}
-  \eqcaption{Formula \textit{answer relevancy}}
-
-
-  \item \textit{Context Precision}
-
-  \textit{Context precision} mengukur apakah dokumen yang relevan berada pada peringkat
-  atas dalam hasil \textit{retrieval}. Metrik ini menggunakan formula \textit{Average
-  Precision} (AP) yang memberikan bobot lebih besar pada dokumen relevan yang ditemukan
-  di posisi awal.
-
-  \begin{equation}
-    \text{Context Precision} = \frac{\sum_{k=1}^{K} \text{Precision@}k \times \text{rel}(k)}
-                                     {\text{jumlah dokumen relevan}}
-    \label{eq:context-precision}
-  \end{equation}
-  \eqcaption{Formula \textit{context precision} (\textit{Average Precision})}
-
-  Pada formula di atas, $\text{Precision@}k$ adalah rasio dokumen relevan pada posisi
-  1 hingga $k$, dan $\text{rel}(k)$ bernilai 1 jika dokumen pada posisi $k$ relevan
-  terhadap pertanyaan berdasarkan jawaban referensi.
-
-\end{enumerate}
-
-
-\subsection{Evaluator Kustom Tanpa NaN}
-\label{subsec:evaluator-kustom}
-
-Keterbatasan \textit{framework} RAGAS dalam menghasilkan evaluasi yang konsisten pada
-LLM lokal mendorong pengembangan evaluator kustom yang menjamin seluruh metrik selalu
-menghasilkan nilai numerik antara 0{,}0 hingga 1{,}0 tanpa kemungkinan \textit{NaN}.
-Pada percobaan awal menggunakan RAGAS versi pustaka resmi, \textit{answer relevancy}
-menghasilkan 72\% nilai \textit{NaN} dan \textit{context precision} menghasilkan 89\%
-nilai \textit{NaN}, disebabkan oleh ketidakmampuan LLM lokal dalam menghasilkan keluaran
-berformat JSON yang sesuai dengan spesifikasi \textit{parser} internal RAGAS. Evaluator
-kustom yang dikembangkan menerapkan pendekatan verifikasi per kalimat dengan mekanisme
-sebagai berikut.
-
-\begin{enumerate}[1.]
-  \item Teks jawaban atau teks referensi dipecah menjadi kalimat-kalimat individual
-        menggunakan pemisahan berbasis ekspresi reguler pada tanda titik, tanda seru, dan
-        tanda tanya. Kalimat dengan panjang kurang dari 15 karakter disaring untuk
-        menghindari fragmen yang tidak informatif.
-
-  \item Setiap kalimat hasil pemecahan diverifikasi secara independen terhadap konteks
-        yang diambil. LLM diminta menjawab pertanyaan sederhana berformat \textit{yes/no},
-        misalnya: ``Apakah pernyataan ini didukung oleh konteks di atas?'' Respons LLM
-        kemudian diperiksa apakah mengandung kata ``yes'' dalam 15 karakter pertama.
-
-  \item Skor akhir dihitung sebagai rasio jumlah kalimat yang mendapat verifikasi
-        ``yes'' terhadap total kalimat yang dievaluasi. Apabila terjadi kesalahan pada
-        panggilan LLM, respons secara konservatif dianggap sebagai ``no'' sehingga skor
-        tidak pernah mengandung nilai \textit{NaN}.
-\end{enumerate}
-
-Untuk metrik \textit{context precision}, evaluator menilai relevansi setiap dokumen
-konteks terhadap pertanyaan dengan bantuan jawaban referensi, kemudian menghitung
-\textit{Average Precision} berdasarkan urutan peringkat dokumen. Pendekatan ini secara
-konseptual setara dengan metrik RAGAS resmi, dengan perbedaan utama pada mekanisme
-\textit{parsing} yang lebih sederhana sehingga kompatibel dengan berbagai model LLM.
-
-
-\subsection{Prosedur Evaluasi}
-\label{subsec:prosedur-evaluasi}
-
-Evaluasi dilaksanakan dalam dua fase yang berurutan untuk setiap konfigurasi sistem.
-
-\textbf{Fase 1: Generasi Jawaban dan Evaluasi Label.}
-Sebanyak 500 entri dari subset \textit{pqa\_labeled} PubMedQA diproses secara berurutan.
-Untuk setiap entri, sistem melakukan \textit{retrieval} menggunakan BM25 dengan parameter
-$k=5$ (atau $k=20$ pada konfigurasi dengan \textit{reranking}), kemudian LLM menghasilkan
-jawaban berdasarkan konteks yang diperoleh. Label prediksi (\textit{yes}, \textit{no},
-atau \textit{maybe}) diekstrak dari jawaban menggunakan kombinasi pencocokan ekspresi
-reguler pada tiga baris terakhir dan pencarian batas kata di seluruh teks. Hasil disimpan
-secara inkremental setiap 10 sampel sehingga proses dapat dilanjutkan apabila terjadi
-interupsi.
-
-\textbf{Fase 2: Evaluasi Kualitas Jawaban.}
-Hasil Fase~1 dievaluasi menggunakan evaluator kustom untuk menghasilkan empat skor
-(\textit{faithfulness}, \textit{context recall}, \textit{answer relevancy}, dan
-\textit{context precision}) per sampel. Evaluasi disimpan secara inkremental setiap
-5 sampel. Seluruh parameter LLM diatur dengan \textit{temperature} bernilai nol dan
-\textit{seed} tetap untuk memastikan keluaran yang dapat direproduksi.
-
-Evaluasi dijalankan pada dua model LLM sebagai berikut.
-
-\begin{enumerate}[1.]
-  \item \textbf{Llama 3.2} (3B parameter), dijalankan secara lokal melalui Ollama.
-        Model ini digunakan untuk mengevaluasi tiga konfigurasi: \textit{baseline},
-        \textit{baseline} + \textit{query rewriting} (QR), dan \textit{baseline} +
-        \textit{context reranking} (CR).
-  \item \textbf{GPT-4.1-mini} (OpenAI API), diakses melalui \textit{endpoint} API
-        berbayar. Model ini digunakan untuk mengevaluasi empat konfigurasi, yaitu
-        \textit{baseline}, QR, CR, dan kombinasi QR + CR, untuk menganalisis pengaruh
-        kapasitas model terhadap efektivitas mitigasi halusinasi.
-\end{enumerate}
-
-
-% ============================================================================================
-\section{Hasil Evaluasi dengan Model Llama 3.2}
-\label{sec:hasil-llama32}
-% ============================================================================================
-
-Bagian ini menyajikan hasil evaluasi tiga konfigurasi sistem RAG yang seluruhnya
-menggunakan Llama~3.2 (3B parameter) sebagai model generatif. Penggunaan model yang
-sama pada seluruh konfigurasi memastikan bahwa perbedaan hasil semata-mata disebabkan
-oleh teknik mitigasi yang diterapkan, bukan oleh variasi kapasitas model. Rangkuman
-hasil seluruh konfigurasi disajikan pada Tabel~\ref{tbl:perbandingan-llama32}, sedangkan
-perbandingan akurasi per label disajikan pada Tabel~\ref{tbl:perlabel-llama32}.
+Tabel~\ref{tbl:retrieval-metrics} menunjukkan hasil pengukuran metrik IR pada konfigurasi BM25 dengan dan tanpa ekspansi akronim Schwartz-Hearst. Penerapan ekspansi akronim meningkatkan \textit{Recall@5} sebesar 6{,}3 poin persentase (78{,}7\% menjadi 85{,}0\%), \textit{MAP@5} sebesar 7{,}2 poin persentase (75{,}3\% menjadi 82{,}5\%), serta \textit{nDCG@5} sebesar 5{,}4 poin persentase (83{,}1\% menjadi 88{,}5\%). Peningkatan konsisten pada ketiga metrik menandakan ekspansi akronim membantu \textit{retriever} berbasis kata kunci menemukan dokumen relevan yang sebelumnya terlewat karena perbedaan bentuk istilah antara kueri dan korpus.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Hasil Evaluasi Seluruh Konfigurasi dengan Llama 3.2 (500 Sampel)}
-  \label{tbl:perbandingan-llama32}
-  \begin{tabular}{|l|c|c|c|}
-    \hline
-    \textbf{Metrik} &
-    \textbf{\textit{Baseline}} &
-    \textbf{+ \textit{QR}} &
-    \textbf{+ \textit{CR}} \\
-    \hline
-    \textit{Label Accuracy}     & \textbf{55{,}6\%} (278/500) & 50{,}0\% (250/500) & 54{,}0\% (270/500) \\
-    \hline
-    \textit{Hallucination Rate} & \textbf{44{,}4\%} (222/500) & 50{,}0\% (250/500) & 46{,}0\% (230/500) \\
-    \hline
-    \textit{Faithfulness}       & 0{,}5596 & 0{,}5381 & \textbf{0{,}5986} \\
-    \hline
-    \textit{Context Recall}     & 0{,}8222 & 0{,}7851 & \textbf{0{,}8422} \\
-    \hline
-  \end{tabular}
-  \vspace{4pt}
-
-  {\footnotesize Angka dicetak tebal menunjukkan nilai terbaik per metrik.}
+\centering
+\caption{Hasil Pengukuran Metrik IR pada Konfigurasi BM25 dengan dan tanpa Ekspansi Akronim}
+\label{tbl:retrieval-metrics}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metrik} & \textbf{Tanpa Ekspansi (\%)} & \textbf{Dengan Ekspansi (\%)} & \textbf{\textit{Delta}} \\
+\midrule
+Recall@5 & 78{,}65 & \textbf{84{,}96} & +6{,}31 \\
+MAP@5    & 75{,}32 & \textbf{82{,}47} & +7{,}15 \\
+nDCG@5   & 83{,}08 & \textbf{88{,}45} & +5{,}37 \\
+\bottomrule
+\end{tabular}
 \end{table}
+
+\subsubsection{Evaluasi Retrieval pada Seluruh Dua Belas Konfigurasi}
+\label{subsubsec:retrieval-12-konfigurasi}
+
+Untuk memahami kontribusi setiap komponen mitigasi pada tahap \textit{retrieval}, Tabel~\ref{tbl:retrieval-12-konfigurasi} memuat hasil ketiga metrik IR pada seluruh dua belas konfigurasi yang diuji. Ketiga metrik tersebut dapat dipahami secara singkat sebagai berikut.
+
+\begin{itemize}
+\item \textbf{Recall@5} mengukur seberapa lengkap sistem menemukan dokumen relevan dalam lima hasil teratas. Sebagai ilustrasi, apabila dari sepuluh dokumen relevan yang ada di korpus sistem berhasil menarik delapan di antaranya pada peringkat 1--5, maka Recall@5 sebesar 80\%.
+\item \textbf{MAP@5} (\textit{Mean Average Precision} pada lima dokumen teratas) menilai bukan hanya kehadiran dokumen relevan, tetapi juga seberapa dini mereka muncul dalam daftar. Dokumen relevan pada peringkat 1 dihargai lebih tinggi dibandingkan yang muncul pada peringkat 5.
+\item \textbf{nDCG@5} (\textit{Normalized Discounted Cumulative Gain}) merupakan ukuran gabungan yang membandingkan urutan dokumen yang dihasilkan sistem terhadap urutan ideal, kemudian dinormalisasi ke skala 0--1. Nilai mendekati 1{,}00 berarti urutan dari sistem nyaris identik dengan urutan terbaik yang mungkin.
+\end{itemize}
+
+Ketiga metrik dilaporkan dalam satuan persen agar mudah dibandingkan dan dibaca lintas konfigurasi.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Akurasi Per Label Seluruh Konfigurasi dengan Llama 3.2}
-  \label{tbl:perlabel-llama32}
-  \begin{tabular}{|l|c|c|c|c|}
-    \hline
-    \textbf{Label} & \textbf{Jumlah ($n$)} &
-    \textbf{\textit{Baseline}} &
-    \textbf{+ \textit{QR}} &
-    \textbf{+ \textit{CR}} \\
-    \hline
-    \textit{yes}   & 275 & \textbf{249/275} (90{,}5\%) & 227/275 (82{,}5\%) & 245/275 (89{,}1\%) \\
-    \hline
-    \textit{no}    & 159 & \textbf{28/159}  (17{,}6\%) & 21/159  (13{,}2\%) & 23/159  (14{,}5\%) \\
-    \hline
-    \textit{maybe} &  66 & 1/66    (1{,}5\%) & \textbf{2/66} (3{,}0\%) & \textbf{2/66} (3{,}0\%) \\
-    \hline
-  \end{tabular}
-  \vspace{4pt}
-
-  {\footnotesize Format sel: jumlah benar / jumlah sampel (persentase akurasi).}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\caption{Metrik \textit{Information Retrieval} pada Dua Belas Konfigurasi}
+\label{tbl:retrieval-12-konfigurasi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Konfigurasi} & \textbf{Recall@5 (\%)} & \textbf{MAP@5 (\%)} & \textbf{nDCG@5 (\%)} \\
+\midrule
+\multicolumn{4}{l}{\textit{Kelompok 1: BM25 tanpa Ekspansi Akronim}} \\
+\quad \textit{Baseline}      & 68{,}94 & 66{,}19 & 75{,}18 \\
+\quad + QR                   & 64{,}65 & 60{,}41 & 70{,}58 \\
+\quad + CR                   & 75{,}54 & 73{,}31 & 81{,}00 \\
+\quad + QR + CR              & 71{,}17 & 68{,}79 & 77{,}45 \\
+\midrule
+\multicolumn{4}{l}{\textit{Kelompok 2: Hybrid Retrieval tanpa Ekspansi Akronim}} \\
+\quad \textit{Baseline}      & 78{,}65 & 75{,}32 & 83{,}08 \\
+\quad + QR                   & 75{,}73 & 71{,}87 & 80{,}40 \\
+\quad + CR                   & 80{,}84 & 77{,}40 & 84{,}79 \\
+\quad + QR + CR              & 77{,}09 & 73{,}29 & 81{,}69 \\
+\midrule
+\multicolumn{4}{l}{\textit{Kelompok 3: Hybrid Retrieval dengan Ekspansi Akronim}} \\
+\quad \textit{Baseline}      & 84{,}96 & 82{,}47 & 88{,}45 \\
+\quad + QR                   & 83{,}06 & 79{,}50 & 86{,}20 \\
+\quad + CR                   & 86{,}49 & 83{,}93 & 89{,}70 \\
+\quad \textbf{+ QR + CR}     & \textbf{87{,}08} & \textbf{84{,}53} & \textbf{90{,}11} \\
+\bottomrule
+\end{tabular}
 \end{table}
 
+Tabel~\ref{tbl:retrieval-12-konfigurasi} memperlihatkan tiga pola utama yang konsisten pada ketiga metrik. Pertama, terdapat peningkatan bertahap dari kelompok ke kelompok berikutnya. Berpindah dari Kelompok 1 (BM25 saja) ke Kelompok 2 (\textit{Hybrid Retrieval}), Recall@5 meningkat rata-rata sekitar +6 hingga +10 poin persentase pada konfigurasi yang setara, sementara MAP@5 dan nDCG@5 juga ikut naik dengan magnitude yang serupa. Penambahan ekspansi akronim pada Kelompok 3 kembali menaikkan ketiga metrik dengan rata-rata sekitar +5 hingga +7 poin persentase terhadap Kelompok 2. Pola ini menunjukkan bahwa \textit{dense retrieval} dan ekspansi akronim memberi manfaat \textbf{kumulatif} terhadap kualitas \textit{retrieval}, bukan saling menggantikan.
 
-\subsection{Konfigurasi \textit{Baseline} (BM25)}
-\label{subsec:hasil-baseline-llama}
+Kedua, \textit{Context Reranking} (CR) konsisten menaikkan kualitas pemeringkatan pada ketiga kelompok. Konfigurasi +CR selalu lebih tinggi dibandingkan \textit{baseline} pada ketiga metrik, dengan kenaikan rata-rata sekitar +5 poin Recall@5 dan +6 poin MAP@5. Hal ini wajar karena CR menggunakan \textit{cross-encoder} yang membaca pasangan (kueri, dokumen) secara bersamaan, sehingga dapat memperbaiki urutan dokumen yang awalnya kurang tepat ditangani oleh \textit{retriever} cepat.
 
-Konfigurasi \textit{baseline} menerapkan BM25 sebagai \textit{retriever} tanpa teknik
-mitigasi halusinasi. Konfigurasi ini menjadi acuan utama untuk mengukur kontribusi
-setiap teknik mitigasi. Sebagaimana terlihat pada Tabel~\ref{tbl:perbandingan-llama32},
-konfigurasi ini mencapai \textit{label accuracy} tertinggi di antara seluruh konfigurasi
-Llama~3.2, yaitu 55{,}6\% (278 dari 500 sampel).
+Ketiga, \textit{Query Rewriting} (QR) sendiri tidak selalu menaikkan metrik \textit{retrieval}. Konfigurasi +QR justru sedikit lebih rendah daripada \textit{baseline} pada ketiga kelompok (misalnya pada Kelompok 1, Recall@5 turun dari 68{,}94\% menjadi 64{,}65\%). Penurunan tersebut dapat dijelaskan karena tulis-ulang kueri mengubah formulasi pertanyaan sehingga sebagian kata kunci yang sebelumnya berhasil dicocokkan oleh BM25 menjadi tergeser. Namun ketika QR digabung dengan CR (konfigurasi +QR+CR), penurunan tersebut diperbaiki kembali oleh CR yang menyaring ulang ranking akhir, dan pada Kelompok 3 kombinasi keduanya bahkan melampaui konfigurasi +CR saja pada seluruh metrik.
 
-Meskipun demikian, terdapat disparitas akurasi yang sangat besar antar label
-(Tabel~\ref{tbl:perlabel-llama32}). Sistem mampu menjawab pertanyaan berlabel
-\textit{yes} dengan akurasi 90{,}5\% (249 dari 275), namun akurasi turun drastis pada
-label \textit{no} yang hanya benar 28 dari 159 sampel (17{,}6\%), dan label
-\textit{maybe} yang hanya benar 1 dari 66 sampel (1{,}5\%). Pola ini mengindikasikan
-adanya bias prediksi yang kuat ke arah label \textit{yes}: dari 500 sampel, sebanyak
-431 (86\%) diprediksi sebagai \textit{yes}, sedangkan hanya 50 (10\%) diprediksi
-sebagai \textit{no} dan 19 (4\%) diprediksi sebagai \textit{maybe}.
+Konfigurasi terbaik adalah \textbf{Kelompok 3 dengan QR dan CR} yang menghasilkan Recall@5 sebesar 87{,}08\%, MAP@5 sebesar 84{,}53\%, dan nDCG@5 sebesar 90{,}11\%. Bila dibandingkan dengan \textit{baseline} paling sederhana pada Kelompok 1 (BM25 saja, tanpa ekspansi akronim dan tanpa mitigasi tambahan), kombinasi penuh empat komponen sistem memberi peningkatan total sekitar +18 poin Recall@5, +18 poin MAP@5, dan +15 poin nDCG@5. Peningkatan pada metrik IR ini selanjutnya berkorelasi dengan peningkatan \textit{Label Accuracy} pada Tabel~\ref{tbl:progressive-accuracy} dan peningkatan \textit{faithfulness} pada Tabel~\ref{tbl:efek-sh}, yang dibahas pada subbab-subbab berikutnya.
 
-Nilai \textit{context recall} sebesar 0{,}8222 menunjukkan bahwa BM25 berhasil menemukan
-sebagian besar informasi yang diperlukan, sementara nilai \textit{faithfulness} sebesar
-0{,}5596 mengindikasikan bahwa sekitar setengah dari pernyataan dalam jawaban LLM tidak
-sepenuhnya didukung oleh konteks yang diberikan.
+\subsection{Perbandingan BM25 dan Hybrid Retrieval}
+\label{subsec:bm25-vs-hybrid}
 
-
-\subsection{Konfigurasi \textit{Baseline} + \textit{Query Rewriting}}
-\label{subsec:hasil-qr-llama}
-
-Konfigurasi ini menambahkan komponen \textit{query rewriting} pada konfigurasi
-\textit{baseline}. Sebelum proses \textit{retrieval}, pertanyaan asli diformulasikan
-ulang oleh LLM untuk menambahkan terminologi medis yang lebih spesifik dan memperluas
-singkatan. Kueri hasil reformulasi digunakan untuk pencarian BM25, sedangkan pertanyaan
-asli tetap digunakan pada tahap generasi jawaban.
-
-Sebagaimana terlihat pada Tabel~\ref{tbl:perbandingan-llama32}, \textit{query rewriting}
-justru menurunkan seluruh metrik dibandingkan \textit{baseline}. \textit{Label accuracy}
-turun 5{,}6\% menjadi 50{,}0\% (250 dari 500), disertai penurunan \textit{faithfulness}
-($-$0{,}022) dan \textit{context recall} ($-$0{,}037). Tabel~\ref{tbl:perlabel-llama32}
-memperlihatkan bahwa penurunan terjadi pada label \textit{yes} (dari 249/275 menjadi
-227/275, turun 8{,}0\%) dan label \textit{no} (dari 28/159 menjadi 21/159, turun 4{,}4\%).
-Peningkatan kecil hanya terjadi pada label \textit{maybe} (dari 1/66 menjadi 2/66, naik
-1{,}5\%). Analisis lebih lanjut mengenai penyebab penurunan ini dibahas pada
-Subbab~\ref{subsec:pembahasan-qr}.
-
-
-\subsection{Konfigurasi \textit{Baseline} + \textit{Context Reranking}}
-\label{subsec:hasil-cr-llama}
-
-Konfigurasi ini menambahkan komponen \textit{context reranking} menggunakan model
-\textit{cross-encoder} (ms-marco-MiniLM-L-6-v2) pada konfigurasi \textit{baseline}.
-Proses \textit{retrieval} dilakukan dalam dua tahap: BM25 terlebih dahulu mengambil
-20 dokumen kandidat, kemudian \textit{cross-encoder} menilai relevansi semantik setiap
-pasangan kueri-dokumen dan memilih 5 dokumen dengan skor tertinggi.
-
-Berdasarkan Tabel~\ref{tbl:perbandingan-llama32}, konfigurasi ini menunjukkan hasil
-yang lebih baik dibandingkan \textit{query rewriting}. Meskipun \textit{label accuracy}
-sedikit menurun sebesar 1{,}6\% menjadi 54{,}0\% (270 dari 500), nilai \textit{faithfulness}
-meningkat sebesar $+$0{,}039 menjadi 0{,}5986 (tertinggi di antara seluruh konfigurasi
-Llama~3.2) dan \textit{context recall} meningkat sebesar $+$0{,}020 menjadi 0{,}8422.
-Peningkatan \textit{faithfulness} mengindikasikan bahwa konteks hasil \textit{reranking}
-lebih mendukung pernyataan dalam jawaban LLM. Analisis lebih lanjut disajikan pada
-Subbab~\ref{subsec:pembahasan-cr}.
-
-
-\subsection{Ringkasan Temuan Llama 3.2}
-\label{subsec:ringkasan-llama32}
-
-Dari Tabel~\ref{tbl:perbandingan-llama32} dan Tabel~\ref{tbl:perlabel-llama32} dapat
-disimpulkan bahwa kedua teknik mitigasi belum berhasil meningkatkan \textit{label accuracy}
-di atas \textit{baseline}. \textit{Query rewriting} menurunkan akurasi secara signifikan,
-sedangkan \textit{context reranking} menunjukkan potensi pada dimensi \textit{faithfulness}
-dan \textit{context recall}. Seluruh konfigurasi menunjukkan pola bias yang konsisten:
-akurasi tinggi pada label \textit{yes} (82\% hingga 90\%), akurasi rendah pada label
-\textit{no} (13\% hingga 17\%), dan akurasi sangat rendah pada label \textit{maybe}
-(1\% hingga 3\%). Pola ini mengindikasikan bahwa permasalahan utama terletak pada bias
-model LLM, bukan pada teknik \textit{retrieval}.
-
-
-% ============================================================================================
-\section{Hasil Evaluasi dengan Model GPT-4.1-mini}
-\label{sec:hasil-openai}
-% ============================================================================================
-
-Untuk menganalisis pengaruh kapasitas model terhadap kualitas jawaban, seluruh tiga
-konfigurasi juga dievaluasi menggunakan GPT-4.1-mini yang diakses melalui OpenAI API,
-ditambah satu konfigurasi baru berupa kombinasi QR dan CR (\textit{Combined}).
-Komponen selain model LLM dibuat identik dengan konfigurasi yang setara pada
-Llama~3.2, yaitu menggunakan BM25 sebagai \textit{retriever}, \textit{prompt}
-generasi yang sama, dan evaluator kustom yang sama. Pada evaluasi ini, empat metrik
-kualitas jawaban dihitung secara lengkap. Rangkuman hasil disajikan pada
-Tabel~\ref{tbl:perbandingan-openai}, sedangkan perbandingan akurasi per label
-disajikan pada Tabel~\ref{tbl:perlabel-openai}.
+Temuan pertama mengevaluasi kontribusi penambahan \textit{dense retrieval} di atas BM25 pada akurasi jawaban akhir. Pengujian dilakukan pada model GPT-4.1-mini dengan empat konfigurasi mitigasi (\textit{baseline}, +QR, +CR, +QR+CR). Tabel~\ref{tbl:bm25-vs-hybrid} dan Gambar~\ref{fig:bm25-vs-hybrid} menyajikan hasil perbandingan akurasi label.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Hasil Evaluasi Seluruh Konfigurasi dengan GPT-4.1-mini (500 Sampel)}
-  \label{tbl:perbandingan-openai}
-  \begin{tabular}{|l|c|c|c|c|}
-    \hline
-    \textbf{Metrik} &
-    \textbf{\textit{Baseline}} &
-    \textbf{+ \textit{QR}} &
-    \textbf{+ \textit{CR}} &
-    \textbf{QR+CR} \\
-    \hline
-    \textit{Label Accuracy}     & 65{,}4\% & 65{,}4\% & \textbf{68{,}4\%} & 68{,}2\% \\
-    \hline
-    & (327/500) & (327/500) & (342/500) & (341/500) \\
-    \hline
-    \textit{Halluc. Rate}       & 34{,}6\% & 34{,}6\% & \textbf{31{,}6\%} & 31{,}8\% \\
-    \hline
-    \textit{Faithfulness}       & 0{,}8933 & 0{,}8958 & \textbf{0{,}8980} & 0{,}8102 \\
-    \hline
-    \textit{Context Recall}     & 0{,}7914 & 0{,}7819 & \textbf{0{,}8203} & 0{,}7373 \\
-    \hline
-    \textit{Answer Relevancy}   & 0{,}9709 & 0{,}9714 & \textbf{0{,}9753} & 0{,}8963 \\
-    \hline
-    \textit{Context Precision}  & 0{,}6983 & 0{,}6696 & \textbf{0{,}7306} & 0{,}6758 \\
-    \hline
-  \end{tabular}
-  \vspace{4pt}
-
-  {\footnotesize QR+CR = kombinasi \textit{Query Rewriting} dan \textit{Context Reranking}.
-   Angka dicetak tebal menunjukkan nilai terbaik per metrik.}
+\centering
+\caption{Perbandingan Label Accuracy antara BM25 dan Hybrid pada GPT-4.1-mini}
+\label{tbl:bm25-vs-hybrid}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Konfigurasi} & \textbf{BM25 (\%)} & \textbf{Hybrid (\%)} & \textbf{\textit{Delta}} \\
+\midrule
+\textit{Baseline}   & 65{,}4 & \textbf{69{,}2} & +3{,}8 \\
++ QR                & 65{,}4 & \textbf{70{,}8} & +5{,}4 \\
++ CR                & 68{,}4 & \textbf{69{,}8} & +1{,}4 \\
++ QR + CR           & 68{,}2 & \textbf{70{,}0} & +1{,}8 \\
+\bottomrule
+\end{tabular}
 \end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.05\textwidth]{image/F1_bm25_vs_hybrid_accuracy.png}
+  \caption{Perbandingan akurasi label antara BM25 saja dengan \textit{Hybrid Retrieval} pada GPT-4.1-mini}
+  \label{fig:bm25-vs-hybrid}
+\end{figure}
+
+Hasil pada Tabel~\ref{tbl:bm25-vs-hybrid} menunjukkan bahwa \textit{Hybrid Retrieval} secara konsisten lebih unggul dibandingkan BM25 saja pada seluruh empat konfigurasi mitigasi yang diuji. Tidak ada satu pun konfigurasi di mana BM25 mengungguli \textit{Hybrid}. Peningkatan berkisar dari +1{,}4 hingga +5{,}4 poin persentase, dengan akurasi tertinggi pada setiap konfigurasi selalu dicapai oleh mode \textit{Hybrid}.
+
+Keunggulan \textit{Hybrid} dapat dipahami dari cara kerja kedua \textit{retriever}. BM25 hanya melakukan pencocokan kata secara eksak, sehingga apabila pengguna memakai kata yang berbeda dari yang ada di dokumen, dokumen relevan dapat terlewat meskipun maknanya sama. Sebagai contoh, kueri yang menyebut ``heart attack'' tidak akan dicocokkan oleh BM25 dengan dokumen yang menggunakan istilah ``myocardial infarction'', padahal keduanya merujuk pada kondisi yang sama. \textit{Hybrid Retrieval} mengatasi kelemahan ini dengan menambahkan \textit{dense retriever} yang membandingkan kueri dan dokumen berdasarkan makna, bukan kemunculan kata, sehingga sinonim, parafrase, dan istilah yang berkaitan secara semantik tetap dapat ditemukan.
+
+Peningkatan paling besar terjadi pada konfigurasi +QR (+5{,}4 poin). Hal ini menegaskan bahwa \textit{Query Rewriting} dan \textit{dense retriever} bekerja saling melengkapi: kueri hasil tulis-ulang sering kali memuat istilah medis atau parafrase yang berbeda dari kueri asli, dan \textit{dense retriever} mampu memetakan istilah-istilah baru tersebut ke dokumen yang relevan, sementara BM25 yang bergantung pada kecocokan kata dapat justru kehilangan dokumen yang sebelumnya ditemukan. Pada konfigurasi yang sudah memakai CR (+CR dan +QR+CR), selisih memang lebih kecil (+1{,}4 dan +1{,}8 poin), namun \textit{Hybrid} tetap mempertahankan keunggulannya. Hal ini menunjukkan bahwa keuntungan dari \textit{dense retriever} bersifat tahan banting: bahkan ketika CR sudah memperbaiki urutan dokumen di lapisan akhir, kandidat dokumen yang lebih baik yang diberikan oleh \textit{Hybrid} di lapisan sebelumnya tetap berpengaruh pada akurasi jawaban akhir.
+
+Temuan ini memberi dua kesimpulan utama. Pertama, kombinasi pencocokan kata (BM25) dan pencocokan makna (\textit{dense}) menghasilkan \textit{retrieval} yang lebih kuat dibandingkan masing-masing pendekatan secara terpisah, karena kedua sinyal saling menutupi kelemahan satu sama lain. Kedua, keunggulan \textit{Hybrid Retrieval} tetap konsisten pada keempat konfigurasi, baik tanpa mitigasi tambahan maupun saat dipadukan dengan \textit{Query Rewriting} dan \textit{Context Reranking}. Temuan ini memvalidasi keputusan rancangan pada Bab~\ref{chap:perancangan} untuk menjadikan \textit{Hybrid Retrieval} sebagai dasar seluruh konfigurasi utama pada eksperimen lintas-model dan lintas-mitigasi yang dibahas pada subbab-subbab berikutnya.
+
+\subsection{Pengaruh Ekspansi Akronim Schwartz-Hearst}
+\label{subsec:efek-sh}
+
+Temuan kedua mengevaluasi pengaruh praproses ekspansi akronim terhadap kualitas jawaban akhir pada konfigurasi \textit{Hybrid}. Tabel~\ref{tbl:efek-sh} membandingkan empat konfigurasi mitigasi dengan dan tanpa ekspansi akronim pada GPT-4.1-mini.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Akurasi Per Label Seluruh Konfigurasi dengan GPT-4.1-mini}
-  \label{tbl:perlabel-openai}
-  \begin{tabular}{|l|c|c|c|c|c|}
-    \hline
-    \textbf{Label} & \textbf{$n$} &
-    \textbf{\textit{Baseline}} &
-    \textbf{+ \textit{QR}} &
-    \textbf{+ \textit{CR}} &
-    \textbf{QR+CR} \\
-    \hline
-    \textit{yes}   & 275 & 229/275 (83{,}3\%) & 222/275 (80{,}7\%) & \textbf{238/275} (86{,}5\%) & 228/275 (82{,}9\%) \\
-    \hline
-    \textit{no}    & 159 & 93/159  (58{,}5\%) & 96/159  (60{,}4\%) & 101/159 (63{,}5\%) & \textbf{106/159} (66{,}7\%) \\
-    \hline
-    \textit{maybe} &  66 & 5/66    (7{,}6\%) & \textbf{9/66} (13{,}6\%) & 3/66 (4{,}5\%) & 7/66 (10{,}6\%) \\
-    \hline
-  \end{tabular}
-  \vspace{4pt}
-
-  {\footnotesize Format sel: jumlah benar / jumlah sampel (persentase akurasi).
-   Angka dicetak tebal menunjukkan nilai terbaik per label.}
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{Pengaruh Ekspansi Akronim terhadap Label Accuracy dan \textit{Faithfulness} pada Konfigurasi \textit{Hybrid} dengan GPT-4.1-mini}
+\label{tbl:efek-sh}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{Accuracy (\%)}} & \multicolumn{2}{c}{\textbf{Faithfulness}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\textbf{Konfigurasi} & Tanpa Ekspansi & Dengan Ekspansi & Tanpa Ekspansi & Dengan Ekspansi \\
+\midrule
+\textit{Baseline} & 69{,}2 & \textbf{73{,}2} & 0{,}893 & \textbf{0{,}988} \\
++ QR              & 70{,}8 & \textbf{73{,}0} & 0{,}896 & \textbf{0{,}979} \\
++ CR              & 69{,}8 & \textbf{73{,}4} & 0{,}898 & \textbf{0{,}987} \\
++ QR + CR         & 70{,}0 & \textbf{74{,}8} & 0{,}810 & \textbf{0{,}980} \\
+\bottomrule
+\end{tabular}
 \end{table}
 
+Penerapan ekspansi akronim menaikkan \textit{Label Accuracy} sebesar +2{,}2 sampai +4{,}8 poin persentase pada keempat konfigurasi, dengan peningkatan terbesar pada konfigurasi gabungan +QR+CR (+4{,}8 poin). Lebih signifikan lagi, \textit{faithfulness} naik secara substansial pada seluruh konfigurasi (rata-rata sekitar +9 poin persentase), menandakan jawaban yang dihasilkan sistem lebih konsisten dengan konteks dokumen ketika kepanjangan akronim tersedia secara eksplisit di setiap \textit{chunk}. Hasil ini sejalan dengan peningkatan metrik IR pada Tabel~\ref{tbl:retrieval-metrics} dan menegaskan bahwa ekspansi akronim memberi manfaat ganda, yaitu memperbaiki kualitas \textit{retrieval} sekaligus mengurangi halusinasi pada tahap \textit{generation}.
 
-\subsection{Konfigurasi \textit{Baseline} dengan GPT-4.1-mini}
-\label{subsec:hasil-baseline-openai}
+\subsection{Peningkatan Akurasi Bertingkat pada Dua Belas Konfigurasi}
+\label{subsec:progressive-accuracy}
 
-Konfigurasi \textit{baseline} GPT-4.1-mini menggunakan BM25 ($k=5$) tanpa teknik mitigasi
-tambahan. Hasil evaluasi menunjukkan peningkatan yang substansial dibandingkan
-\textit{baseline} Llama~3.2. \textit{Label accuracy} meningkat sebesar $+$9{,}8\% (dari
-55{,}6\% menjadi 65{,}4\%, atau dari 278/500 menjadi 327/500), dan \textit{faithfulness}
-meningkat sangat signifikan sebesar $+$0{,}334 (dari 0{,}5596 menjadi 0{,}8933).
-Peningkatan \textit{faithfulness} ini menunjukkan bahwa GPT-4.1-mini menghasilkan
-jawaban yang jauh lebih konsisten dengan konteks yang diberikan: 89{,}3\% pernyataan
-dalam jawaban didukung oleh konteks, dibandingkan hanya 56{,}0\% pada Llama~3.2.
-
-Tabel~\ref{tbl:perlabel-openai} menunjukkan peningkatan paling signifikan pada akurasi
-label \textit{no} yang melonjak dari 28/159 (17{,}6\%) menjadi 93/159 (58{,}5\%),
-yaitu peningkatan sebesar 40{,}9\%. Temuan ini mengindikasikan bahwa GPT-4.1-mini
-memiliki kemampuan penalaran negatif yang jauh lebih baik, yaitu kemampuan untuk
-menyimpulkan bahwa bukti dalam konteks tidak mendukung hipotesis yang diajukan.
-
-
-\subsection{Konfigurasi \textit{Baseline} + \textit{Query Rewriting} dengan GPT-4.1-mini}
-\label{subsec:hasil-qr-openai}
-
-Pada model GPT-4.1-mini, \textit{query rewriting} tidak menunjukkan perbaikan maupun
-penurunan yang signifikan pada \textit{label accuracy} (tetap 65{,}4\% atau 327/500,
-identik dengan \textit{baseline}). Nilai \textit{faithfulness} mengalami peningkatan
-kecil sebesar $+$0{,}003 menjadi 0{,}8958, sedangkan \textit{context recall} sedikit
-menurun sebesar $-$0{,}010 menjadi 0{,}7819.
-
-Menariknya, distribusi prediksi per label mengalami pergeseran: akurasi label
-\textit{maybe} meningkat dari 5/66 menjadi 9/66 (dari 7{,}6\% menjadi 13{,}6\%), dan
-akurasi label \textit{no} sedikit meningkat dari 93/159 menjadi 96/159 (dari 58{,}5\%
-menjadi 60{,}4\%). Peningkatan ini dikompensasi oleh penurunan akurasi label \textit{yes}
-dari 229/275 menjadi 222/275 (dari 83{,}3\% menjadi 80{,}7\%). Hasilnya, total jumlah
-prediksi benar tetap sama meskipun distribusi kesalahan bergeser.
-
-
-\subsection{Konfigurasi \textit{Baseline} + \textit{Context Reranking} dengan GPT-4.1-mini}
-\label{subsec:hasil-cr-openai}
-
-Konfigurasi \textit{context reranking} pada GPT-4.1-mini menghasilkan peningkatan yang
-konsisten pada seluruh metrik. \textit{Label accuracy} meningkat sebesar $+$3{,}0\%
-menjadi 68{,}4\% (342 dari 500), nilai tertinggi di antara seluruh konfigurasi pada
-penelitian ini. \textit{Faithfulness} meningkat menjadi 0{,}8980, \textit{context recall}
-menjadi 0{,}8203, \textit{answer relevancy} menjadi 0{,}9753, dan \textit{context precision}
-menjadi 0{,}7306.
-
-Berdasarkan Tabel~\ref{tbl:perlabel-openai}, konfigurasi ini mencatatkan peningkatan
-akurasi pada label \textit{yes} (dari 229/275 menjadi 238/275) dan label \textit{no}
-(dari 93/159 menjadi 101/159). Akurasi label \textit{maybe} menurun dari 5/66 menjadi
-3/66, namun peningkatan pada dua label lainnya menghasilkan perbaikan akurasi
-keseluruhan yang signifikan.
-
-
-\subsection{Konfigurasi Kombinasi QR + CR dengan GPT-4.1-mini}
-\label{subsec:hasil-combined-openai}
-
-Konfigurasi ini menggabungkan dua teknik mitigasi secara berurutan. Pertama, pertanyaan
-asli diformulasikan ulang oleh LLM (QR). Kueri hasil reformulasi kemudian digunakan
-untuk mengambil 20 dokumen kandidat melalui BM25, yang selanjutnya diurutkan ulang oleh
-\textit{cross-encoder} untuk memilih 5 dokumen terbaik (CR). Tahap generasi tetap
-menggunakan pertanyaan asli dengan konteks hasil \textit{reranking}.
-
-Hasil evaluasi pada Tabel~\ref{tbl:perbandingan-openai} menunjukkan temuan yang menarik.
-Dari segi \textit{label accuracy}, konfigurasi QR + CR mencapai 68{,}2\% (341 dari 500),
-hampir identik dengan CR saja (68{,}4\%), namun masih tertinggal sangat tipis sebesar
-0{,}2\%. Artinya, penambahan QR di atas CR tidak memberikan peningkatan akurasi.
-
-Namun pada dimensi distribusi prediksi per label, konfigurasi QR + CR justru menunjukkan
-pola paling seimbang (Tabel~\ref{tbl:perlabel-openai}). Akurasi label \textit{no}
-mencapai nilai tertinggi di antara seluruh konfigurasi, yaitu 106/159 (66{,}7\%),
-mengungguli CR saja yang memperoleh 101/159 (63{,}5\%). Akurasi label \textit{maybe}
-juga lebih tinggi (7/66 atau 10{,}6\% vs 3/66 atau 4{,}5\% pada CR). Peningkatan ini
-dibayar dengan penurunan akurasi label \textit{yes} dari 238/275 menjadi 228/275 (dari
-86{,}5\% menjadi 82{,}9\%).
-
-Pola yang paling mengejutkan terlihat pada empat metrik kualitas jawaban. Seluruh
-metrik RAGAS justru menurun dibandingkan CR saja: \textit{faithfulness} turun dari
-0{,}8980 menjadi 0{,}8102 ($-$0{,}088), \textit{context recall} turun dari 0{,}8203
-menjadi 0{,}7373 ($-$0{,}083), \textit{answer relevancy} turun dari 0{,}9753 menjadi
-0{,}8963 ($-$0{,}079), dan \textit{context precision} turun dari 0{,}7306 menjadi
-0{,}6758 ($-$0{,}055). Penurunan ini menunjukkan bahwa penambahan QR di depan CR masih
-membawa dampak \textit{semantic drift} (konsisten dengan temuan pada Llama 3.2),
-meskipun \textit{reranking} berhasil mengompensasi penurunan akurasi label dengan
-memilih konteks terbaik dari kandidat yang di-\textit{retrieve}. Analisis lebih
-lanjut disajikan pada Subbab~\ref{subsec:pembahasan-combined}.
-
-
-\subsection{Ringkasan Temuan GPT-4.1-mini}
-\label{subsec:ringkasan-openai}
-
-Berbeda dengan hasil pada Llama~3.2, teknik \textit{context reranking} memberikan
-kontribusi positif yang konsisten pada GPT-4.1-mini. \textit{Query rewriting} secara
-mandiri tidak memberikan peningkatan akurasi keseluruhan, namun menggeser distribusi
-prediksi ke arah yang lebih seimbang. Konfigurasi CR saja memperoleh nilai tertinggi
-pada lima dari enam metrik, sementara konfigurasi QR + CR menghasilkan distribusi
-prediksi paling seimbang (akurasi \textit{no} tertinggi) tetapi dengan \textit{trade-off}
-berupa penurunan pada seluruh metrik kualitas jawaban.
-
-
-% ============================================================================================
-\section{Perbandingan Menyeluruh}
-\label{sec:perbandingan-menyeluruh}
-% ============================================================================================
-
-Bagian ini menyajikan perbandingan menyeluruh antara tujuh konfigurasi yang telah diuji
-untuk memudahkan analisis lintas model. Tabel~\ref{tbl:perbandingan-semua} merangkum
-seluruh metrik kualitas jawaban, sedangkan Tabel~\ref{tbl:perlabel-semua} merangkum
-akurasi per label.
+Subbab ini merangkum perbandingan akurasi pada seluruh dua belas konfigurasi yang dievaluasi pada GPT-4.1-mini, mulai dari konfigurasi paling sederhana (BM25 tanpa ekspansi akronim) hingga konfigurasi paling lengkap (\textit{Hybrid Retrieval} dengan ekspansi akronim, \textit{Query Rewriting}, dan \textit{Context Reranking}). Tabel~\ref{tbl:progressive-accuracy} disusun mengikuti tiga kelompok pada Tabel~\ref{tbl:ringkasan-konfigurasi} di Bab~\ref{chap:perancangan} agar pembaca dapat melihat kontribusi setiap komponen secara bertahap.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Hasil Evaluasi Seluruh Konfigurasi (500 Sampel)}
-  \label{tbl:perbandingan-semua}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{|l|c|c|c|c|c|c|c|}
-    \hline
-    \textbf{Metrik} &
-    \multicolumn{3}{c|}{\textbf{Llama 3.2 (3B)}} &
-    \multicolumn{4}{c|}{\textbf{GPT-4.1-mini}} \\
-    \cline{2-8}
-    &
-    \textbf{BL} & \textbf{+QR} & \textbf{+CR} &
-    \textbf{BL} & \textbf{+QR} & \textbf{+CR} & \textbf{QR+CR} \\
-    \hline
-    \textit{Label Accuracy}     & 55{,}6\% & 50{,}0\% & 54{,}0\% & 65{,}4\% & 65{,}4\% & \textbf{68{,}4\%} & 68{,}2\% \\
-    \hline
-    \textit{Halluc. Rate}       & 44{,}4\% & 50{,}0\% & 46{,}0\% & 34{,}6\% & 34{,}6\% & \textbf{31{,}6\%} & 31{,}8\% \\
-    \hline
-    \textit{Faithfulness}       & 0{,}5596 & 0{,}5381 & 0{,}5986 & 0{,}8933 & 0{,}8958 & \textbf{0{,}8980} & 0{,}8102 \\
-    \hline
-    \textit{Context Recall}     & 0{,}8222 & 0{,}7851 & \textbf{0{,}8422} & 0{,}7914 & 0{,}7819 & 0{,}8203 & 0{,}7373 \\
-    \hline
-    \textit{Answer Relevancy}   & --- & --- & --- & 0{,}9709 & 0{,}9714 & \textbf{0{,}9753} & 0{,}8963 \\
-    \hline
-    \textit{Context Precision}  & --- & --- & --- & 0{,}6983 & 0{,}6696 & \textbf{0{,}7306} & 0{,}6758 \\
-    \hline
-  \end{tabular}%
-  }
-  \vspace{4pt}
-
-  {\footnotesize BL = \textit{Baseline}; QR = \textit{Query Rewriting}; CR = \textit{Context Reranking};
-   QR+CR = kombinasi QR dan CR.
-   Angka dicetak tebal menunjukkan nilai terbaik per metrik.
-   Tanda ``---'' menunjukkan metrik tidak dihitung pada konfigurasi tersebut.}
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{Peningkatan \textit{Accuracy} \textit{Across} Konfigurasi}
+\label{tbl:progressive-accuracy}
+\begin{tabular}{p{10.5cm}c}
+\toprule
+\textbf{Konfigurasi} & \textbf{Accuracy (\%)} \\
+\midrule
+\textit{Baseline} BM25 (tanpa Ekspansi Akronim)                                    & 65{,}4 \\
+BM25 + \textit{Query Rewriting} (tanpa Ekspansi Akronim)                           & 65{,}4 \\
+BM25 + \textit{Context Reranking} (tanpa Ekspansi Akronim)                         & 68{,}4 \\
+BM25 + \textit{Query Rewriting} + \textit{Context Reranking} (tanpa Ekspansi Akronim) & 68{,}2 \\
+\midrule
+\textit{Baseline} \textit{Hybrid Retrieval} (tanpa Ekspansi Akronim)               & 69{,}2 \\
+\textit{Hybrid} + \textit{Query Rewriting} (tanpa Ekspansi Akronim)                & 70{,}8 \\
+\textit{Hybrid} + \textit{Context Reranking} (tanpa Ekspansi Akronim)              & 69{,}8 \\
+\textit{Hybrid} + \textit{Query Rewriting} + \textit{Context Reranking} (tanpa Ekspansi Akronim) & 70{,}0 \\
+\midrule
+\textit{Baseline} \textit{Hybrid Retrieval} (dengan Ekspansi Akronim)              & 73{,}2 \\
+\textit{Hybrid} + \textit{Query Rewriting} (dengan Ekspansi Akronim)               & 73{,}0 \\
+\textit{Hybrid} + \textit{Context Reranking} (dengan Ekspansi Akronim)             & 73{,}4 \\
+\textbf{\textit{Hybrid} + \textit{Query Rewriting} + \textit{Context Reranking} (dengan Ekspansi Akronim)} & \textbf{74{,}8} \\
+\bottomrule
+\end{tabular}
 \end{table}
+
+Tabel~\ref{tbl:progressive-accuracy} memperlihatkan tren peningkatan akurasi yang konsisten dari satu kelompok ke kelompok berikutnya. Pada kelompok pertama yang hanya memakai BM25 tanpa ekspansi akronim, akurasi berkisar antara 65{,}4\% hingga 68{,}4\%, dengan kontribusi terbesar dari \textit{Context Reranking}. Penambahan \textit{dense retrieval} di atas BM25 pada kelompok kedua menaikkan akurasi seluruh konfigurasi menjadi rentang 69{,}2\%--70{,}8\%, dengan peningkatan rata-rata sekitar +3{,}3 poin persentase terhadap kelompok pertama. Penerapan ekspansi akronim pada kelompok ketiga kembali menaikkan akurasi menjadi 73{,}0\%--74{,}8\%, dengan tambahan rata-rata sekitar +3{,}5 poin persentase terhadap kelompok kedua. Konfigurasi terbaik adalah kombinasi \textit{Hybrid Retrieval}, ekspansi akronim, \textit{Query Rewriting}, dan \textit{Context Reranking} dengan \textit{accuracy} sebesar 74{,}8\%, yang merupakan peningkatan total +9{,}4 poin persentase dari titik awal BM25 \textit{baseline}.
+
+\subsection{Hallucination Rate pada Dua Belas Konfigurasi}
+\label{subsec:hallucination-rate}
+
+Karena tujuan utama tugas akhir ini adalah mitigasi halusinasi, hasil pada Tabel~\ref{tbl:progressive-accuracy} dilengkapi dengan \textit{hallucination rate} yang disajikan pada Tabel~\ref{tbl:hallucination-rate}. Penyajian dalam bentuk \textit{hallucination rate} bertujuan agar dampak mitigasi terlihat lebih jelas, yaitu sebagai penurunan yang konsisten dari konfigurasi paling sederhana ke konfigurasi paling lengkap.
 
 \begin{table}[H]
-  \centering
-  \caption{Perbandingan Akurasi Per Label Seluruh Konfigurasi (Jumlah Prediksi Benar)}
-  \label{tbl:perlabel-semua}
-  \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
-    \hline
-    \textbf{Label} & \textbf{$n$} &
-    \multicolumn{3}{c|}{\textbf{Llama 3.2}} &
-    \multicolumn{4}{c|}{\textbf{GPT-4.1-mini}} \\
-    \cline{3-9}
-    & &
-    \textbf{BL} & \textbf{+QR} & \textbf{+CR} &
-    \textbf{BL} & \textbf{+QR} & \textbf{+CR} & \textbf{QR+CR} \\
-    \hline
-    \textit{yes} & 275 & 249 & 227 & 245 & 229 & 222 & \textbf{238} & 228 \\
-    \hline
-    \textit{no}  & 159 &  28 &  21 &  23 &  93 &  96 & 101 & \textbf{106} \\
-    \hline
-    \textit{maybe} & 66 & 1 & 2 & 2 & 5 & \textbf{9} & 3 & 7 \\
-    \hline
-  \end{tabular}
-  \vspace{4pt}
-
-  {\footnotesize Setiap sel menunjukkan jumlah prediksi benar dari total sampel label tersebut.
-   Angka dicetak tebal menunjukkan nilai terbaik per label.}
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{\textit{Hallucination Rate} \textit{Across} Konfigurasi}
+\label{tbl:hallucination-rate}
+\begin{tabular}{p{10.5cm}c}
+\toprule
+\textbf{Konfigurasi} & \textbf{Hallucination Rate (\%)} \\
+\midrule
+\textit{Baseline} BM25 (tanpa Ekspansi Akronim)                                    & 34{,}6 \\
+BM25 + \textit{Query Rewriting} (tanpa Ekspansi Akronim)                           & 34{,}6 \\
+BM25 + \textit{Context Reranking} (tanpa Ekspansi Akronim)                         & 31{,}6 \\
+BM25 + \textit{Query Rewriting} + \textit{Context Reranking} (tanpa Ekspansi Akronim) & 31{,}8 \\
+\midrule
+\textit{Baseline} \textit{Hybrid Retrieval} (tanpa Ekspansi Akronim)               & 30{,}8 \\
+\textit{Hybrid} + \textit{Query Rewriting} (tanpa Ekspansi Akronim)                & 29{,}2 \\
+\textit{Hybrid} + \textit{Context Reranking} (tanpa Ekspansi Akronim)              & 30{,}2 \\
+\textit{Hybrid} + \textit{Query Rewriting} + \textit{Context Reranking} (tanpa Ekspansi Akronim) & 30{,}0 \\
+\midrule
+\textit{Baseline} \textit{Hybrid Retrieval} (dengan Ekspansi Akronim)              & 26{,}8 \\
+\textit{Hybrid} + \textit{Query Rewriting} (dengan Ekspansi Akronim)               & 27{,}0 \\
+\textit{Hybrid} + \textit{Context Reranking} (dengan Ekspansi Akronim)             & 26{,}6 \\
+\textbf{\textit{Hybrid} + \textit{Query Rewriting} + \textit{Context Reranking} (dengan Ekspansi Akronim)} & \textbf{25{,}2} \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-Dari Tabel~\ref{tbl:perbandingan-semua} terlihat bahwa konfigurasi CR dengan GPT-4.1-mini
-memperoleh nilai terbaik pada lima dari enam metrik, dengan satu-satunya pengecualian
-adalah \textit{context recall} yang unggul pada konfigurasi CR Llama~3.2 (0{,}8422 vs
-0{,}8203). Perbedaan \textit{context recall} ini dapat dijelaskan oleh fakta bahwa
-evaluator yang berbeda (Llama~3.2 vs GPT-4.1-mini) memberikan penilaian yang sedikit
-berbeda terhadap cakupan konteks. Pada metrik utama \textit{label accuracy}, konfigurasi
-terbaik (CR GPT-4.1-mini) mencapai 68{,}4\% (342/500), unggul 12{,}8\% dibandingkan
-\textit{baseline} Llama~3.2 dan 3{,}0\% dibandingkan \textit{baseline} GPT-4.1-mini.
+Analisis lanjutan mengenai kontribusi teknik QR dan CR pada berbagai pilihan LLM, serta perbandingan kinerja model \textit{open-source} lokal Llama 3.2 3B dengan model berbayar berskala besar, disajikan secara lengkap pada Lampiran~\ref{lamp:evaluasi-lintas-model}. Secara ringkas, analisis tersebut menunjukkan bahwa \textit{Context Reranking} memberi peningkatan yang relatif stabil di seluruh model, sedangkan kontribusi \textit{Query Rewriting} bervariasi mengikuti karakteristik tiap LLM, dan model berskala besar secara konsisten mengungguli model kecil pada tugas tanya jawab biomedis.
 
-Tabel~\ref{tbl:perlabel-semua} memperlihatkan pola yang menarik. Pertama, pada label
-\textit{no}, seluruh konfigurasi Llama~3.2 hanya mampu menjawab benar 21 hingga 28 dari
-159 sampel, sedangkan seluruh konfigurasi GPT-4.1-mini mampu menjawab benar 93 hingga
-106 dari 159 sampel. Selisih ini mencerminkan perbedaan kapasitas model yang jauh lebih
-besar dibandingkan pengaruh teknik mitigasi manapun. Kedua, konfigurasi QR + CR pada
-GPT-4.1-mini mencapai jumlah prediksi benar tertinggi untuk label \textit{no} (106),
-sementara konfigurasi CR saja mencapai jumlah tertinggi untuk label \textit{yes} (238).
-Pola ini menunjukkan \textit{trade-off} antara akurasi pada label dominan (\textit{yes})
-dan akurasi pada label minoritas (\textit{no} dan \textit{maybe}).
+\subsection{Analisis Kasus Kegagalan}
+\label{subsec:analisis-kegagalan}
 
+Selain mengukur kinerja agregat, dilakukan penelusuran terhadap kasus-kasus jawaban yang salah pada konfigurasi terbaik (\textit{Hybrid Retrieval} dengan ekspansi akronim, GPT-4.1-mini) untuk memahami sumber kesalahan yang tersisa. Dari 500 pertanyaan, terdapat 134 jawaban yang salah. Setiap kasus salah ditelusuri untuk menentukan apakah kegagalan berasal dari tahap \textit{retrieval} (dokumen sumber tidak berhasil ditarik) atau tahap \textit{generation} (dokumen sumber sudah ada pada konteks, tetapi LLM salah menyimpulkan). Hasil penelusuran disajikan pada Tabel~\ref{tbl:tipe-kegagalan}.
 
-% ============================================================================================
-\section{Analisis dan Pembahasan}
-\label{sec:pembahasan}
-% ============================================================================================
+\begin{table}[H]
+\centering
+\caption{Distribusi Tipe Kegagalan pada Konfigurasi Terbaik}
+\label{tbl:tipe-kegagalan}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Tipe Kegagalan} & \textbf{Jumlah} & \textbf{Porsi} \\
+\midrule
+\textit{Retrieval-miss} (dokumen sumber tidak ter-\textit{retrieve}) & 5 & 3{,}7\% \\
+\textit{Generation-error} (dokumen ada, LLM salah menyimpulkan) & 129 & 96{,}3\% \\
+\midrule
+\textbf{Total} & \textbf{134} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Analisis Dampak \textit{Query Rewriting}}
-\label{subsec:pembahasan-qr}
+Temuan paling menonjol adalah bahwa hanya 5 dari 134 kasus salah (3{,}7\%) yang disebabkan oleh kegagalan \textit{retrieval}, sedangkan 129 sisanya (96{,}3\%) terjadi karena LLM salah menyimpulkan meskipun dokumen sumber sudah tersedia pada konteks. Hal ini menunjukkan bahwa setelah ekspansi akronim dan \textit{hybrid retrieval} diterapkan, tahap \textit{retrieval} sudah sangat jarang gagal menemukan dokumen yang tepat, sehingga tantangan utama yang tersisa bergeser ke kemampuan penalaran LLM pada tahap \textit{generation}.
 
-Hasil evaluasi menunjukkan pola yang berbeda antara kedua model. Pada Llama~3.2,
-\textit{query rewriting} menurunkan \textit{label accuracy} sebesar 5{,}6\% (dari
-55{,}6\% menjadi 50{,}0\%) serta menurunkan \textit{faithfulness} dan \textit{context
-recall}. Pada GPT-4.1-mini, \textit{query rewriting} tidak memberikan peningkatan
-maupun penurunan akurasi (tetap 65{,}4\%), meskipun terdapat pergeseran distribusi
-prediksi per label. Analisis mengidentifikasi tiga faktor utama yang menjelaskan
-temuan ini.
+Pola kesalahan klasifikasi memperlihatkan kecenderungan LLM untuk terlalu sering memilih label \textit{yes}. Kesalahan terbanyak adalah \textit{maybe} yang diprediksi sebagai \textit{yes} (41 kasus) dan \textit{no} yang diprediksi sebagai \textit{yes} (38 kasus). Sebagai contoh, pada pertanyaan \textit{``Is adjustment for reporting heterogeneity necessary in sleep disorders?''} (jawaban benar \textit{no}), dokumen sumber yang tepat berhasil ditarik ke konteks, tetapi LLM tetap menyimpulkan \textit{yes}. Contoh lain pada pertanyaan \textit{``Double balloon enteroscopy: is it efficacious and safe in a community setting?''} (jawaban benar \textit{yes}) merupakan kasus \textit{retrieval-miss}, yaitu dokumen sumber tidak masuk ke lima dokumen teratas sehingga LLM menjawab tanpa bukti yang memadai.
 
-\textbf{Pertama, ketidaksesuaian antara \textit{query rewriting} dan \textit{retriever}
-berbasis kata kunci.} BM25 bekerja berdasarkan pencocokan kata kunci secara eksak.
-\textit{Query rewriting} menambahkan sinonim medis dan parafrasa pada kueri, seperti
-mengubah ``aspirin'' menjadi ``low-dose aspirin therapy in patients with coronary artery
-disease''. Terminologi tambahan yang dihasilkan oleh proses reformulasi belum tentu
-muncul dalam dokumen yang terindeks, sehingga BM25 kehilangan kecocokan yang sebelumnya
-ada pada kueri asli. Paradoks ini terlihat pada rata-rata skor BM25 yang justru lebih
-tinggi pada konfigurasi QR (30{,}66 vs 25{,}18 pada Llama~3.2), yang menandakan
-kesamaan kata kunci yang lebih besar tetapi bukan relevansi semantik yang lebih baik.
+Oleh karena itu, untuk penggunaan pada konteks nyata, hasil jawaban LLM sebaiknya tetap didiskusikan kembali dengan ahli biomedis, karena pada beberapa kasus ditemukan bahwa dokumen sumber yang relevan sebenarnya sudah tersedia, tetapi LLM tetap berhalusinasi dalam menyimpulkan jawaban. Hal ini menegaskan bahwa sistem ini lebih tepat diposisikan sebagai alat bantu yang mempercepat penelusuran bukti, bukan sebagai pengganti penilaian tenaga ahli.
 
-\textbf{Kedua, \textit{semantic drift} akibat keterbatasan kapasitas model kecil.}
-Pada Llama~3.2 (3B parameter), proses reformulasi kadang menggeser fokus atau cakupan
-pertanyaan asli. Sebagai contoh, pertanyaan umum tentang efek aspirin dapat berubah
-menjadi pertanyaan spesifik tentang aspirin pada pasien dengan riwayat tertentu, sehingga
-konteks yang diambil menjadi berbeda dan tidak sesuai dengan maksud pertanyaan awal.
-Pada GPT-4.1-mini, kualitas reformulasi lebih baik sehingga tidak terjadi penurunan
-akurasi, tetapi tetap tidak memberikan peningkatan karena faktor pertama (BM25 yang
-lebih menyukai kueri asli) tetap berlaku.
+\subsection{Validitas Eksperimen}
+\label{subsec:validitas-eksperimen}
 
-\textbf{Ketiga, pertanyaan PubMedQA sudah bersifat spesifik.} Berbeda dengan dataset
-\textit{question answering} umum yang kuerinnya pendek dan ambigu, pertanyaan dalam
-PubMedQA sudah menggunakan terminologi biomedis yang tepat. Ruang perbaikan dari
-reformulasi kueri pada dataset ini sangat terbatas, dan upaya untuk menambahkan
-spesifisitas justru dapat mengubah makna pertanyaan.
+Untuk menjaga keadilan perbandingan, seluruh dua belas konfigurasi dievaluasi pada himpunan 500 pertanyaan yang sama. Dengan demikian, selisih kinerja antar konfigurasi dapat diatribusikan pada perbedaan teknik mitigasi yang diterapkan, bukan pada perbedaan data uji. Selain itu, parameter pemanggilan model dijaga tetap (\textit{temperature} dan \textit{seed} yang sama) sehingga keluaran bersifat dapat direproduksi pada pemanggilan berulang.
 
-
-\subsection{Analisis Dampak \textit{Context Reranking}}
-\label{subsec:pembahasan-cr}
-
-Konfigurasi \textit{context reranking} menunjukkan pola dampak yang bergantung pada
-kapasitas model generatif. Pada Llama~3.2, CR menghasilkan penurunan kecil pada
-\textit{label accuracy} ($-$1{,}6\%) namun peningkatan pada \textit{faithfulness}
-($+$0{,}039) dan \textit{context recall} ($+$0{,}020). Pada GPT-4.1-mini, CR memberikan
-peningkatan pada seluruh metrik, termasuk peningkatan \textit{label accuracy} sebesar
-$+$3{,}0\%.
-
-Fenomena ini menunjukkan bahwa \textit{context reranking} memerlukan model generatif
-dengan kapasitas yang memadai agar manfaatnya dapat terlihat pada metrik akhir.
-\textit{Cross-encoder} berhasil menyajikan konteks yang lebih relevan secara semantik,
-namun manfaat tersebut hanya dapat dimaksimalkan ketika model generatif mampu memahami
-dan memanfaatkan nuansa konteks yang lebih berkualitas tersebut. Pada Llama~3.2,
-bias prediksi yang kuat ke arah label \textit{yes} menjadi hambatan utama yang tidak
-dapat diatasi hanya dengan meningkatkan kualitas konteks. Pada GPT-4.1-mini, bias
-tersebut jauh lebih rendah sehingga konteks yang lebih baik dapat diterjemahkan menjadi
-jawaban yang lebih akurat.
-
-Nilai \textit{context precision} GPT-4.1-mini CR sebesar 0{,}7306 (tertinggi di antara
-seluruh konfigurasi) mengonfirmasi bahwa \textit{reranker} berhasil menempatkan dokumen
-yang relevan pada peringkat atas. Kombinasi ini dengan \textit{faithfulness} tertinggi
-(0{,}8980) mengindikasikan bahwa CR pada GPT-4.1-mini tidak hanya menghasilkan konteks
-yang lebih baik, tetapi juga jawaban yang lebih setia pada konteks tersebut.
-
-
-\subsection{Analisis Kombinasi QR + CR}
-\label{subsec:pembahasan-combined}
-
-Konfigurasi gabungan QR + CR pada GPT-4.1-mini menghasilkan temuan yang menarik dan
-memperjelas dinamika antara kedua teknik mitigasi. Meskipun \textit{label accuracy}
-QR + CR (68{,}2\%) hampir identik dengan CR saja (68{,}4\%), distribusi prediksi dan
-kualitas jawaban menunjukkan pola yang sangat berbeda.
-
-\textbf{Pergeseran distribusi prediksi.} Konfigurasi QR + CR mencapai akurasi tertinggi
-pada label \textit{no} (106/159 atau 66{,}7\%) dan lebih tinggi pada label \textit{maybe}
-(7/66 atau 10{,}6\%) dibandingkan CR saja. Peningkatan ini dibayar dengan penurunan
-akurasi label \textit{yes} dari 238/275 menjadi 228/275. Fenomena ini mengindikasikan
-bahwa \textit{query rewriting} membuat model GPT-4.1-mini lebih berani menyimpulkan
-hasil negatif atau ambigu dari konteks yang diberikan, yang berguna untuk mengurangi
-bias ke label \textit{yes} yang masih tersisa.
-
-\textbf{Trade-off pada kualitas jawaban.} Seluruh empat metrik kualitas jawaban mengalami
-penurunan pada konfigurasi QR + CR dibandingkan CR saja. \textit{Faithfulness} turun
-$-$0{,}088, \textit{context recall} turun $-$0{,}083, \textit{answer relevancy} turun
-$-$0{,}079, dan \textit{context precision} turun $-$0{,}055. Penurunan ini menunjukkan
-bahwa efek \textit{semantic drift} dari QR tidak hilang meskipun CR mengkompensasi
-dengan memilih konteks terbaik dari kandidat. Kueri hasil reformulasi mengarahkan
-\textit{retrieval} ke dokumen yang kurang optimal dibandingkan kueri asli, dan
-\textit{reranker} hanya dapat memilih yang terbaik dari kandidat yang tersedia, bukan
-menghadirkan dokumen yang seharusnya di-\textit{retrieve} oleh kueri asli.
-
-\textbf{Implikasi desain sistem.} Temuan ini menunjukkan bahwa penggabungan teknik
-mitigasi tidak selalu bersifat aditif. Dalam kasus QR + CR, peningkatan pada dimensi
-distribusi prediksi dicapai dengan mengorbankan kualitas konteks yang di-\textit{retrieve}.
-Pilihan antara CR saja (akurasi sedikit lebih tinggi dan kualitas konteks lebih baik)
-dan QR + CR (distribusi label lebih seimbang) bergantung pada prioritas aplikasi:
-apabila akurasi keseluruhan dan kepatuhan terhadap konteks menjadi prioritas, CR saja
-lebih sesuai. Apabila pengurangan bias prediksi dan keseimbangan antar label menjadi
-prioritas, kombinasi QR + CR dapat dipertimbangkan.
-
-
-\subsection{Analisis Pengaruh Kapasitas Model}
-\label{subsec:pembahasan-model}
-
-Perbandingan antara Llama~3.2 dan GPT-4.1-mini pada konfigurasi yang identik menghasilkan
-temuan yang signifikan (Tabel~\ref{tbl:perbandingan-semua} dan
-Tabel~\ref{tbl:perlabel-semua}).
-
-\begin{enumerate}[1.]
-  \item \textbf{Kapasitas model merupakan faktor dominan.} Pada konfigurasi
-        \textit{baseline}, peningkatan \textit{label accuracy} sebesar $+$9{,}8\% dan
-        \textit{faithfulness} sebesar $+$0{,}334 dari penggunaan model yang lebih kapabel
-        jauh melampaui seluruh perubahan yang dihasilkan oleh teknik mitigasi pada tahap
-        \textit{retrieval} (QR Llama: $-$5{,}6\%; CR Llama: $-$1{,}6\%).
-
-  \item \textbf{Model yang lebih kapabel mengurangi bias prediksi.} Pada Llama~3.2
-        \textit{baseline}, sistem memprediksi \textit{yes} sebanyak 431 kali (86\% dari
-        500 sampel), sedangkan GPT-4.1-mini \textit{baseline} hanya 319 kali (64\%).
-        Distribusi yang lebih seimbang pada GPT-4.1-mini mendekati distribusi
-        \textit{ground truth} yang sebenarnya (55\% \textit{yes}, 32\% \textit{no},
-        13\% \textit{maybe}).
-
-  \item \textbf{Penalaran negatif memerlukan kapasitas model yang memadai.} Lonjakan
-        akurasi label \textit{no} dari 28/159 (17{,}6\%) menjadi 93/159 (58{,}5\%)
-        pada \textit{baseline} menunjukkan bahwa kemampuan untuk menyimpulkan ``bukti
-        tidak mendukung hipotesis'' memerlukan pemahaman yang lebih dalam terhadap
-        konteks.
-
-  \item \textbf{Efek teknik mitigasi bergantung pada kapasitas model.} Teknik CR
-        yang merugikan sedikit pada Llama~3.2 ($-$1{,}6\%) justru memberikan peningkatan
-        pada GPT-4.1-mini ($+$3{,}0\%). Temuan ini mengindikasikan bahwa manfaat dari
-        konteks yang lebih baik hanya dapat dimaksimalkan oleh model generatif yang
-        cukup kapabel untuk memahami konteks tersebut.
-
-  \item \textbf{Kombinasi teknik tidak selalu aditif.} Menggabungkan QR dan CR pada
-        GPT-4.1-mini menghasilkan akurasi label yang hampir identik dengan CR saja
-        (68{,}2\% vs 68{,}4\%), tetapi menurunkan seluruh metrik kualitas jawaban.
-        Kombinasi teknik mitigasi memerlukan evaluasi \textit{trade-off} yang hati-hati.
-\end{enumerate}
-
-
-\subsection{Diskusi Umum}
-\label{subsec:diskusi-umum}
-
-Berdasarkan seluruh hasil evaluasi, beberapa kesimpulan utama dapat dirumuskan untuk
-menjawab pertanyaan penelitian yang diajukan pada Bab~\ref{chap:pendahuluan}.
-
-Pertama, teknik mitigasi pada tahap \textit{retrieval} memberikan dampak yang berbeda
-tergantung pada kapasitas model generatif. Pada Llama~3.2, kedua teknik (QR dan CR)
-belum menunjukkan peningkatan konsisten terhadap \textit{label accuracy}. Pada
-GPT-4.1-mini, \textit{context reranking} memberikan peningkatan sebesar $+$3{,}0\%
-menjadi konfigurasi dengan akurasi tertinggi (68{,}4\% atau 342 dari 500 sampel).
-
-Kedua, konfigurasi terbaik secara keseluruhan adalah GPT-4.1-mini dengan
-\textit{context reranking}. Konfigurasi ini memperoleh nilai terbaik pada lima dari
-enam metrik yang diuji, termasuk \textit{label accuracy}, \textit{faithfulness},
-\textit{answer relevancy}, dan \textit{context precision}. Kombinasi ini menunjukkan
-bahwa peningkatan kualitas konteks melalui \textit{reranking} dapat efektif apabila
-dipasangkan dengan model generatif yang memadai.
-
-Ketiga, kombinasi QR + CR pada GPT-4.1-mini menunjukkan bahwa penggabungan teknik
-mitigasi memerlukan analisis \textit{trade-off} yang hati-hati. Konfigurasi ini mencapai
-akurasi label yang hampir sama dengan CR saja (68{,}2\% vs 68{,}4\%) dan mencapai
-distribusi prediksi paling seimbang (akurasi \textit{no} tertinggi 66{,}7\%), tetapi
-dengan penurunan seluruh metrik kualitas jawaban. Pilihan konfigurasi optimal
-bergantung pada prioritas aplikasi.
-
-Keempat, kapasitas model merupakan faktor yang sangat berpengaruh. Peningkatan
-\textit{label accuracy} sebesar $+$9{,}8\% dan \textit{faithfulness} sebesar $+$0{,}334
-dari penggunaan GPT-4.1-mini dibandingkan Llama~3.2 melampaui seluruh perubahan yang
-dihasilkan oleh teknik mitigasi \textit{retrieval}. Bias prediksi ke arah \textit{yes}
-juga berkurang secara signifikan, dengan akurasi label \textit{no} meningkat dari
-28/159 (17{,}6\%) menjadi 106/159 (66{,}7\%) pada konfigurasi QR + CR. Temuan ini
-menunjukkan bahwa pemilihan model generatif yang tepat merupakan komponen penting
-dalam strategi mitigasi halusinasi, yang kemudian dapat ditingkatkan lebih lanjut
-oleh teknik \textit{retrieval} yang sesuai.

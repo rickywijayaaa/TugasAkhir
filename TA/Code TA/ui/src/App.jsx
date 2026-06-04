@@ -4,6 +4,7 @@ import ChatArea from './components/ChatArea'
 import DocumentPanel from './components/DocumentPanel'
 import DocumentModal from './components/DocumentModal'
 import StatsDashboard from './components/StatsDashboard'
+import SHExplorer from './components/SHExplorer'
 import { CONFIGS } from './data/realData'
 
 function getPhaseDelays(config) {
@@ -33,6 +34,7 @@ export default function App() {
   const [selectedDoc, setSelectedDoc] = useState(null)
   const [selectedConfig, setSelectedConfig] = useState('hybrid_cr_openai')
   const [statsOpen, setStatsOpen] = useState(false)
+  const [shExplorerOpen, setShExplorerOpen] = useState(false)
 
   const timersRef = useRef([])
   const typewriterRef = useRef(null)
@@ -133,6 +135,7 @@ export default function App() {
         selectedConfig={selectedConfig}
         onSelectConfig={handleSelectConfig}
         onOpenStats={() => setStatsOpen(true)}
+        onOpenSHExplorer={() => setShExplorerOpen(true)}
       />
 
       <ChatArea
@@ -157,6 +160,7 @@ export default function App() {
           selectedConfig={selectedConfig}
         />
       )}
+      {shExplorerOpen && <SHExplorer onClose={() => setShExplorerOpen(false)} />}
     </div>
   )
 }

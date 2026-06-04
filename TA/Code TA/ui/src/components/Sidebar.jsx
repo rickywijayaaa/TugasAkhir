@@ -13,6 +13,7 @@ export default function Sidebar({
   selectedConfig,
   onSelectConfig,
   onOpenStats,
+  onOpenSHExplorer,
 }) {
   const currentConfig = CONFIGS.find((c) => c.key === selectedConfig) || CONFIGS[3]
   const currentStats = AGGREGATE_STATS[selectedConfig]
@@ -119,6 +120,25 @@ export default function Sidebar({
             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
           </svg>
           Lihat Perbandingan Penuh
+        </button>
+
+        <button
+          onClick={onOpenSHExplorer}
+          className="mt-2 w-full flex items-center justify-center gap-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-300 text-xs font-medium py-1.5 rounded-md border border-emerald-500/30 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-3.5 h-3.5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Explore 500 SH Baseline
         </button>
       </div>
 

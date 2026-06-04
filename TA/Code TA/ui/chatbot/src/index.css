@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-white text-slate-900 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Scrollbar styling — minimalis */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+  }
+}
+
+@layer utilities {
+  /* Animasi fade-in untuk welcome state dan pesan baru */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Typing dots animation untuk loading state */
+  .typing-dot {
+    animation: typingPulse 1.4s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .typing-dot:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes typingPulse {
+    0%,
+    60%,
+    100% {
+      opacity: 0.3;
+      transform: scale(0.9);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+/* Markdown styling — clean & readable */
+.markdown-body {
+  @apply text-[15px] leading-relaxed;
+}
+.markdown-body p {
+  @apply mb-3 last:mb-0;
+}
+.markdown-body strong {
+  @apply font-semibold text-slate-900;
+}
+.markdown-body em {
+  @apply italic;
+}
+.markdown-body ul,
+.markdown-body ol {
+  @apply mb-3 pl-5 space-y-1;
+}
+.markdown-body ul {
+  @apply list-disc;
+}
+.markdown-body ol {
+  @apply list-decimal;
+}
+.markdown-body code {
+  @apply bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-[13.5px] font-mono;
+}
+.markdown-body pre {
+  @apply bg-slate-100 rounded-lg p-3 my-3 overflow-x-auto text-[13.5px];
+}
+.markdown-body pre code {
+  @apply bg-transparent p-0;
+}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  @apply font-semibold mt-4 mb-2;
+}
+.markdown-body h1 {
+  @apply text-lg;
+}
+.markdown-body h2 {
+  @apply text-base;
+}
+.markdown-body h3 {
+  @apply text-[15px];
+}
+.markdown-body blockquote {
+  @apply border-l-4 border-slate-300 pl-4 italic text-slate-600 my-3;
+}
+.markdown-body a {
+  @apply text-blue-600 hover:underline;
+}

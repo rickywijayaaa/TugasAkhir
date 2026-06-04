@@ -1,10 +1,115 @@
 \cleardoublepage
-\chapter{KODE PROGRAM}
-Pada umumnya, kode program tidak perlu disertakan di dalam laporan tugas akhir karena kode program biasanya sangat panjang
-dan sudah disimpan dalam bentuk berkas-berkas elektronik terpisah di repositori daring. 
-Namun, jika ada bagian kode program singkat yang penting untuk ditulis dalam laporan tugas akhir, 
-bagian tersebut dapat disertakan di dalam laporan.
-\section{Perangkat Lunak untuk Akuisisi Data dari Sensor Ultrasonik}
-\lstinputlisting[language=Python, caption=Binary search code]{listings/binary-search-python.tex}  
-\section{Perangkat Lunak untuk Pengolahan Data Akuisisi dan Visualisasi Hasil Pengukuran Jarak} 
-asdjfkjashdkjfas
+\chapter{\textit{PROMPT} SISTEM}
+\label{lamp:prompt-sistem}
+
+Lampiran ini memuat seluruh \textit{prompt} yang dipakai pada implementasi sistem mitigasi halusinasi RAG-LLM. \textit{Prompt} ditampilkan dalam format kode persis seperti yang diteruskan ke model bahasa, agar reproduksibilitas eksperimen tetap terjaga. Variabel substitusi ditulis dengan kurung kurawal (misalnya \texttt{\{context\}} dan \texttt{\{question\}}) sebagaimana konvensi \textit{string formatting} Python.
+
+\section{\textit{Prompt} Generation Jawaban Biomedis}
+\label{lamp:prompt-generation}
+
+\textit{Prompt} berikut dipakai pada tahap \textit{generation} untuk seluruh konfigurasi sistem (\textit{baseline}, +QR, +CR, +QR+CR). \textit{Prompt} dirancang agar LLM menjawab pertanyaan biomedis berbasis lima \textit{chunk} konteks yang sudah dipilih oleh \textit{retriever} dan mengakhiri jawaban dengan satu dari tiga label klasifikasi (\textit{yes}, \textit{no}, atau \textit{maybe}) pada baris terakhir. Instruksi spesifik mengenai kapan memilih label \textit{maybe} ditambahkan untuk mencegah model bersikap terlalu konservatif pada bukti yang sebenarnya cukup memadai untuk satu arah.
+
+\begin{lstlisting}[language=,caption={\textit{Prompt} \textit{generation} jawaban biomedis (GENERATION\_PROMPT)},label={lst:generation-prompt}]
+You are a medical research assistant. Answer a biomedical
+yes/no/maybe question based solely on the provided scientific
+abstracts.
+
+Context from medical literature:
+{context}
+
+Question: {question}
+
+Instructions:
+- Carefully read the context and assess whether it supports
+  or refutes the question.
+- Provide a brief explanation (2-3 sentences) using ONLY the
+  information above.
+- End your response with EXACTLY ONE of these words on its
+  own line: yes, no, or maybe.
+  - yes   : the evidence supports the hypothesis, even if not
+            perfectly conclusive
+  - no    : the evidence refutes or does not support the
+            hypothesis
+  - maybe : ONLY if the evidence is directly contradictory
+            (some findings say yes, others say no), or if the
+            context contains no relevant information at all
+- IMPORTANT: If the evidence leans in one direction, even
+  partially, choose yes or no. Do NOT use maybe simply
+  because the evidence is limited or not 100% certain.
+
+Answer:
+\end{lstlisting}
+
+Variabel \texttt{\{context\}} pada \textit{Listing}~\ref{lst:generation-prompt} diisi dengan lima \textit{chunk} hasil \textit{retrieval} yang sudah disusun secara berurutan dan diberi penanda nomor serta label \textit{section} sumber paper. Format penyusunan konteks dilakukan oleh fungsi pembentuk konteks pada modul \textit{generation}, sebagaimana ditunjukkan pada \textit{Listing}~\ref{lst:context-format}.
+
+\begin{lstlisting}[language=Python,caption={Fungsi pembentuk \texttt{\{context\}} untuk diteruskan ke \textit{prompt}},label={lst:context-format}]
+def generate_answer(query, retrieved):
+    context = "\n\n".join(
+        f"[{i}] ({r.document.section_label}): {r.document.text}"
+        for i, r in enumerate(retrieved, 1)
+    )
+    return openai_generate(
+        GENERATION_PROMPT.format(context=context, question=query),
+        max_tokens=300, temperature=TEMPERATURE
+    )
+\end{lstlisting}
+
+\section{\textit{Prompt} Query Rewriting}
+\label{lamp:prompt-qr}
+
+\textit{Prompt} berikut dipakai pada modul \textit{Query Rewriting} (QR) yang berjalan sebelum tahap \textit{retrieval} pada konfigurasi +QR dan +QR+CR. Tugasnya sederhana, yaitu menulis ulang pertanyaan pengguna menjadi satu pertanyaan baru yang lebih spesifik dan lebih kaya istilah biomedis. \textit{Prompt} ini berisi empat aturan utama, yaitu (1) membuat pertanyaan lebih spesifik dengan menambahkan istilah medis yang relevan, (2) mengekspansi akronim seperti \texttt{MI} menjadi \textit{myocardial infarction}, (3) mempertahankan jenis pertanyaan agar tetap dapat dijawab dengan \textit{yes}, \textit{no}, atau \textit{maybe}, serta (4) mengeluarkan hanya pertanyaan baru tanpa penjelasan tambahan.
+
+\begin{lstlisting}[language=,caption={\textit{Prompt} \textit{Query Rewriting} dengan pendekatan \textit{single-query rewriting}},label={lst:qr-prompt}]
+You are a query rewriting assistant for a biomedical
+question-answering system.
+Rewrite the following medical question to improve retrieval
+from a PubMed research database.
+
+Rules:
+1. Be more specific and add relevant medical/scientific
+   terminology.
+2. Expand abbreviations (e.g. "MI" -> "myocardial infarction").
+3. Preserve the original yes/no/maybe answerable intent.
+4. Output ONLY the rewritten question, no explanations.
+
+Original question: {query}
+
+Rewritten question:
+\end{lstlisting}
+
+Keluaran LLM langsung dipakai sebagai kueri baru pada tahap \textit{retrieval}, baik BM25 maupun \textit{dense}. Apabila pertanyaan hasil tulis-ulang terlalu pendek (kurang dari 10 karakter) atau pemanggilan LLM gagal, sistem akan memakai pertanyaan asli sebagai \textit{fallback} agar \textit{pipeline} tetap berjalan tanpa harus menghentikan proses. \textit{Listing}~\ref{lst:qr-function} memperlihatkan implementasi fungsi yang menjalankan pendekatan ini.
+
+\begin{lstlisting}[language=Python,caption={Fungsi \textit{rewriter} \textit{single-query} (\texttt{rewrite\_query})},label={lst:qr-function}]
+def rewrite_query(query: str) -> str:
+    """Reformulasi query menjadi satu pertanyaan baru yang
+    lebih spesifik dan kaya istilah biomedis."""
+    prompt = QUERY_REWRITE_PROMPT.format(query=query)
+    try:
+        rewritten = openai_generate(
+            prompt, max_tokens=150, temperature=0.3
+        )
+        rewritten = rewritten.strip().replace('\n', ' ')
+        return rewritten if len(rewritten) >= 10 else query
+    except Exception:
+        return query  # fallback ke pertanyaan asli
+\end{lstlisting}
+
+\section{Parameter Pemanggilan Model Bahasa}
+\label{lamp:parameter-llm}
+
+Seluruh pemanggilan model bahasa pada tahap \textit{generation} dan \textit{Query Rewriting} memakai parameter yang ditetapkan sama untuk seluruh konfigurasi agar perbandingan antarmodel bersifat \textit{apple-to-apple}. Ringkasan parameter tersebut disajikan pada Tabel~\ref{tbl:parameter-llm}.
+
+\begin{table}[H]
+\centering
+\caption{Parameter Pemanggilan Model Bahasa pada Tahap \textit{Generation} dan \textit{Query Rewriting}}
+\label{tbl:parameter-llm}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Parameter} & \textbf{Generation} & \textbf{Query Rewriting} \\ \hline
+\textit{Temperature}            & 0{,}0 & 0{,}3 \\ \hline
+\textit{Max tokens}             & 300   & 150   \\ \hline
+\textit{Seed}                   & 42    & 42    \\ \hline
+\end{tabular}
+\end{table}
+
+Penggunaan \textit{temperature} 0{,}0 pada tahap \textit{generation} menjamin determinisme jawaban sehingga eksperimen yang sama menghasilkan keluaran identik antar-pemanggilan. Untuk \textit{Query Rewriting}, \textit{temperature} dinaikkan menjadi 0{,}3 agar LLM dapat menghasilkan reformulasi yang lebih kaya istilah biomedis sambil tetap menjaga makna pertanyaan asli.

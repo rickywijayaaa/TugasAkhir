@@ -140,6 +140,8 @@ Fenomena halusinasi pada LLM dapat disebabkan oleh tiga faktor utama:
 
 Dengan demikian, deteksi dan mitigasi halusinasi menjadi aspek penting dalam pengembangan sistem berbasis LLM, khususnya pada domain yang menuntut keakuratan dan kredibilitas tinggi seperti kesehatan, keuangan, serta pendidikan \parencite{math2024hallucination}.
 
+Khusus pada domain biomedis, halusinasi pada sistem RAG tidak hanya dipengaruhi oleh keterbatasan model pada tahap \textit{generation}, tetapi juga oleh kegagalan \textit{retrieval} akibat penggunaan akronim yang tidak konsisten antara kueri pengguna dan dokumen ilmiah. Ketika istilah panjang pada kueri tidak cocok dengan akronim yang tertulis pada abstrak (\textit{vocabulary mismatch}), dokumen yang sebenarnya relevan gagal ditemukan, dan kekosongan konteks ini kemudian memicu model menghasilkan jawaban yang tidak \textit{grounded}. Oleh karena itu, mitigasi halusinasi pada domain biomedis perlu memperbaiki dua hal sekaligus, yaitu memastikan dokumen yang relevan berhasil ditemukan pada tahap \textit{retrieval} dan memastikan jawaban tetap setia pada dokumen tersebut pada tahap \textit{generation}.
+
 % % ==========================================
 % % 2.3 Deteksi Halusinasi Menggunakan LRP4RAG
 % % ==========================================
@@ -385,9 +387,69 @@ Selain mengarahkan proses generasi, banyak tugas akhir yang menambahkan lapisan 
   \item \textbf{Deteksi segmen halusinatif}, di mana model atau klasifikator tambahan menandai kalimat atau frasa yang tidak didukung bukti, untuk kemudian ditulis ulang atau dihapus.
 \end{itemize}
 
-Pendekatan ini sejalan dengan konsep \textit{active detection} yang akan dimanfaatkan dalam tugas akhir ini sebagai lapisan terakhir untuk menandai dan, bila perlu, memperbaiki keluaran yang berisiko mengandung \textit{hallucination}.
+Pendekatan-pendekatan verifikasi tersebut menggambarkan bahwa keluaran model masih dapat diperiksa ulang melalui lapisan tambahan setelah generasi sebagai salah satu arah mitigasi halusinasi pada sistem RAG. Pada tugas akhir ini, fokus mitigasi diarahkan pada tahap praproses dokumen, \textit{retrieval}, dan pemilihan konteks, sehingga lapisan verifikasi pascagenerasi berada di luar cakupan dan dibahas hanya sebagai konteks pustaka.
 
 
+
+% ==========================================
+% 2.3 Ekspansi Akronim Dokumen pada Sistem RAG
+% ==========================================
+
+\section{Ekspansi Akronim Dokumen pada Sistem RAG}
+\label{sec:ekspansi-akronim-rag}
+
+Salah satu sumber utama kegagalan pada sistem RAG adalah ketidakcocokan kosakata (\textit{vocabulary mismatch}) antara kueri pengguna dan dokumen pada korpus, yaitu kondisi ketika makna semantik antara keduanya sebenarnya sama namun bentuk istilahnya berbeda. Untuk mengatasi hal ini, salah satu strategi yang banyak diadopsi adalah memperkaya isi setiap dokumen sebelum diindeks, sehingga setiap \textit{chunk} mengandung istilah yang lebih beragam dan lebih dekat dengan gaya kueri pengguna. Strategi ini dikenal sebagai \textit{document expansion} atau \textit{document enrichment}.
+
+Strategi pengayaan dokumen telah terbukti efektif pada berbagai domain. Pada domain finansial, \textcite{fintechrag2025} dan \textcite{financialmeta2025} menyuntik akronim domain-spesifik, sinonim, serta metadata terstruktur ke dokumen sebelum diindeks, dan melaporkan peningkatan akurasi \textit{retrieval} yang konsisten dibandingkan \textit{baseline} BM25 maupun \textit{dense retrieval} tunggal. Pada domain enterprise yang lebih umum, \textcite{enterprisekg2025} mengusulkan kerangka sistematis yang memanfaatkan model bahasa besar untuk membangkitkan metadata terenrichi (kata kunci, entitas, akronim, sinonim) pada tiap \textit{chunk}, dengan hasil peningkatan retrieval hingga sepuluh poin persentase pada korpus internal perusahaan. Pendekatan serupa pada level enrichment per-chunk juga diusulkan oleh \textcite{mdkeychunker2025} yang menggabungkan ekstraksi kata kunci, ringkasan, dan pertanyaan hipotetis melalui satu pemanggilan LLM. Pola yang konsisten lintas-domain ini menegaskan bahwa pengayaan dokumen pada tahap \textit{indexing} merupakan strategi yang dapat digeneralisasi dan menjadi salah satu fondasi penting pada sistem RAG modern.
+
+% ==========================================
+% 2.4 BM25 sebagai Algoritma Retrieval Klasik
+% ==========================================
+
+\section{BM25 sebagai Algoritma \textit{Retrieval} Klasik}
+\label{sec:bm25-teori}
+
+BM25 (\textit{Best Matching 25}) adalah algoritma \textit{retrieval} berbasis statistik yang dikembangkan oleh Robertson dan kolega pada awal tahun 1990-an sebagai penyempurnaan dari skema TF-IDF. Algoritma ini memberi peringkat dokumen terhadap suatu kueri berdasarkan tiga prinsip utama, yaitu seberapa sering istilah kueri muncul pada dokumen (\textit{term frequency}), seberapa langka istilah tersebut pada keseluruhan korpus (\textit{inverse document frequency}), serta seberapa panjang dokumen tersebut dibandingkan rata-rata panjang dokumen pada korpus. Tiga prinsip ini memastikan dokumen yang lebih banyak memuat istilah kueri yang langka dan tidak terlalu panjang akan menempati peringkat lebih atas dibandingkan dokumen yang sekadar panjang dan kebetulan mengulang istilah umum.
+
+Skor BM25 untuk pasangan dokumen $D$ dan kueri $Q$ dirumuskan sebagai berikut.
+
+\begin{equation}
+\label{eq:bm25}
+\text{BM25}(D, Q) = \sum_{q \in Q} \text{IDF}(q) \cdot \frac{f(q, D) \cdot (k_1 + 1)}{f(q, D) + k_1 \cdot \left(1 - b + b \cdot \dfrac{|D|}{\text{avgdl}}\right)}
+\end{equation}
+
+Pada Persamaan~\ref{eq:bm25}, $f(q, D)$ menyatakan jumlah kemunculan istilah $q$ pada dokumen $D$, $|D|$ adalah panjang dokumen $D$ dalam jumlah kata, dan $\text{avgdl}$ adalah rata-rata panjang dokumen pada korpus. Sementara itu, $\text{IDF}(q)$ adalah komponen \textit{inverse document frequency} yang dihitung sebagai berikut.
+
+\begin{equation}
+\label{eq:bm25-idf}
+\text{IDF}(q) = \ln \left( \dfrac{N - n(q) + 0{,}5}{n(q) + 0{,}5} + 1 \right)
+\end{equation}
+
+Pada Persamaan~\ref{eq:bm25-idf}, $N$ adalah jumlah total dokumen pada korpus dan $n(q)$ adalah jumlah dokumen yang memuat istilah $q$ minimal sekali. Persamaan ini memberikan bobot yang lebih besar pada istilah langka, sehingga kemunculan istilah seperti ``hyperbaric'' lebih berkontribusi terhadap skor dibandingkan istilah umum seperti ``patient'' atau ``study''.
+
+Dua parameter $k_1$ dan $b$ pada Persamaan~\ref{eq:bm25} mengatur perilaku algoritma. Parameter $k_1$ mengendalikan tingkat saturasi \textit{term frequency}, yaitu seberapa cepat tambahan kemunculan istilah berhenti memberi kontribusi tambahan terhadap skor; nilai standar yang sering dipakai pada literatur adalah $k_1 = 1{,}5$. Parameter $b$ mengendalikan tingkat normalisasi panjang dokumen, dengan nilai standar $b = 0{,}75$ yang menyeimbangkan antara dokumen panjang dan pendek tanpa menghukum keduanya secara berlebihan. Kombinasi kedua parameter ini memberi BM25 keunggulan dibandingkan TF-IDF murni karena tidak terlalu sensitif terhadap panjang dokumen maupun pengulangan istilah yang berlebihan.
+
+% ==========================================
+% 2.5 Dense Retrieval dan Pencarian Berbasis Vektor
+% ==========================================
+
+\section{\textit{Dense Retrieval} dan Pencarian Berbasis Vektor}
+\label{sec:dense-teori}
+
+\textit{Dense retrieval} adalah pendekatan pencarian dokumen yang merepresentasikan baik kueri maupun dokumen sebagai vektor numerik berdimensi tinggi, lalu menghitung kemiripan antara dua vektor sebagai dasar peringkat. Berbeda dengan BM25 yang hanya mencocokkan kata kunci, \textit{dense retrieval} memanfaatkan kemampuan model bahasa untuk menangkap makna semantik teks, sehingga dokumen yang menggunakan istilah berbeda tetapi maknanya mirip dengan kueri tetap dapat ditemukan. Sebagai contoh, kueri yang menyebut ``\textit{physical activity}'' dapat menemukan dokumen yang menulis ``\textit{exercise}'' atau ``\textit{aerobic training}'', selama ketiga istilah tersebut berdekatan posisinya pada ruang vektor.
+
+Setiap teks pada \textit{dense retrieval} diubah menjadi vektor melalui model \textit{embedding}, yaitu jaringan saraf yang telah dilatih agar pasangan teks dengan makna mirip menghasilkan vektor yang berdekatan, sedangkan pasangan teks dengan makna berbeda menghasilkan vektor yang berjauhan \parencite{reimers2019sbert}. Model \textit{embedding} modern umumnya berbasis arsitektur \textit{transformer} dan menghasilkan vektor berdimensi antara 256 hingga 1.536, tergantung ukuran dan tujuan model. Dimensi yang tinggi memungkinkan model menangkap nuansa makna yang lebih halus, namun juga menuntut kapasitas penyimpanan dan komputasi yang lebih besar.
+
+Kemiripan antara vektor kueri $\vec{q}$ dan vektor dokumen $\vec{d}$ dihitung menggunakan \textit{cosine similarity}, yang mengukur sudut antara kedua vektor pada ruang berdimensi tinggi. Rumusnya adalah sebagai berikut.
+
+\begin{equation}
+\label{eq:cosine-similarity}
+\text{cosine}(\vec{q}, \vec{d}) = \dfrac{\vec{q} \cdot \vec{d}}{\|\vec{q}\| \cdot \|\vec{d}\|}
+\end{equation}
+
+Pada Persamaan~\ref{eq:cosine-similarity}, $\vec{q} \cdot \vec{d}$ adalah \textit{dot product} antara kedua vektor, sedangkan $\|\vec{q}\|$ dan $\|\vec{d}\|$ adalah norma Euclidean dari masing-masing vektor. Nilai \textit{cosine similarity} berada pada rentang $[-1, 1]$, dengan nilai mendekati satu menandakan kemiripan makna yang tinggi, nilai mendekati nol menandakan tidak ada hubungan, dan nilai negatif menandakan makna yang bertolak belakang. Pada konteks pencarian dokumen, hanya dokumen dengan skor kemiripan tertinggi yang dipilih sebagai kandidat.
+
+Keunggulan \textit{dense retrieval} dibandingkan BM25 terletak pada kemampuannya menangani parafrasa, sinonim, dan terminologi yang berbeda namun bermakna serupa. Pada sisi lain, \textit{dense retrieval} cenderung lemah pada pencocokan istilah teknis yang sangat spesifik (misalnya nama obat, gen, atau akronim langka) karena model \textit{embedding} mungkin belum cukup mengenali kosakata domain tersebut. Karakteristik ini menjadi alasan utama banyak sistem RAG modern memilih pendekatan \textit{hybrid retrieval} yang menggabungkan keunggulan kedua metode.
 
 % ==========================================
 % 2.6 Query Rewriting untuk Mitigasi Halusinasi pada RAG
@@ -442,7 +504,6 @@ Berdasarkan eksperimen dalam Ma dkk.\ (2023), teknik ini memberikan keuntungan b
   \item \textbf{Peningkatan relevansi konteks} melalui kueri yang lebih kaya informasi.
   \item \textbf{Penurunan \textit{retrieval failure}}, khususnya pada kueri pendek.
   \item \textbf{Peningkatan \textit{faithfulness}} jawaban karena LLM memperoleh konteks yang lebih akurat.
-  \item \textbf{Reduksi halusinasi generatif}, karena model tidak lagi bergantung pada memori parametrik semata.
 \end{itemize}
 
 Dalam konteks ini, \textit{query rewriting} berfungsi sebagai \textbf{mekanisme mitigasi pada tahap retrieval}. Dengan mengolah ulang kueri pengguna sebelum proses pencarian dokumen, sistem RAG menjadi lebih stabil dan lebih tahan terhadap halusinasi baik intrinsik maupun ekstrinsik.
@@ -453,10 +514,19 @@ Dalam konteks ini, \textit{query rewriting} berfungsi sebagai \textbf{mekanisme 
 % 2.X Reranking Konteks untuk Mengurangi Kebisingan
 % ==========================================
 
-\section{\textit{Reranking} Konteks untuk Mengurangi Kebisingan}
+\section{\textit{Context Reranking} untuk Mengurangi Kebisingan}
 \label{sec:context-reranking}
 
 Pada sistem \textit{Retrieval-Augmented Generation} (RAG), tahap \textit{retrieval} sering menghasilkan sekumpulan potongan dokumen (\textit{chunk}) yang tidak hanya relevan, tetapi juga mengandung informasi yang berulang, terlalu umum, atau bahkan tidak terkait dengan maksud kueri. Kondisi ini dikenal sebagai \textit{konteks berisik} dan dapat mendorong \textit{Large Language Model} (LLM) untuk melakukan \textit{hallucination}, karena model berusaha menyintesis jawaban dari bukti yang sebagian tidak tepat sasaran.
+
+Gambar~\ref{fig:context-reranking-flow} mengilustrasikan posisi \textit{context reranking} pada alur RAG. Setelah kueri dipakai untuk menarik sejumlah dokumen kandidat (\textit{top-k}) dari basis data vektor melalui \textit{semantic search}, sebuah modul \textit{reranker} menilai ulang relevansi tiap dokumen terhadap kueri, lalu menyusun ulang urutannya sehingga dokumen yang paling relevan menempati peringkat teratas sebelum diteruskan ke tahap \textit{generation} \parencite{chitika2025reranking}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{image/context-rerankingflow.jpg}
+  \caption[Alur kerja \textit{context reranking} pada sistem RAG]{Alur kerja \textit{context reranking} pada sistem RAG \parencite{chitika2025reranking}}
+  \label{fig:context-reranking-flow}
+\end{figure}
 
 Ma dkk.\ mengkaji masalah ini pada skenario kueri yang bersifat \textit{multi-faceted}, yaitu ketika satu kueri pengguna memuat beberapa aspek atau \textit{sub-intent} sekaligus, misalnya dimensi produk, atribut kualitas, dan preferensi pengguna. Dalam kasus seperti ini, \textit{retriever} standar (misalnya \textit{BM25} atau \textit{dense retriever}) cenderung mengembalikan \textit{top-k} dokumen yang hanya menangkap sebagian aspek kueri dan mencampurkannya dengan dokumen yang relevansinya lemah.
 
@@ -480,7 +550,6 @@ Untuk mengurangi kebisingan dan meningkatkan kualitas konteks yang dikonsumsi ol
 \end{enumerate}
 
 Pendekatan \textit{context reranking} ini relevan karena berfokus pada deteksi dan mitigasi \textit{hallucination} pada sistem RAG. Pada tahap \textit{retrieval}, modul \textit{reranker} berperan sebagai filter kualitas yang memastikan hanya konteks yang paling relevan dan informatif yang diteruskan ke model generatif. Dengan demikian, \textit{hallucination} yang disebabkan oleh \textit{retrieval failure} berupa pemilihan dokumen yang salah atau berisik dapat dikurangi sebelum memasuki tahap \textit{generation} \parencite{math2024hallucination,craft2023richresponses}.
-
 
 % ==========================================
 % 2.X Active Detection untuk Mitigasi Halusinasi
@@ -718,16 +787,84 @@ Dalam konteks mitigasi \textit{hallucination}, kedua paradigma ini sering dipadu
 % 2.8 Kerangka Kerja Evaluasi Sistem RAG
 % ==========================================
 
-\section{Kerangka Kerja Evaluasi Sistem \textit{Retrieval-Augmented Generation (RAG)}}
-\label{sec:ragas-framework}
+\section{Kerangka Kerja Evaluasi Sistem \textit{Retrieval-Augmented Generation} (RAG)}
+\label{sec:kerangka-evaluasi-rag}
 
 Pengembangan sistem \textit{Retrieval-Augmented Generation} (RAG) memerlukan metode \textit{tuning} yang tepat karena kinerjanya dipengaruhi oleh berbagai komponen seperti model \textit{retriever}, model bahasa (\textit{language model}), rancangan \textit{prompt}, serta parameter konfigurasi lainnya. Oleh karena itu, evaluasi sistem RAG yang terotomasi menjadi hal yang penting dalam memastikan keluaran model yang akurat, relevan, dan berlandaskan bukti \parencite{es2024ragas}.
 
+Evaluasi sistem RAG dapat dilakukan pada dua tingkat. Pertama, evaluasi pada tahap \textit{retrieval} yang berfokus pada kualitas dokumen yang berhasil ditemukan oleh \textit{retriever}. Kedua, evaluasi pada tahap \textit{generation} yang berfokus pada kualitas jawaban akhir yang dihasilkan oleh \textit{Large Language Model} berdasarkan konteks tersebut. Pada tugas akhir ini, evaluasi tahap \textit{retrieval} menggunakan tiga metrik konvensional yaitu \textit{Recall@k}, \textit{Mean Average Precision} (MAP@k), dan \textit{Normalized Discounted Cumulative Gain} (nDCG@k), sedangkan evaluasi tahap \textit{generation} menggunakan kerangka kerja \textit{Retrieval-Augmented Generation Assessment} (RAGAS).
+
+% =====================================================
+\subsection{Metrik Evaluasi \textit{Retrieval}}
+\label{subsec:metrik-retrieval}
+
+Metrik evaluasi \textit{retrieval} mengukur kualitas pencarian dokumen pada korpus, mulai dari kelengkapan dokumen relevan yang ditemukan hingga kualitas peringkatnya. Pada tugas akhir ini digunakan tiga metrik utama yang lazim dipakai dalam literatur \textit{Information Retrieval} dan RAG \parencite{ma2023queryrewriting, cormack2009reciprocal, lewis2020retrieval}.
+
+\subsubsection{\textit{Recall@k}}
+
+\textit{Recall@k} mengukur kelengkapan informasi yang berhasil di-\textit{retrieve} oleh sistem, yaitu proporsi dokumen relevan pada korpus yang berhasil muncul dalam $k$ dokumen teratas hasil pencarian. Metrik ini cocok untuk mengevaluasi seberapa baik sistem menangkap seluruh dokumen relevan yang tersedia, terutama pada tugas yang membutuhkan konteks lengkap seperti \textit{question answering} berbasis RAG. Rumus \textit{Recall@k} ditulis sebagai berikut:
+
+\begin{equation}
+\text{Recall@}k = \frac{|\{d \in R_q\} \cap \{d_1, d_2, \dots, d_k\}|}{|R_q|}
+\end{equation}
+
+dengan $R_q$ adalah himpunan seluruh dokumen relevan untuk \textit{query} $q$ pada korpus, dan $\{d_1, d_2, \dots, d_k\}$ adalah $k$ dokumen teratas yang dikembalikan oleh sistem \textit{retrieval}. Nilai \textit{Recall@k} berkisar antara 0 dan 1, di mana nilai 1 menunjukkan bahwa seluruh dokumen relevan berhasil ter-\textit{retrieve} dalam $k$ teratas.
+
+\subsubsection{\textit{Mean Average Precision} (MAP@k)}
+
+\textit{Mean Average Precision} mengukur kualitas peringkat hasil \textit{retrieval} secara menyeluruh dengan mempertimbangkan posisi setiap dokumen relevan pada daftar hasil. Berbeda dengan \textit{Recall@k} yang hanya menghitung jumlah dokumen relevan, MAP@k juga memperhatikan apakah dokumen relevan tersebut ditempatkan pada posisi atas atau bawah. Metrik ini menjadi metrik utama pada paper \textit{Reciprocal Rank Fusion} oleh Cormack dkk.\ \parencite{cormack2009reciprocal}.
+
+MAP@k dihitung dengan terlebih dahulu menghitung \textit{Average Precision} (AP) untuk setiap \textit{query}, kemudian merata-ratakannya di seluruh \textit{query}. Rumus \textit{Average Precision} pada $k$ teratas ditulis sebagai berikut:
+
+\begin{equation}
+\text{AP@}k = \frac{1}{|R_q|} \sum_{i=1}^{k} \text{Precision@}i \cdot \mathbb{1}[d_i \in R_q]
+\end{equation}
+
+dengan $\text{Precision@}i$ adalah \textit{precision} pada $i$ dokumen teratas, $\mathbb{1}[d_i \in R_q]$ adalah fungsi indikator yang bernilai 1 jika dokumen pada peringkat ke-$i$ relevan, serta $|R_q|$ adalah jumlah dokumen relevan untuk \textit{query} $q$. Selanjutnya \textit{Mean Average Precision} dihitung dengan merata-ratakan AP@k di seluruh \textit{query} pada himpunan uji:
+
+\begin{equation}
+\text{MAP@}k = \frac{1}{|Q|} \sum_{q \in Q} \text{AP@}k(q)
+\end{equation}
+
+dengan $Q$ adalah himpunan seluruh \textit{query} yang dievaluasi. Nilai MAP@k berkisar antara 0 dan 1, dengan nilai mendekati 1 menunjukkan bahwa sistem konsisten menempatkan dokumen relevan pada posisi atas di seluruh \textit{query}.
+
+\subsubsection{\textit{Normalized Discounted Cumulative Gain} (nDCG@k)}
+
+\textit{Normalized Discounted Cumulative Gain} memberikan bobot yang lebih besar untuk dokumen relevan yang berada pada peringkat atas dibandingkan peringkat bawah. Hal ini didasarkan pada asumsi bahwa pengguna sistem pencarian biasanya lebih memperhatikan hasil di posisi teratas. nDCG@k menjadi metrik standar pada evaluasi sistem \textit{retrieval} modern karena sensitivitasnya terhadap kualitas peringkat.
+
+Perhitungan nDCG@k dilakukan dalam tiga tahap. Pertama, hitung \textit{Discounted Cumulative Gain} (DCG) pada $k$ teratas:
+
+\begin{equation}
+\text{DCG@}k = \sum_{i=1}^{k} \frac{\text{rel}_i}{\log_2(i+1)}
+\end{equation}
+
+dengan $\text{rel}_i$ adalah skor relevansi dokumen pada peringkat ke-$i$. Pada kasus relevansi biner, $\text{rel}_i$ bernilai 1 jika dokumen relevan dan 0 jika tidak. Faktor pembagi $\log_2(i+1)$ memberikan diskon yang semakin besar untuk dokumen pada peringkat bawah, sehingga dokumen pada posisi atas memberikan kontribusi yang lebih besar terhadap skor.
+
+Kedua, hitung \textit{Ideal DCG} (IDCG), yaitu nilai DCG maksimum yang dapat dicapai apabila seluruh dokumen relevan diurutkan pada posisi paling atas:
+
+\begin{equation}
+\text{IDCG@}k = \sum_{i=1}^{\min(k, |R_q|)} \frac{1}{\log_2(i+1)}
+\end{equation}
+
+Ketiga, normalisasi DCG dengan IDCG untuk memperoleh nDCG@k:
+
+\begin{equation}
+\text{nDCG@}k = \frac{\text{DCG@}k}{\text{IDCG@}k}
+\end{equation}
+
+Nilai nDCG@k berkisar antara 0 dan 1, di mana nilai 1 menunjukkan bahwa peringkat yang dihasilkan sistem identik dengan peringkat ideal. Metrik ini sangat berguna untuk membandingkan sistem \textit{retrieval} yang berbeda karena dapat menangkap perbedaan kualitas peringkat meskipun jumlah dokumen relevan yang ditemukan sama.
+
+Pada tugas akhir ini, ketiga metrik tersebut dievaluasi pada $k=5$ karena lima dokumen teratas yang diteruskan dari \textit{retriever} ke \textit{generator} sesuai dengan praktik umum pada sistem RAG \parencite{ma2023queryrewriting, lewis2020retrieval} sekaligus menyesuaikan dengan keterbatasan ukuran konteks pada \textit{Large Language Model} yang digunakan.
+
+% =====================================================
+\subsection{Kerangka Kerja RAGAS untuk Evaluasi \textit{Generation}}
+\label{subsec:ragas-framework}
+
 Berbagai metode dan perkakas evaluasi telah diusulkan oleh beberapa tugas akhir sebelumnya untuk memfasilitasi proses penilaian sistem RAG, misalnya oleh Y. Gao dkk.\ (2023) dan Es dkk.\ (2024). Namun demikian, banyak strategi evaluasi yang masih bergantung pada probabilitas token dari model bahasa. Pendekatan tersebut menjadi tidak praktis untuk diterapkan pada model \textit{closed-source} seperti GPT-4, karena model tersebut tidak memberikan akses langsung terhadap probabilitas internalnya. Alternatif lain berupa penilaian berbasis sistem tanya-jawab dengan tipe jawaban singkat juga dinilai tidak representatif terhadap cara kerja sistem RAG secara keseluruhan \parencite{gao2023rag-eval}.
 
-Untuk mengatasi keterbatasan tersebut, dikembangkanlah kerangka kerja bernama \textbf{RAGAS} (\textit{Retrieval-Augmented Generation Assessment System}). RAGAS merupakan kerangka kerja evaluasi otomatis yang dirancang untuk menilai kinerja sistem RAG dengan cara memanfaatkan kemampuan LLM dalam melakukan penilaian berbasis \textit{prompt}. Kerangka ini dikembangkan oleh tim peneliti dari Cardiff University dengan tujuan untuk mengukur kualitas sistem RAG dari tiga aspek utama, yaitu \textit{faithfulness}, \textit{answer relevance}, dan \textit{context relevance} \parencite{es2024ragas}.
+Untuk mengatasi keterbatasan tersebut, dikembangkanlah kerangka kerja bernama \textbf{RAGAS} (\textit{Retrieval-Augmented Generation Assessment System}). RAGAS merupakan kerangka kerja evaluasi otomatis yang dirancang untuk menilai kinerja sistem RAG dengan cara memanfaatkan kemampuan LLM dalam melakukan penilaian berbasis \textit{prompt}. Kerangka ini dikembangkan oleh tim peneliti dari Cardiff University dengan tujuan untuk mengukur kualitas sistem RAG dari tiga aspek utama, yaitu \textit{faithfulness}, \textit{answer relevance}, dan \textit{context relevance} \parencite{es2024ragas}. RAGAS dipilih sebagai kerangka evaluasi pada tugas akhir ini karena mampu menilai kualitas \textit{generation} berbasis \textit{retrieval} secara otomatis tanpa memerlukan anotasi manusia dalam skala besar, sehingga sesuai untuk eksperimen lintas-konfigurasi yang melibatkan ribuan pasangan pertanyaan dan jawaban.
 
-\subsection{Aspek Penilaian dalam RAGAS}
+\subsubsection{Aspek Penilaian dalam RAGAS}
 
 Aspek \textit{faithfulness} mengukur sejauh mana jawaban yang dihasilkan oleh sistem RAG didasarkan pada konteks yang diberikan. Dalam praktiknya, LLM digunakan untuk mengekstraksi satu atau lebih pernyataan dari setiap kalimat pada jawaban sistem, kemudian memverifikasi apakah pernyataan tersebut terdapat dalam konteks hasil \textit{retrieval}. Nilai \textit{faithfulness} dihitung dengan rumus berikut:
 
@@ -751,7 +888,7 @@ Aspek ketiga adalah \textit{context relevance}, yang berfokus pada relevansi ant
 CR = \frac{\text{Jumlah kalimat relevan}}{\text{Jumlah total kalimat dalam konteks}}
 \end{equation}
 
-\subsection{Metrik Turunan dalam RAGAS}
+\subsubsection{Metrik Turunan dalam RAGAS}
 
 \textbf{a. Context Precision}
 
@@ -778,3 +915,21 @@ Metrik ini mengukur seberapa banyak dokumen relevan yang berhasil ditemukan oleh
 \end{equation}
 
 Pendekatan evaluasi berbasis RAGAS memberikan beberapa keunggulan penting. Pertama, kerangka ini mampu melakukan penilaian yang objektif karena seluruh proses evaluasi dilakukan secara otomatis melalui LLM, sehingga mengurangi bias subjektif dari evaluator manusia. Kedua, RAGAS bersifat adaptif dan dapat diterapkan pada berbagai konfigurasi sistem RAG tanpa memerlukan akses terhadap probabilitas token internal. Ketiga, RAGAS memberikan evaluasi yang komprehensif dengan mempertimbangkan baik aspek \textit{retrieval} maupun \textit{generation}, sehingga menghasilkan pemahaman yang lebih menyeluruh terhadap kinerja sistem.
+
+% ==========================================
+% 2.11 Justifikasi Pemilihan Teknik Mitigasi
+% ==========================================
+\section{Justifikasi Pemilihan Teknik Mitigasi}
+\label{sec:justifikasi-teknik}
+
+Berdasarkan seluruh tinjauan pustaka pada bab ini, terdapat banyak teknik yang dapat dipakai untuk menekan halusinasi pada sistem RAG, mulai dari teknik pada tahap praproses dokumen, tahap \textit{retrieval}, hingga tahap \textit{generation}. Dari sekian banyak pilihan tersebut, tugas akhir ini memilih tiga teknik utama, yaitu \textbf{ekspansi akronim}, \textbf{\textit{query rewriting}}, dan \textbf{\textit{context reranking}}. Pemilihan ketiganya tidak dilakukan secara acak, melainkan didasari oleh satu prinsip sederhana, yaitu halusinasi pada sistem RAG dapat muncul dari beberapa titik kegagalan yang berbeda, sehingga mitigasi yang baik perlu menutup titik-titik kegagalan tersebut secara bertahap dan saling melengkapi. Penjelasan alasan pemilihan setiap teknik diuraikan sebagai berikut.
+
+\textbf{Ekspansi akronim} dipilih karena menangani akar masalah yang khas pada domain biomedis, yaitu \textit{vocabulary mismatch}. Pada literatur biomedis, satu istilah panjang sering kali lebih sering dituliskan dalam bentuk akronim, misalnya \textit{Hyperbaric Oxygen} yang ditulis HBO atau \textit{Body Mass Index} yang ditulis BMI. Apabila dokumen yang hanya memuat akronim langsung diindeks tanpa pengayaan, maka representasi dokumen tersebut tidak memuat bentuk panjang istilahnya. Akibatnya, ketika pengguna bertanya menggunakan istilah lengkap, dokumen yang sebenarnya relevan dapat gagal ditemukan. Ekspansi akronim mengatasi hal ini sejak tahap paling awal, yaitu saat dokumen disiapkan dan diindeks, sehingga masalah tidak menumpuk ke tahap berikutnya. Teknik ini juga dipilih karena ringan dan murah, sebab hanya dijalankan sekali pada saat praproses dan tidak menambah beban komputasi ketika sistem menjawab pertanyaan.
+
+\textbf{\textit{Query rewriting}} dipilih karena memperbaiki kualitas pertanyaan dari sisi pengguna sebelum proses pencarian dilakukan. Pertanyaan asli pengguna sering kali singkat, ambigu, atau tidak memakai istilah yang persis sama dengan yang tertulis pada dokumen. Dengan menulis ulang pertanyaan menjadi bentuk yang lebih spesifik dan kaya istilah medis, peluang sistem menemukan dokumen yang tepat menjadi lebih besar. Jika ekspansi akronim memperbaiki masalah dari sisi dokumen, maka \textit{query rewriting} memperbaiki masalah dari sisi kueri, sehingga keduanya bekerja pada dua sisi yang saling berlawanan namun saling menguatkan dalam menutup celah \textit{vocabulary mismatch}.
+
+\textbf{\textit{Context reranking}} dipilih karena bekerja sebagai penyaring kualitas terakhir sebelum dokumen diberikan ke model bahasa. Meskipun tahap \textit{retrieval} telah berhasil menarik sejumlah dokumen, tidak semua dokumen tersebut memiliki tingkat relevansi yang sama; sebagian dapat bersifat terlalu umum, berulang, atau hanya menyentuh sebagian kecil maksud pertanyaan. Dokumen yang kurang relevan ini menjadi kebisingan (\textit{noise}) yang dapat menyesatkan model saat menyusun jawaban. \textit{Context reranking} menilai ulang setiap dokumen kandidat menggunakan \textit{cross-encoder} yang membaca pasangan kueri dan dokumen secara bersamaan, lalu hanya meneruskan dokumen yang paling relevan ke tahap \textit{generation}. Dengan demikian, model bekerja dengan konteks yang lebih bersih dan terfokus.
+
+Ketiga teknik tersebut dipilih karena bekerja pada tiga tahap yang berbeda namun berurutan, yaitu praproses dokumen, sebelum \textit{retrieval}, dan setelah \textit{retrieval}, sehingga membentuk lapisan mitigasi yang saling melengkapi dari hulu hingga hilir. Pendekatan berlapis ini lebih kuat dibandingkan penerapan satu teknik saja, karena kelemahan pada satu tahap dapat ditutupi oleh tahap lainnya. Sebagai contoh, apabila ekspansi akronim belum sepenuhnya menutup perbedaan istilah, \textit{query rewriting} masih dapat membantu menyelaraskan kueri dengan dokumen, dan apabila masih terdapat dokumen kurang relevan yang lolos, \textit{context reranking} akan menyaringnya sebelum sampai ke model. 
+
+Selain pertimbangan teknis, ketiga teknik ini juga dipilih karena bersifat praktis untuk diterapkan pada lingkup tugas akhir. Ketiganya dapat dijalankan tanpa perlu melatih ulang (\textit{fine-tuning}) model bahasa, tidak menuntut perangkat keras khusus berskala besar, serta dapat diaktifkan atau dinonaktifkan secara terpisah. Sifat modular ini penting karena memungkinkan kontribusi masing-masing teknik diukur secara terpisah maupun gabungan pada tahap evaluasi, sehingga pengaruh setiap teknik terhadap penurunan halusinasi dapat dianalisis secara jelas dan adil.

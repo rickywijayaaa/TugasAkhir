@@ -1,8 +1,40 @@
 \cleardoublepage
-\chapter{HASIL SURVEI LAPANGAN}
-\section{Foto Survei Lokasi 1}
-Teks survei lokasi 1.
-\section{Foto Survei Lokasi 2}
-Teks survei lokasi 2.
-\section{Transkrip Wawancara dengan Narasumber}
-Teks transkrip wawancara.
+\chapter{DATASET DAN KORPUS}
+\label{lamp:dataset-korpus}
+
+Lampiran ini menjelaskan dataset PubMedQA yang dipakai sebagai sumber pertanyaan dan korpus dokumen pada tugas akhir ini, beserta versi korpus yang telah melalui tahap ekspansi akronim sebagai praproses.
+
+\section{Dataset PubMedQA}
+\label{lamp:dataset-pubmedqa}
+
+Dataset PubMedQA yang digunakan pada tugas akhir ini diunduh dari \textit{HuggingFace} dengan identitas \texttt{qiaojin/PubMedQA} dan konfigurasi \texttt{pqa\_labeled}. PubMedQA merupakan \textit{dataset question answering} domain biomedis yang dibangun dari abstrak paper PubMed, di mana setiap entri terdiri dari pertanyaan penelitian (umumnya berasal dari judul artikel), konteks (abstrak tanpa bagian \textit{conclusion}), jawaban panjang (bagian \textit{conclusion} dari abstrak), serta jawaban klasifikasi singkat berupa label \textit{yes}, \textit{no}, atau \textit{maybe}. Subset \texttt{pqa\_labeled} berisi 1.000 paper berlabel \textit{expert}, dengan 500 pertanyaan dipakai sebagai himpunan uji evaluasi pada tugas akhir ini. Ringkasan struktur entri PubMedQA disajikan pada Tabel~\ref{tbl:pubmedqa-sample}.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Contoh Entri Dataset PubMedQA (Subset \texttt{pqa\_labeled})}
+\label{tbl:pubmedqa-sample}
+\begin{tabular}{l p{3.3cm} p{3.3cm} p{3.3cm} c}
+\toprule
+\textbf{pubid} & \textbf{question} & \textbf{context} & \textbf{long\_answer} & \textbf{labelled} \\
+\midrule
+26370095 & Are financial incentives cost-effective to support smoking cessation during pregnancy? & To investigate the cost-effectiveness of financial incentives for smoking cessation in pregnancy as an adjunct to routine health care. & Financial incentives for smoking cessation in pregnancy are highly cost-effective, well below recommended decision thresholds. & yes \\
+\addlinespace
+20684175 & Does vitamin D supplementation increase regulatory T cells in healthy subjects? & Epidemiological data show significant associations of vitamin D deficiency and autoimmune diseases. Vitamin D may prevent autoimmunity by stimulating regulatory T cells. & Vitamin D supplementation was associated with significantly increased \%Tregs in apparently healthy individuals. & yes \\
+\addlinespace
+21880023 & Does exercise during pregnancy prevent postnatal depression? & To study whether exercise during pregnancy reduces the risk of postnatal depression in a randomized controlled trial. & We did not find a lower prevalence of high depression scores among women randomized to regular exercise during pregnancy compared with the control group. & no \\
+\addlinespace
+17076091 & Does obstructive sleep apnea affect aerobic fitness? & We sought to determine whether patients with obstructive sleep apnea had an objective change in aerobic fitness compared to a normal population. & Overall, obstructive sleep apnea does not predict a decrease in aerobic fitness, but patients with severe apnea show a significant decrease. & maybe \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pada implementasi sistem, hanya kolom \texttt{question} dan \texttt{context} yang dimasukkan ke basis data \textit{retriever}, sedangkan kolom \texttt{long\_answer} dan \texttt{final\_decision} disisihkan sebagai \textit{ground truth} evaluasi agar tidak terjadi kebocoran jawaban (\textit{answer leakage}) pada tahap \textit{retrieval}.
+
+\section{Korpus dengan Ekspansi Akronim}
+\label{lamp:korpus-ekspansi}
+
+Untuk mengatasi masalah \textit{vocabulary mismatch} antara kueri pengguna yang sering memakai istilah panjang dengan dokumen biomedis yang banyak memuat akronim, tugas akhir ini membangun versi korpus terpisah yang telah melalui tahap ekspansi akronim berbasis algoritma Schwartz-Hearst. Pada versi ini, setiap kemunculan akronim pada \textit{chunk} dokumen disisipi kepanjangannya secara \textit{inline} menggunakan format ``\texttt{AKRONIM (kepanjangan)}'' sehingga \textit{chunk} tetap dapat dicocokkan baik melalui pencarian dengan akronim maupun istilah panjang. Contoh perbandingan teks \textit{chunk} sebelum dan sesudah ekspansi diterapkan disajikan pada Tabel~\ref{tbl:ekspansi-contoh} di Bab~\ref{chap:implementasi}.
+
+Penerapan ekspansi akronim ini meningkatkan panjang rata-rata \textit{chunk} dari sekitar 423 karakter menjadi 473 karakter, namun jumlah total \textit{chunk} pada korpus tidak berubah karena substitusi bersifat \textit{inline}. Kedua versi korpus, yaitu \texttt{pubmedqa\_bm25.pkl} untuk versi asli dan \texttt{pubmedqa\_bm25\_sh.pkl} untuk versi dengan ekspansi akronim, disimpan secara terpisah pada repositori sistem sehingga dapat dipakai bergantian sesuai konfigurasi eksperimen.

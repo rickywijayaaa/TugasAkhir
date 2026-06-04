@@ -9,96 +9,76 @@
 \setcounter{section}{0}
 \vspace{2em}
 
-
-
-
-\begin{longtable}{@{} l >{\raggedright\arraybackslash}p{6.5cm} c @{}}
+\begin{longtable}{@{} l >{\raggedright\arraybackslash}p{8cm} c @{}}
 \multicolumn{1}{l}{\textbf{Notasi}} & \multicolumn{1}{l}{\textbf{Deskripsi}} & \multicolumn{1}{l}{\parbox[c]{3.5cm}{\raggedright \textbf{Pemakaian pertama kali}}} \\
+\endhead
 
+% ===== Notasi Umum =====
+$D$ & Dokumen atau \textit{chunk} pada korpus & 10 \\
+$Q$ & \textit{Query} atau pertanyaan pengguna & 10 \\
+$q_i$ & Istilah ke-$i$ pada \textit{query} & 22 \\
+$N$ & Jumlah total dokumen pada korpus & 22 \\
+$k$ & Parameter \textit{top-k retrieval} (jumlah dokumen teratas yang diambil) & 22 \\
+$|D|$ & Panjang dokumen (jumlah \textit{token}) & 22 \\
+$\text{avgdl}$ & Panjang dokumen rata-rata pada korpus & 22 \\[1ex]
 
+% ===== BM25 =====
+$\text{TF}(q_i, D)$ & \textit{Term frequency} istilah $q_i$ pada dokumen $D$ & 22 \\
+$\text{IDF}(q_i)$ & \textit{Inverse document frequency} istilah $q_i$ & 22 \\
+$k_1$ & \textit{Hyperparameter} BM25 untuk skala saturasi \textit{term frequency} & 22 \\
+$b$ & \textit{Hyperparameter} BM25 untuk normalisasi panjang dokumen & 22 \\
+$\text{score}_{\text{BM25}}(Q,D)$ & Skor relevansi BM25 antara \textit{query} $Q$ dan dokumen $D$ & 22 \\[1ex]
 
-% \multicolumn{2}{l}{\textbf{Huruf Yunani (Parameter Model)}} \\
+% ===== Embedding & Dense Retrieval =====
+$\vec{q}$ & Vektor representasi (\textit{embedding}) \textit{query} & 23 \\
+$\vec{d}$ & Vektor representasi (\textit{embedding}) dokumen & 23 \\
+$\cos(\vec{q},\vec{d})$ & \textit{Cosine similarity} antara vektor \textit{query} dan dokumen & 23 \\
+$\langle \vec{q}, \vec{d}\rangle$ & \textit{Dot product} antara dua vektor & 23 \\
+$\|\vec{v}\|$ & Norma Euclidean (L2) dari vektor $\vec{v}$ & 23 \\
+$d$ & Dimensi vektor \textit{embedding} & 23 \\[1ex]
 
-$\alpha$ & Koefisien bobot untuk \textit{loss function}, tingkat signifikansi statistik & 75 \\
-$\beta$ & Koefisien bobot untuk \textit{Binary Cross-Entropy loss} & 75 \\
-$\lambda$ & Koefisien bobot untuk CTC \textit{loss}, parameter regularisasi & 75 \\
-$\theta$ & Parameter model \textit{neural network} & 75 \\
-$\sigma$ & Deviasi standar & 75 \\
-$\mu$ & Rata-rata (\textit{mean}) & 75 \\
-$\epsilon$ & \textit{Token blank}/kosong dalam CTC, konstanta kecil untuk stabilitas numerik & 75 \\
-$\Delta$ & Delta (selisih/perubahan nilai) & 75 \\
-$\pi$ & \textit{Alignment path} dalam CTC & 75 \\
-$\pi_t$ & \textit{Token} pada \textit{timestep} $t$ dalam \textit{alignment path} & 76 \\[1ex]
+% ===== RRF =====
+$r_i$ & Peringkat dokumen ke-$i$ pada daftar hasil pencarian & 24 \\
+$\text{rank}(D,L)$ & Posisi peringkat dokumen $D$ pada daftar $L$ & 24 \\
+$\text{score}_{\text{RRF}}(D)$ & Skor \textit{Reciprocal Rank Fusion} untuk dokumen $D$ & 24 \\
+$k_{\text{RRF}}$ & Konstanta pelembut pada RRF (umumnya 60) & 24 \\[1ex]
 
-% \multicolumn{2}{l}{\textbf{Operator Matematis}} \\
+% ===== Metrik Retrieval =====
+$\text{Recall@}k$ & Proporsi dokumen relevan yang berhasil di-\textit{retrieve} dalam $k$ teratas & 64 \\
+$\text{Precision@}k$ & Proporsi dokumen relevan pada $k$ teratas hasil \textit{retrieval} & 64 \\
+$\text{MAP@}k$ & \textit{Mean Average Precision} pada $k$ teratas & 64 \\
+$\text{MRR}$ & \textit{Mean Reciprocal Rank} & 64 \\
+$\text{Hit@}k$ & Indikator apakah minimal satu dokumen relevan ada pada $k$ teratas & 64 \\
+$\text{DCG@}k$ & \textit{Discounted Cumulative Gain} pada $k$ teratas & 65 \\
+$\text{IDCG@}k$ & \textit{Ideal Discounted Cumulative Gain} pada $k$ teratas & 65 \\
+$\text{nDCG@}k$ & \textit{Normalized Discounted Cumulative Gain} pada $k$ teratas & 65 \\
+$\text{rel}_i$ & Skor relevansi dokumen pada peringkat ke-$i$ & 65 \\[1ex]
 
-$\nabla$ atau $\partial$ & Operator gradien atau turunan parsial & 75 \\
-$\sum$ & Operator penjumlahan & 75 \\
-$\prod$ & Operator perkalian & 75 \\
-$\int$ & Operator integral & 75 \\
-argmax & Argumen yang memaksimalkan fungsi & 76 \\
-$\sim$ & Terdistribusi menurut & 75 \\
-$\to$ & Menuju atau konvergen ke & 75 \\[1ex]
+% ===== Klasifikasi =====
+$\text{TP}$ & \textit{True Positive} & 63 \\
+$\text{FP}$ & \textit{False Positive} & 63 \\
+$\text{TN}$ & \textit{True Negative} & 63 \\
+$\text{FN}$ & \textit{False Negative} & 63 \\
+$\text{Accuracy}$ & Proporsi prediksi yang benar terhadap seluruh prediksi & 63 \\
+$\text{Precision}$ & Proporsi prediksi positif yang benar & 63 \\
+$\text{Recall}$ & Proporsi positif aktual yang berhasil diprediksi & 63 \\
+$\text{F1}$ & Rata-rata harmonis dari \textit{precision} dan \textit{recall} & 63 \\[1ex]
 
-% \multicolumn{2}{l}{\textbf{Fungsi \textit{Loss} dan Kerugian}} \\
+% ===== RAGAS =====
+$F$ & Skor \textit{Faithfulness} pada metrik RAGAS & 65 \\
+$\text{CR}_{\text{RAGAS}}$ & Skor \textit{Context Recall} pada metrik RAGAS & 65 \\
+$\text{AR}$ & Skor \textit{Answer Relevancy} pada metrik RAGAS & 65 \\
+$\text{CP}$ & Skor \textit{Context Precision} pada metrik RAGAS & 65 \\
+$S$ & Himpunan kalimat pada jawaban yang dievaluasi & 65 \\
+$|S|$ & Jumlah kalimat pada jawaban & 65 \\[1ex]
 
-$\mathcal{L}$ & Fungsi \textit{loss} (kerugian) & 75 \\
-$\mathcal{L}_{total}$ & Total \textit{loss function} & 75 \\
-$\mathcal{L}_{adversarial}$ atau $\mathcal{L}_{adv}$ & \textit{Adversarial loss} & 75 \\
-$\mathcal{L}_{reconstruction}$ & \textit{Reconstruction loss} & 75 \\
-$\mathcal{L}_{L1}$ & L1 \textit{loss} (\textit{Mean Absolute Error}) & 75 \\
-$\mathcal{L}_{L2}$ & L2 \textit{loss} (\textit{Mean Squared Error}) & 75 \\
-$\mathcal{L}_{CTC}$ & CTC (\textit{Connectionist Temporal Classification}) \textit{loss} & 75 \\
-$\mathcal{L}_{perceptual}$ & \textit{Perceptual loss} & 75 \\
-$\mathcal{L}_{pixel}$ & \textit{Pixel-wise loss} & 75 \\
-$\mathcal{L}_{BCE}$ & \textit{Binary Cross-Entropy loss} & 75 \\
-$\mathcal{L}_{GAN}$ & GAN \textit{loss} & 75 \\
-$\mathcal{L}_{cycle}$ & \textit{Cycle consistency loss} & 75 \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Variabel Model dan Komponen GAN}} \\
-
-$G$ & \textit{Generator} dalam GAN & 75 \\
-$D$ & \textit{Discriminator} dalam GAN & 75 \\
-$G(z)$ & \textit{Output} dari \textit{generator} dengan \textit{input} $z$ & 75 \\
-$D(x)$ & \textit{Output} dari \textit{discriminator} dengan \textit{input} $x$ & 75 \\
-$G_{A \to B}$ & \textit{Generator} dari domain $A$ ke $B$ & 75 \\
-$G_{B \to A}$ & \textit{Generator} dari domain $B$ ke $A$ & 75 \\
-$V(D, G)$ & Fungsi nilai (\textit{value function}) dalam GAN & 75 \\
-$x$ & Sampel data asli, \textit{input} citra & 75 \\
-$y$ & Label atau \textit{ground truth}, kondisi dalam \textit{conditional GAN} & 75 \\
-$z$ & \textit{Noise vector} atau representasi laten \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Distribusi Probabilitas}} \\
-
-$\mathbb{E}$ & Ekspektasi atau nilai harapan & 75 \\
-$p_{data}$ & Distribusi data asli & 75 \\
-$p_z$ & Distribusi \textit{prior} (\textit{noise}) & 75 \\
-$p(y|x)$ & Probabilitas bersyarat \textit{output} $y$ \textit{given input} $x$ & 75 \\
-$p_t(\pi_t|x)$ & Probabilitas \textit{token} pada \textit{timestep} $t$ \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Fungsi dan Transformasi CTC}} \\
-
-$\mathcal{B}$ & Fungsi penciutan (\textit{collapse function}) dalam CTC & 75 \\
-$\mathcal{B}^{-1}$ & Fungsi invers penciutan dalam CTC & 75 \\
-$T$ & Jumlah \textit{timestep} atau panjang \textit{sequence} \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Metrik Jarak dan Norma}} \\
-
-$|x - G(y)|_1$ & L1 \textit{distance} antara \textit{ground truth} dan \textit{generated image} & 75 \\
-$|x - G(y)|_2$ & L2 \textit{distance} antara \textit{ground truth} dan \textit{generated image} & 75 \\
-$N \times N$ & Ukuran \textit{patch} dalam PatchGAN \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Statistik dan Analisis}} \\
-
-$d$ & Cohen's $d$ (\textit{effect size}) & 75 \\
-$n$ & Jumlah sampel & 75 \\
-$p$ & \textit{p-value} (nilai probabilitas statistik) & 75 \\
-$r$ & Koefisien korelasi & 75 \\
-$R^2$ & Koefisien determinasi \\[1ex]
-
-% \multicolumn{2}{l}{\textbf{Notasi Kompleksitas Komputasi}} \\
-
-$O(n)$ & Notasi Big-O untuk kompleksitas linear & 75 \\
-$O(n^2)$ & Notasi Big-O untuk kompleksitas kuadratik & 75 \\
+% ===== Operator Statistik & Matematis =====
+$\sum$ & Operator penjumlahan & 22 \\
+$\prod$ & Operator perkalian & 22 \\
+$\log$ & Logaritma natural & 22 \\
+$\max$ & Nilai maksimum & 24 \\
+$\text{argmax}$ & Argumen yang memaksimalkan fungsi & 24 \\
+$\mathbb{1}[\cdot]$ & Fungsi indikator (bernilai 1 jika kondisi benar, 0 jika salah) & 64 \\
+$p$ & \textit{P-value} statistik & 67 \\
 
 \end{longtable}
