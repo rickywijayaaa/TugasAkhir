@@ -1,10 +1,7 @@
 % ============================================================================================
 % BAB V IMPLEMENTASI
-% MITIGASI HALUSINASI PADA RAG LLM MENGGUNAKAN
-% QUERY REWRITING, CONTEXT RERANKING, DAN ACTIVE HALLUCINATION DETECTION
-%
-% TODO: Ganti semua placeholder [TODO: ...] dengan isi yang sebenarnya.
-% TODO: Tambahkan screenshot atau listing kode yang relevan.
+% MITIGASI HALUSINASI PADA RAG-LLM MENGGUNAKAN
+% EKSPANSI AKRONIM, QUERY REWRITING, DAN CONTEXT RERANKING
 % ============================================================================================
 
 \cleardoublepage
@@ -13,6 +10,8 @@
 
 Bab ini menjelaskan implementasi teknis dari rancangan sistem yang telah dijabarkan pada Bab~\ref{chap:perancangan}. Implementasi mencakup penyiapan lingkungan kerja, pembangunan indeks korpus PubMedQA, integrasi tiga komponen mitigasi halusinasi (ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking}), serta penyiapan kerangka evaluasi. Seluruh komponen dikembangkan dalam bentuk \textit{notebook} Python yang dijalankan secara lokal pada satu unit \textit{laptop} pengembangan dan memanfaatkan beberapa layanan API eksternal untuk pemanggilan model bahasa berukuran besar.
 
+Penjelasan pada bab ini disusun mengikuti alur sistem secara berurutan, yaitu dimulai dari penyiapan lingkungan implementasi, dilanjutkan dengan pembangunan \textit{pipeline} pengolahan data, implementasi komponen \textit{retrieval}, integrasi komponen mitigasi halusinasi, hingga tahap \textit{generation} dan kerangka evaluasi, serta diakhiri dengan prototipe antarmuka demonstrasi. Pendekatan implementasi diarahkan agar setiap komponen bersifat modular dan dapat diuji secara terpisah, sehingga kontribusi tiap teknik mitigasi dapat dianalisis secara independen pada tahap evaluasi. Selain itu, seluruh proses pembangunan indeks dan pemanggilan model dirancang agar dapat direproduksi, antara lain dengan menetapkan \textit{seed} tetap serta menyimpan indeks ke berkas sehingga tidak perlu dibangun ulang pada setiap eksekusi.
+
 
 % ============================================================================================
 \section{Lingkungan Implementasi}
@@ -20,6 +19,8 @@ Bab ini menjelaskan implementasi teknis dari rancangan sistem yang telah dijabar
 % ============================================================================================
 
 Sistem mitigasi halusinasi RAG-LLM untuk sistem tanya jawab biomedis ini diimplementasikan pada satu mesin pengembangan tunggal dengan kombinasi infrastruktur lokal dan layanan eksternal. Infrastruktur lokal digunakan untuk menyimpan indeks vektor, menjalankan model \textit{embedding} dan \textit{reranker} ringan, serta mengeksekusi seluruh \textit{notebook} eksperimen. Layanan API eksternal dipakai untuk pemanggilan \textit{Large Language Model} (LLM) berukuran besar yang tidak dapat dijalankan secara lokal karena keterbatasan memori dan kapasitas komputasi. Subbab ini menjelaskan spesifikasi perangkat keras dan perangkat lunak, konfigurasi layanan API dan basis data, serta organisasi kode pada repositori penelitian.
+
+Kombinasi infrastruktur lokal dan layanan \textit{cloud} ini dipilih dengan mempertimbangkan keseimbangan antara biaya, kemudahan reproduksi, dan keterbatasan perangkat. Komponen yang ringan dan sering dipanggil, seperti \textit{retriever} dan \textit{reranker}, dijalankan secara lokal agar tidak menimbulkan biaya \textit{Application Programming Interface} (API) berulang, sedangkan LLM berukuran besar yang menuntut sumber daya tinggi diakses melalui API agar tetap dapat digunakan tanpa perangkat keras khusus. Dengan pembagian peran ini, eksperimen berskala ribuan pertanyaan tetap dapat dijalankan pada satu unit \textit{laptop} pengembangan.
 
 \subsection{Spesifikasi Perangkat Keras dan Perangkat Lunak}
 \label{subsec:spesifikasi-perangkat}
@@ -32,7 +33,7 @@ Dari sisi perangkat lunak, sistem berjalan di atas Windows 11 (64-bit). Bahasa p
 \centering
 \caption{Ringkasan Perangkat Keras dan Perangkat Lunak yang Digunakan pada Penelitian}
 \label{tbl:spesifikasi-implementasi}
-\begin{tabular}{|p{5cm}|p{8.5cm}|}
+\begin{tabular}{|p{4.6cm}|p{8.4cm}|}
 \hline
 \textbf{Komponen} & \textbf{Spesifikasi / Pustaka} \\ \hline
 \multicolumn{2}{|l|}{\textit{Perangkat Keras}} \\ \hline
@@ -61,17 +62,17 @@ Pustaka NLP tambahan     & \texttt{nltk}, \texttt{regex}, \texttt{tiktoken} \\ \
 \subsection{Konfigurasi Layanan API dan Basis Data}
 \label{subsec:konfigurasi-api}
 
-Sistem mengintegrasikan tiga layanan API model bahasa berbasis \textit{cloud}, yaitu OpenAI API untuk pemanggilan \texttt{gpt-4.1-mini} dan \texttt{text-embedding-3-small}, Anthropic API untuk pemanggilan \texttt{claude-haiku-4.5}, serta OpenRouter sebagai \textit{gateway} untuk mengakses \texttt{llama-3.3-70b-instruct} dari penyedia Meta. Pendekatan multi-penyedia ini dipilih agar setiap kategori model, yaitu \textit{closed-source} berkualitas tinggi (OpenAI, Anthropic) dan \textit{open-source} berukuran besar (Llama via OpenRouter), dapat dibandingkan secara adil pada beban kerja yang sama. Selain layanan eksternal, sistem juga memakai \texttt{Ollama} sebagai layanan lokal yang menjalankan model \texttt{llama3.2} dan \texttt{nomic-embed-text} secara \textit{on-premise} pada CPU, sehingga eksperimen tetap dapat berjalan tanpa biaya API ketika digunakan hanya untuk \textit{prototyping} atau pengujian awal.
+Sistem mengintegrasikan tiga layanan API model bahasa berbasis \textit{cloud}, yaitu OpenAI API untuk pemanggilan \texttt{gpt-4.1-mini} dan \texttt{text-embedding-3-small}, Anthropic API untuk pemanggilan \texttt{claude-haiku-4.5}, serta OpenRouter sebagai \textit{gateway} untuk mengakses \texttt{llama-3.3-70b-instruct} dari penyedia Meta. Pendekatan multi-penyedia ini dipilih agar setiap kategori model, yaitu sumber tertutup berkualitas tinggi (OpenAI, Anthropic) dan sumber terbuka berukuran besar (Llama via OpenRouter), dapat dibandingkan secara adil pada beban kerja yang sama. Selain layanan eksternal, sistem juga memakai \texttt{Ollama} sebagai layanan lokal yang menjalankan model \texttt{llama3.2} dan \texttt{nomic-embed-text} secara \textit{on-premise} pada CPU, sehingga eksperimen tetap dapat berjalan tanpa biaya API ketika digunakan hanya untuk \textit{prototyping} atau pengujian awal.
 
 Seluruh kredensial layanan eksternal, termasuk \texttt{OPENAI\_API\_KEY}, \texttt{ANTHROPIC\_API\_KEY}, dan \texttt{OPENROUTER\_API\_KEY}, disimpan pada berkas \texttt{.env} di akar repositori dan dimuat menggunakan pustaka \texttt{python-dotenv} pada awal setiap \textit{notebook}. Berkas \texttt{.env} ini dimasukkan ke dalam \texttt{.gitignore} agar informasi sensitif tidak ikut terunggah saat repositori didorong ke \textit{remote} GitHub. Untuk mencegah pelanggaran batas \textit{rate limit} pada masing-masing penyedia, setiap pemanggilan API diberi \textit{retry policy} sederhana dengan \textit{exponential backoff} pada kegagalan \textit{transient}, serta jeda kecil antarpermintaan ketika dijalankan pada eksperimen berukuran besar (500 pertanyaan). Parameter pemanggilan, seperti suhu (\textit{temperature}), \textit{top-p}, dan jumlah token maksimum, ditetapkan sama untuk seluruh konfigurasi agar perbandingan antarmodel bersifat \textit{apple-to-apple}.
 
-Dari sisi basis data, sistem menggunakan dua jenis penyimpanan lokal yang saling melengkapi. Pertama, indeks BM25 dibangun menggunakan pustaka \texttt{rank-bm25} lalu disimpan dalam berkas \textit{pickle} (\texttt{pubmedqa\_bm25.pkl} dan \texttt{pubmedqa\_bm25\_sh.pkl}) sehingga indeks tidak perlu dibangun ulang setiap kali \textit{notebook} dijalankan. Kedua, indeks vektor menggunakan \texttt{ChromaDB} dalam mode \textit{persistent client} dengan direktori penyimpanan terpisah untuk masing-masing kombinasi praproses, yaitu \texttt{pubmedqa\_chroma/} (korpus asli), \texttt{pubmedqa\_chroma\_sh/} (korpus dengan ekspansi Schwartz-Hearst), serta \texttt{pubmedqa\_chroma\_llama/} (korpus dengan \textit{embedding} dari Ollama). Pemisahan direktori ini bertujuan memastikan setiap variasi eksperimen memiliki basis data yang konsisten dan dapat diuji ulang tanpa risiko \textit{cache poisoning} antarkonfigurasi. Ringkasan layanan API eksternal dan basis data lokal disajikan pada Tabel~\ref{tbl:layanan-api}.
+Dari sisi basis data, sistem menggunakan dua jenis penyimpanan lokal yang saling melengkapi. Pertama, indeks BM25 dibangun menggunakan pustaka \texttt{rank-bm25} lalu disimpan dalam berkas \textit{pickle} (\texttt{pubmedqa\_bm25.pkl} dan \texttt{pubmedqa\_bm25\_ekspansi.pkl}) sehingga indeks tidak perlu dibangun ulang setiap kali \textit{notebook} dijalankan. Kedua, indeks vektor menggunakan \texttt{ChromaDB} dalam mode \textit{persistent client} dengan direktori penyimpanan terpisah untuk masing-masing kombinasi praproses, yaitu \texttt{pubmedqa\_chroma/} (korpus asli), \texttt{pubmedqa\_chroma\_ekspansi/} (korpus dengan ekspansi akronim), serta \texttt{pubmedqa\_chroma\_llama/} (korpus dengan \textit{embedding} dari Ollama). Pemisahan direktori ini bertujuan memastikan setiap variasi eksperimen memiliki basis data yang konsisten dan dapat diuji ulang tanpa risiko \textit{cache poisoning} antarkonfigurasi. Ringkasan layanan API eksternal dan basis data lokal disajikan pada Tabel~\ref{tbl:layanan-api}.
 
 \begin{table}[H]
 \centering
 \caption{Ringkasan Konfigurasi Layanan API Eksternal dan Basis Data Lokal}
 \label{tbl:layanan-api}
-\begin{tabular}{|p{4.5cm}|p{9cm}|}
+\begin{tabular}{|p{4.3cm}|p{8.7cm}|}
 \hline
 \textbf{Layanan / Basis Data} & \textbf{Konfigurasi} \\ \hline
 \multicolumn{2}{|l|}{\textit{Layanan API Model Bahasa Eksternal}} \\ \hline
@@ -81,8 +82,8 @@ OpenRouter           & Model \texttt{meta-llama/llama-3.3-70b-instruct} (kompati
 \multicolumn{2}{|l|}{\textit{Layanan Lokal}} \\ \hline
 Ollama               & \textit{Runtime} lokal untuk \texttt{llama3.2}, \texttt{llama3.3}, dan \texttt{nomic-embed-text} (768d); diakses melalui HTTP pada \texttt{localhost:11434} \\ \hline
 \multicolumn{2}{|l|}{\textit{Basis Data Lokal}} \\ \hline
-Indeks BM25          & Format \textit{pickle} (\texttt{pubmedqa\_bm25.pkl}, \texttt{pubmedqa\_bm25\_sh.pkl}) \\ \hline
-ChromaDB             & Mode \textit{persistent client}, direktori terpisah per praproses (\texttt{pubmedqa\_chroma/}, \texttt{pubmedqa\_chroma\_sh/}, \texttt{pubmedqa\_chroma\_llama/}) \\ \hline
+Indeks BM25          & Format \textit{pickle} (\texttt{pubmedqa\_bm25.pkl}, \texttt{pubmedqa\_bm25\_ekspansi.pkl}) \\ \hline
+ChromaDB             & Mode \textit{persistent client}, direktori terpisah per praproses (\texttt{pubmedqa\_chroma/}, \texttt{pubmedqa\_chroma\_ekspansi/}, \texttt{pubmedqa\_chroma\_llama/}) \\ \hline
 \multicolumn{2}{|l|}{\textit{Manajemen Konfigurasi}} \\ \hline
 Berkas \texttt{.env} & Pusat penyimpanan kredensial API; dimuat melalui \texttt{python-dotenv}; dimasukkan ke \texttt{.gitignore} \\ \hline
 \end{tabular}
@@ -91,27 +92,34 @@ Berkas \texttt{.env} & Pusat penyimpanan kredensial API; dimuat melalui \texttt{
 \subsection{Struktur dan Organisasi Repositori}
 \label{subsec:struktur-repo}
 
-Kode sumber sistem disusun dengan prinsip pemisahan tanggung jawab agar tiap komponen utama dapat dikembangkan dan diuji secara independen. Struktur direktori repositori mencerminkan alur eksperimen, mulai dari penyiapan korpus, pembangunan indeks, pemanggilan komponen mitigasi, hingga visualisasi hasil pada antarmuka pengguna. Tabel~\ref{tbl:struktur-repo} merangkum direktori utama beserta fungsinya.
+Kode sumber sistem disusun dengan prinsip pemisahan tanggung jawab agar tiap komponen utama dapat dikembangkan dan diuji secara independen. Direktori \textit{notebook} eksperimen ditata mengikuti tiga kelompok konfigurasi yang sama dengan Tabel~\ref{tbl:ringkasan-konfigurasi} di Bab~\ref{chap:perancangan}, dan setiap kelompok dipecah lagi per model bahasa, sehingga alur eksperimen mudah ditelusuri dari penyiapan korpus, pembangunan indeks, eksekusi tiap konfigurasi, hingga evaluasi dan visualisasi. Tabel~\ref{tbl:struktur-repo} merangkum direktori utama beserta fungsinya.
 
 \begin{table}[H]
 \centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \caption{Struktur Direktori Utama Repositori Sistem}
 \label{tbl:struktur-repo}
-\begin{tabular}{|p{4.5cm}|p{9cm}|}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{4.9cm}|p{8.4cm}|}
 \hline
 \textbf{Direktori / Berkas} & \textbf{Fungsi} \\ \hline
-\texttt{notebooks/}                 & \textit{Notebook} eksperimen konfigurasi utama (\textit{baseline}, +QR, +CR, +QR+CR) untuk tiga model: Llama, OpenAI, dan Claude \\ \hline
-\texttt{notebooks/BM25/}            & \textit{Notebook} variasi ablation BM25 saja (tanpa \textit{dense retrieval}) \\ \hline
-\texttt{notebooks/BM25 Expansion/}  & \textit{Notebook} variasi dengan ekspansi akronim Schwartz-Hearst beserta skrip pembangunan indeks dan evaluasi \textit{retrieval} \\ \hline
-\texttt{data/}                      & Dataset PubMedQA subset \textit{pqa\_labeled} hasil unduhan dari Hugging Face \\ \hline
-\texttt{results/}                   & Hasil \textit{phase 1} (jawaban LLM dan label prediksi) dan \textit{phase 2} (skor RAGAS) per konfigurasi dalam format JSON, dengan subdirektori \texttt{BM25/} dan \texttt{BM25\_Expansion/} \\ \hline
-\texttt{ui/}                        & Aplikasi web berbasis React + Vite + Tailwind untuk eksplorasi 500 pertanyaan hasil \textit{baseline} SH \\ \hline
-\texttt{pyproject.toml}             & Definisi dependensi proyek dan konfigurasi \textit{virtualenv} \\ \hline
-\texttt{.env}                       & Kredensial API eksternal (tidak diunggah ke repositori publik) \\ \hline
+\texttt{notebooks/00\_setup/}                  & \textit{Notebook} eksplorasi dataset PubMedQA dan pembangunan indeks korpus \\ \hline
+\texttt{notebooks/10\_bm25/}                   & Kelompok 1 (BM25 tanpa ekspansi), dengan subdirektori per model (\texttt{gpt4mini}, \texttt{claude}, \texttt{llama\_3\_3}, \texttt{llama\_3\_2}), masing-masing berisi \texttt{baseline}, \texttt{qr}, \texttt{cr}, \texttt{qr\_cr} \\ \hline
+\texttt{notebooks/\allowbreak 20\_hybrid\_tanpa\_ekspansi/} & Kelompok 2 (\textit{Hybrid} tanpa ekspansi), berstruktur sama per model dan konfigurasi \\ \hline
+\texttt{notebooks/\allowbreak 30\_hybrid\_dengan\_ekspansi/} & Kelompok 3 (\textit{Hybrid} dengan ekspansi akronim), berstruktur sama per model dan konfigurasi \\ \hline
+\texttt{notebooks/40\_evaluation/}             & \textit{Runner} evaluasi RAGAS, \textit{runner} metrik \textit{retrieval}, dan \textit{notebook} visualisasi hasil \\ \hline
+\texttt{notebooks/scripts/}                    & Modul bersama, antara lain \texttt{ragas\_evaluator.py}, \texttt{retrieval\_metrics.py}, dan \texttt{acronym\_expander.py} \\ \hline
+\texttt{notebooks/indexes/}                    & Indeks terpusat: berkas BM25 (\texttt{pubmedqa\_bm25.pkl}, \texttt{pubmedqa\_bm25\_ekspansi.pkl}) dan basis vektor Chroma \\ \hline
+\texttt{notebooks/archive/}                    & \textit{Notebook} legacy yang berada di luar lingkup akhir \\ \hline
+\texttt{data/}                                 & Dataset PubMedQA subset \textit{pqa\_labeled} hasil unduhan dari Hugging Face \\ \hline
+\texttt{results/}                              & Hasil per kelompok (\texttt{10\_bm25/}, \texttt{20\_hybrid\_\allowbreak tanpa\_ekspansi/}, \texttt{30\_hybrid\_\allowbreak dengan\_ekspansi/}) berisi berkas \textit{phase 1} (jawaban dan label), \textit{phase 2} (skor RAGAS), dan metrik \textit{retrieval} dalam format JSON \\ \hline
+\texttt{chatbot\_backend/}                     & \textit{Backend} prototipe berbasis FastAPI (\texttt{main.py}, \texttt{pipeline.py}, \texttt{models.py}, \texttt{prompts.py}) \\ \hline
+\texttt{ui/chatbot/}                           & Antarmuka web prototipe berbasis React + Vite + Tailwind \\ \hline
+\texttt{.env}                                  & Kredensial API eksternal (tidak diunggah ke repositori publik) \\ \hline
 \end{tabular}
 \end{table}
 
-Pemisahan antara \textit{notebook} eksperimen utama, variasi ablation BM25 saja, dan variasi dengan ekspansi akronim, beserta direktori hasil per kelompok eksperimen, bertujuan agar setiap konfigurasi dapat dijalankan ulang secara mandiri tanpa risiko menimpa hasil eksperimen lainnya. Pendekatan ini juga memudahkan pelacakan saat melakukan analisis komparatif antarkonfigurasi pada Bab~\ref{chap:evaluasi}.
+Penataan \textit{notebook} per kelompok konfigurasi dan per model, beserta direktori hasil yang juga dipisah per kelompok, bertujuan agar setiap konfigurasi dapat dijalankan ulang secara mandiri tanpa risiko menimpa hasil eksperimen lainnya. Indeks BM25 dan basis vektor disimpan terpusat pada \texttt{notebooks/indexes/} agar tidak terduplikasi di tiap \textit{notebook}, sedangkan modul evaluasi bersama pada \texttt{notebooks/scripts/} dipakai ulang oleh seluruh konfigurasi sehingga perhitungan metrik konsisten. Pendekatan ini memudahkan pelacakan saat melakukan analisis komparatif antarkonfigurasi pada Bab~\ref{chap:evaluasi}.
 
 
 % ============================================================================================
@@ -124,7 +132,7 @@ Tahap pengolahan data mengubah korpus mentah PubMedQA menjadi aset pengetahuan y
 \subsection{Pra-pemrosesan Korpus PubMedQA}
 \label{subsec:impl-praproses-korpus}
 
-Korpus PubMedQA subset \textit{pqa\_labeled} dimuat menggunakan pustaka \texttt{datasets} dari Hugging Face dengan identitas dataset \texttt{qiaojin/PubMedQA} dan konfigurasi \texttt{pqa\_labeled}. Setiap entri dataset memiliki empat \textit{field} utama, yaitu \textit{question}, \textit{context}, \textit{long\_answer}, dan \textit{final\_decision}. Untuk keperluan pembangunan indeks, hanya \textit{field context} yang dipakai sebagai sumber dokumen; sedangkan \textit{question} dipakai sebagai \textit{query} pada saat \textit{retrieval}, dan dua \textit{field} terakhir disisihkan sebagai \textit{ground truth} evaluasi tanpa dimasukkan ke basis data agar tidak terjadi kebocoran jawaban (\textit{answer leakage}).
+Korpus PubMedQA subset \textit{pqa\_labeled} dimuat menggunakan pustaka \texttt{datasets} dari Hugging Face dengan identitas dataset \texttt{qiaojin/PubMedQA} dan konfigurasi \texttt{pqa\_labeled}. Setiap entri dataset memiliki empat \textit{field} utama, yaitu \textit{question}, \textit{context}, \textit{long\_answer}, dan \textit{final\_decision}. Untuk keperluan pembangunan indeks, hanya \textit{field context} yang dipakai sebagai sumber dokumen; sedangkan \textit{question} dipakai sebagai kueri pada saat \textit{retrieval}, dan dua \textit{field} terakhir disisihkan sebagai \textit{ground truth} evaluasi tanpa dimasukkan ke basis data agar tidak terjadi kebocoran jawaban (\textit{answer leakage}).
 
 Fitur \textit{context} pada setiap entri berbentuk \textit{list} paragraf dengan label \textit{section} (\textit{BACKGROUND}, \textit{METHODS}, \textit{RESULTS}, \textit{CONCLUSIONS}, dan sebagainya). Pada implementasi, setiap paragraf diperlakukan sebagai satu \textit{chunk} terpisah dengan metadata berupa \textit{pubid}, \textit{section label}, dan posisi \textit{chunk} pada paper asal. Pendekatan ini dipilih karena ukuran paragraf pada abstrak biomedis sudah secara natural sesuai dengan \textit{context window} model \textit{embedding} dan tidak memerlukan strategi \textit{chunking} tambahan seperti \textit{sliding window} atau \textit{recursive splitting}. Setelah \textit{chunking} selesai, dilakukan normalisasi ringan berupa pembersihan \textit{whitespace} berlebih dan penghapusan karakter kontrol \textit{non-printable} jika ditemukan. Korpus dibangun dari seluruh 1.000 paper pada subset \textit{pqa\_labeled} dan menghasilkan kumpulan \textit{chunk} yang siap dipakai sebagai sumber dokumen.
 
@@ -140,10 +148,10 @@ Setelah pasangan akronim dan kepanjangannya teridentifikasi, sistem menjalankan 
 \begin{table}[H]
 \centering
 \footnotesize
-\setlength{\tabcolsep}{5pt}
+\setlength{\tabcolsep}{3pt}
 \caption{Contoh Hasil Ekspansi Akronim pada Teks \textit{Chunk} Dokumen}
 \label{tbl:ekspansi-contoh}
-\begin{tabular}{p{1.3cm} p{5.2cm} p{6.2cm}}
+\begin{tabular}{p{1.2cm} p{5.1cm} p{6.3cm}}
 \toprule
 \textbf{Akronim} & \textbf{Teks Asli (Korpus Original)} & \textbf{Teks Setelah Ekspansi} \\
 \midrule
@@ -243,6 +251,8 @@ Komponen \textit{dense retrieval} mencari \textit{chunk} dokumen berdasarkan kem
 
 Pemilihan model \textit{embedding} disesuaikan dengan LLM yang dipakai pada tahap \textit{generation}. Untuk konfigurasi yang memakai GPT-4.1-mini atau Claude Haiku 4.5, sistem memanggil model \texttt{text-embedding-3-small} dari OpenAI yang menghasilkan vektor berdimensi 1.536; sedangkan untuk konfigurasi yang memakai Llama, sistem memanggil model \texttt{nomic-embed-text} yang dijalankan secara lokal melalui Ollama dan menghasilkan vektor berdimensi 768. Penggunaan model \textit{embedding} yang sama saat \textit{indexing} dan saat kueri adalah syarat wajib, karena dua model yang berbeda akan menempatkan teks pada ruang vektor yang berbeda pula sehingga perhitungan kemiripan tidak bermakna. Setelah vektor kueri terbentuk, basis data ChromaDB menghitung \textit{cosine similarity} antara vektor tersebut dengan seluruh vektor pada koleksi, lalu mengembalikan 50 \textit{chunk} teratas (\textit{Dense Top-50}) sebagai kandidat untuk tahap fusi peringkat.
 
+Keunggulan utama \textit{dense retrieval} terletak pada kemampuannya menangkap kedekatan makna yang tidak dapat dijangkau oleh pencocokan kata kunci. Dua teks yang menggunakan istilah berbeda namun bermakna serupa, misalnya \textit{``physical activity''} dan \textit{``exercise''}, akan dipetakan ke posisi yang berdekatan pada ruang vektor sehingga tetap dapat saling ditemukan. Kemampuan ini menjadikan \textit{dense retrieval} bersifat komplementer terhadap BM25 yang unggul pada pencocokan istilah spesifik, dan keduanya kemudian digabungkan pada tahap \textit{hybrid retrieval}. Karena nilai \textit{cosine similarity} berkisar antara $-1$ hingga $1$, dengan nilai mendekati $1$ menandakan arah vektor yang hampir sama, skor ini dapat langsung dipakai sebagai ukuran relevansi semantik antara kueri dan dokumen.
+
 Untuk memberikan gambaran tentang kekuatan \textit{dense retrieval} dalam menangkap kemiripan makna, Tabel~\ref{tbl:dense-contoh} memperlihatkan ilustrasi pencocokan kueri \textit{``Does physical activity reduce postnatal depression?''} (yang merupakan parafrasa dari pertanyaan PubMedQA mengenai olahraga saat hamil dan depresi pasca-melahirkan) terhadap tiga \textit{chunk} kandidat. Nilai \textit{cosine similarity} pada tabel ini dihitung secara sederhana sebagai ilustrasi dan bukan merupakan skor sebenarnya dari korpus penelitian.
 
 \begin{table}[H]
@@ -291,6 +301,31 @@ Hasil dari kedua \textit{retriever} digabungkan melalui fungsi \texttt{rrf\_merg
 \end{algorithmic}
 \end{algorithm}
 
+Sebagai ilustrasi sederhana, misalkan pengguna bertanya \textit{``Does regular exercise reduce the risk of heart disease?''}. Setelah \textit{retrieval}, BM25 dan \textit{dense retrieval} menghasilkan dua daftar peringkat yang berbeda untuk empat dokumen kandidat. Tabel~\ref{tbl:rrf-contoh} menunjukkan peringkat masing-masing dokumen pada kedua daftar beserta skor RRF hasil penggabungannya dengan $k = 60$. Skor pada tabel ini dihitung sebagai ilustrasi dan bukan merupakan skor sebenarnya dari korpus penelitian.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Ilustrasi Penggabungan Peringkat dengan \textit{Reciprocal Rank Fusion} ($k = 60$); kolom BM25 dan \textit{Dense} menunjukkan peringkat dokumen pada masing-masing daftar}
+\label{tbl:rrf-contoh}
+\begin{tabular}{p{0.7cm} p{4.8cm} c c c c}
+\toprule
+\textbf{Dok.} & \textbf{Cuplikan \textit{Chunk}} & \textbf{BM25} & \textbf{\textit{Dense}} & \textbf{Skor RRF} & \textbf{Peringkat} \\
+\midrule
+$D_1$ & \textit{Regular exercise lowers the risk of heart disease.} & 1 & 1 & 0{,}0328 & \textbf{1} \\
+\addlinespace
+$D_2$ & \textit{Aerobic activity protects the heart and lowers cardiovascular risk.} & 3 & 2 & 0{,}0320 & 2 \\
+\addlinespace
+$D_3$ & \textit{Smoking increases the risk of heart disease.} & 2 & 4 & 0{,}0318 & 3 \\
+\addlinespace
+$D_4$ & \textit{Exercise is useful for managing body weight.} & 4 & 3 & 0{,}0315 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pada Tabel~\ref{tbl:rrf-contoh}, dokumen $D_1$ menempati peringkat satu pada kedua daftar, sehingga memperoleh skor RRF tertinggi ($\frac{1}{60+1} + \frac{1}{60+1} \approx 0{,}0328$) dan tetap berada di puncak. Yang lebih menarik adalah dokumen $D_3$ (\textit{``Smoking increases the risk of heart disease''}) yang menempati peringkat tinggi pada BM25 karena banyak memuat kata kunci yang sama (\textit{risk}, \textit{heart}, \textit{disease}), padahal maknanya justru berlawanan dengan maksud pertanyaan. Karena \textit{dense retrieval} menilai maknanya kurang relevan (peringkat 4), RRF menurunkan peringkat akhir $D_3$. Sebaliknya, dokumen $D_2$ yang kuat secara makna namun memakai kata berbeda (\textit{aerobic activity}) terangkat naik ke peringkat dua. Contoh ini memperlihatkan cara RRF menyeimbangkan kekuatan pencocokan kata kunci dari BM25 dan kemiripan makna dari \textit{dense retrieval}.
+
 
 % ============================================================================================
 \section{Implementasi Komponen Mitigasi Halusinasi}
@@ -306,12 +341,58 @@ Komponen \textit{Query Rewriting} diimplementasikan sebagai fungsi yang menerima
 
 LLM yang dipakai untuk \textit{Query Rewriting} adalah model yang sama dengan model untuk tahap \textit{generation} pada konfigurasi bersangkutan (\textit{gpt-4.1-mini}, \textit{claude-haiku-4.5}, atau \textit{llama-3.3-70b-instruct}). Pendekatan ini menjaga kompatibilitas gaya bahasa antara penulisan ulang dan pembentukan jawaban. Hasil \textit{rewriting} menggantikan pertanyaan asli pada tahap \textit{retrieval} (baik BM25 maupun \textit{dense}), namun pertanyaan asli tetap diteruskan ke tahap \textit{generation} agar LLM menjawab pertanyaan yang sebenarnya diajukan pengguna, bukan versi tulis-ulang internal.
 
+Tabel~\ref{tbl:qr-contoh} menampilkan beberapa contoh nyata pertanyaan sehari-hari beserta hasil penulisan ulangnya oleh modul \textit{Query Rewriting} pada prototipe. Terlihat bahwa pertanyaan sederhana ditulis ulang menjadi pertanyaan yang lebih kaya istilah biomedis, misalnya \textit{walking} menjadi \textit{ambulatory exercise} dan \textit{blood pressure} menjadi \textit{arterial hypertension}, tanpa mengubah maksud asli pertanyaan.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\caption{Contoh Hasil \textit{Query Rewriting} pada Beberapa Pertanyaan Pengguna}
+\label{tbl:qr-contoh}
+\begin{tabular}{p{5.4cm} p{7.6cm}}
+\toprule
+\textbf{Pertanyaan Asli} & \textbf{Hasil \textit{Query Rewriting}} \\
+\midrule
+\textit{Can walking lower blood pressure?} & \textit{Can regular ambulatory exercise reduce arterial hypertension in adults?} \\
+\addlinespace
+\textit{Is skipping breakfast bad for your health?} & \textit{Does skipping breakfast negatively impact metabolic health and increase the risk of cardiovascular disease and obesity?} \\
+\addlinespace
+\textit{Does drinking enough water help reduce headaches?} & \textit{Does adequate hydration reduce the incidence and severity of tension-type headaches and migraines?} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Implementasi Context Reranking}
 \label{subsec:impl-cr}
 
-Komponen \textit{Context Reranking} diimplementasikan menggunakan model \textit{cross-encoder} \texttt{ms-marco-MiniLM-L-6-v2} dari pustaka \texttt{sentence-transformers}. Model dipilih karena ukurannya kecil (sekitar 22 MB), dapat berjalan cepat pada CPU tanpa GPU, dan terbukti efektif untuk tugas \textit{passage reranking}. Berbeda dengan model \textit{embedding} yang menghasilkan satu vektor per teks, \textit{cross-encoder} menerima pasangan (\textit{query}, \textit{passage}) sekaligus pada satu inferensi dan menghasilkan skor relevansi tunggal, sehingga kualitas penilaian lebih akurat untuk tugas \textit{re-ranking} skala kecil.
+Komponen \textit{Context Reranking} diimplementasikan menggunakan model \textit{cross-encoder} \texttt{ms-marco-MiniLM-L-6-v2} dari pustaka \texttt{sentence-transformers}. Model dipilih karena ukurannya kecil (sekitar 22 MB), dapat berjalan cepat pada CPU tanpa GPU, dan terbukti efektif untuk tugas \textit{passage reranking}. Berbeda dengan model \textit{embedding} yang menghasilkan satu vektor per teks, \textit{cross-encoder} menerima pasangan (kueri, \textit{passage}) sekaligus pada satu inferensi dan menghasilkan skor relevansi tunggal, sehingga kualitas penilaian lebih akurat untuk tugas \textit{re-ranking} skala kecil.
 
 Pada implementasi, 20 \textit{chunk} teratas hasil RRF (\textit{Top-20}) dipasangkan satu per satu dengan kueri pengguna, sehingga terbentuk 20 pasangan masukan. Pasangan tersebut diteruskan ke metode \texttt{predict} dari objek \texttt{CrossEncoder} secara \textit{batch} agar inferensi efisien. Setelah skor relevansi diperoleh, \textit{chunk} diurutkan ulang dari skor tertinggi ke terendah, dan lima \textit{chunk} paling relevan (\textit{Top-5}) dipilih sebagai konteks akhir yang diteruskan ke tahap \textit{generation}. Pemilihan \textit{Top-5} ini konsisten dengan rancangan pada Bab~\ref{chap:perancangan} dan menjadi standar input konteks untuk seluruh konfigurasi sistem.
+
+Sebagai ilustrasi, misalkan pengguna bertanya \textit{``Does drinking water help with headaches?''}. Setelah tahap \textit{hybrid retrieval}, urutan dokumen kandidat masih didominasi oleh dokumen yang memuat kata kunci umum, sehingga dokumen yang paling langsung menjawab pertanyaan belum tentu berada di peringkat atas. \textit{Context Reranking} kemudian menilai ulang setiap pasangan (kueri, dokumen) menggunakan \textit{cross-encoder}, lalu menata ulang peringkatnya. Tabel~\ref{tbl:cr-contoh} membandingkan peringkat empat dokumen sebelum dan sesudah \textit{reranking}; peringkat pada tabel ini bersifat ilustratif.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\caption{Ilustrasi Peringkat Dokumen Sebelum dan Sesudah \textit{Context Reranking}}
+\label{tbl:cr-contoh}
+\begin{tabular}{p{0.8cm} p{7.4cm} c c}
+\toprule
+\textbf{Dok.} & \textbf{Cuplikan \textit{Chunk}} & \textbf{Sebelum} & \textbf{Sesudah (CR)} \\
+\midrule
+$C_1$ & \textit{Dehydration is a common trigger of headaches; drinking water can relieve them.} & 3 & \textbf{1} \\
+\addlinespace
+$C_2$ & \textit{Headaches can be caused by many factors such as stress.} & 1 & 3 \\
+\addlinespace
+$C_3$ & \textit{Water is essential for healthy kidney function.} & 2 & 4 \\
+\addlinespace
+$C_4$ & \textit{Staying well hydrated may reduce how often headaches occur.} & 4 & \textbf{2} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pada Tabel~\ref{tbl:cr-contoh}, dokumen $C_1$ yang secara langsung menjelaskan hubungan dehidrasi dengan sakit kepala naik dari peringkat 3 menjadi 1, dan $C_4$ yang juga relevan naik dari peringkat 4 menjadi 2. Sebaliknya, $C_2$ yang hanya menyebut sakit kepala secara umum dan $C_3$ yang membahas air untuk fungsi ginjal di luar konteks pertanyaan justru turun ke peringkat bawah. Hal ini terjadi karena \textit{cross-encoder} membaca pasangan kueri dan dokumen secara bersamaan, sehingga mampu menilai keterkaitan makna yang sebenarnya, bukan sekadar kemunculan kata. Dengan demikian, dokumen yang benar-benar menjawab pertanyaan terdorong ke peringkat teratas sebelum diteruskan ke tahap \textit{generation}.
 
 
 % ============================================================================================
@@ -322,15 +403,91 @@ Pada implementasi, 20 \textit{chunk} teratas hasil RRF (\textit{Top-20}) dipasan
 \subsection{Implementasi Tahap Generation}
 \label{subsec:impl-generation}
 
-Tahap \textit{generation} menerima pertanyaan asli pengguna beserta lima \textit{chunk} konteks pilihan (\textit{Top-5}), lalu meminta LLM membentuk jawaban berupa label klasifikasi (\textit{yes}, \textit{no}, atau \textit{maybe}) beserta penjelasan singkat yang berlandaskan pada konteks. \textit{Prompt} yang dikirim ke LLM disusun dengan tiga komponen, yaitu (1) instruksi peran sebagai asisten peneliti biomedis yang menjawab berdasarkan dokumen yang diberikan, (2) lima \textit{chunk} konteks yang dipisahkan oleh delimiter \texttt{===} dan dilengkapi dengan penanda sumber paper, serta (3) pertanyaan pengguna disertai instruksi eksplisit agar jawaban diakhiri dengan satu dari tiga label pada baris terakhir.
+Pada tahap \textit{generation}, sistem mengirim pertanyaan asli pengguna bersama lima dokumen konteks terbaik (\textit{Top-5}) ke LLM, lalu meminta LLM menjawab. Jawaban terdiri atas satu label (\textit{yes}, \textit{no}, atau \textit{maybe}) beserta penjelasan singkat yang harus berdasarkan dokumen tersebut. \textit{Prompt} yang dikirim berisi tiga bagian, yaitu (1) instruksi agar LLM berperan sebagai asisten peneliti biomedis yang hanya menjawab berdasarkan dokumen yang diberikan, (2) lima dokumen konteks yang dipisahkan dengan tanda \texttt{===} dan diberi penanda sumber paper, serta (3) pertanyaan pengguna disertai instruksi agar baris terakhir jawaban berupa salah satu dari ketiga label.
 
-Pemanggilan LLM dilakukan melalui klien resmi masing-masing penyedia, yaitu \texttt{openai} untuk OpenAI dan OpenRouter (\textit{schema}-nya kompatibel), \texttt{anthropic} untuk Claude, serta antarmuka HTTP Ollama untuk Llama lokal. Parameter pemanggilan ditetapkan sama untuk seluruh model, yaitu \textit{temperature} sebesar 0 untuk menjamin determinisme jawaban dan jumlah token maksimum yang disesuaikan dengan kebutuhan jawaban biomedis singkat. Keluaran LLM berupa teks bebas kemudian diproses oleh fungsi ekstraksi label yang mencoba tiga strategi secara berurutan, yaitu (1) pencocokan langsung pada baris terakhir, (2) penelusuran kata kunci \textit{yes}, \textit{no}, atau \textit{maybe} pada seluruh teks, dan (3) pencocokan berbasis ekspresi reguler sebagai penanganan kasus tepi. Apabila ketiga strategi gagal, label ditetapkan sebagai \textit{unknown} dan ditandai sebagai sampel yang tidak dapat dievaluasi.
+LLM dipanggil melalui klien resmi tiap penyedia, yaitu \texttt{openai} untuk OpenAI dan OpenRouter, \texttt{anthropic} untuk Claude, serta antarmuka HTTP Ollama untuk Llama lokal. Parameter pemanggilan dibuat sama untuk semua model, yaitu \textit{temperature} sebesar 0 agar jawaban konsisten dan tidak berubah-ubah, serta batas jumlah token secukupnya untuk jawaban biomedis yang singkat. Karena keluaran LLM berupa teks bebas, sistem perlu mengambil labelnya secara bertahap, yaitu pertama mencari label pada baris terakhir, jika gagal mencari kata \textit{yes}, \textit{no}, atau \textit{maybe} di seluruh teks, dan jika masih gagal menggunakan pencocokan pola (\textit{regex}). Bila ketiga cara tersebut gagal, label ditandai sebagai \textit{unknown} dan sampel tersebut tidak ikut dievaluasi.
 
 \subsection{Implementasi Kerangka Evaluasi}
 \label{subsec:impl-evaluasi}
 
-Evaluasi sistem dijalankan dalam dua fase yang menyimpan hasilnya secara inkremental untuk menghindari kehilangan data apabila proses terhenti di tengah jalan. Fase pertama (\textit{phase 1}) menjalankan seluruh proses \textit{retrieval} dan \textit{generation}, kemudian menyimpan jawaban LLM beserta label prediksi dan lima \textit{chunk} konteks ke berkas \texttt{*\_phase1\_answers.json}. Fase kedua (\textit{phase 2}) memuat keluaran fase pertama dan menjalankan evaluasi RAGAS pada empat metrik, yaitu \textit{faithfulness}, \textit{context recall}, \textit{answer relevancy}, dan \textit{context precision}, lalu menyimpannya ke berkas \texttt{*\_phase2\_custom.json}. Pemisahan fase ini juga memungkinkan eksperimen yang sama dijalankan ulang dengan metrik berbeda tanpa perlu memanggil ulang LLM untuk membentuk jawaban.
+Evaluasi dijalankan dalam dua tahap, dan hasilnya disimpan secara bertahap agar tidak hilang apabila proses berhenti di tengah jalan. Tahap pertama (\textit{phase 1}) menjalankan \textit{retrieval} dan \textit{generation}, lalu menyimpan jawaban LLM, label prediksi, dan lima dokumen konteks ke berkas \texttt{*\_phase1\_answers.json}. Tahap kedua (\textit{phase 2}) membaca hasil tahap pertama dan menghitung dua metrik RAGAS, yaitu \textit{faithfulness} dan \textit{context recall}, lalu menyimpannya ke berkas \texttt{*\_phase2\_custom.json}. Pemisahan ini membuat evaluasi dapat diulang dengan metrik berbeda tanpa perlu memanggil LLM lagi.
 
-Implementasi evaluasi RAGAS pada penelitian ini menjalankan empat metrik tersebut pada setiap pasangan (\textit{question}, \textit{contexts}, \textit{answer}, \textit{ground truth}) yang dihasilkan pada fase pertama. Setiap konteks yang diteruskan ke evaluator merupakan lima \textit{chunk} hasil \textit{retrieval} yang sama persis dengan yang dipakai LLM saat membentuk jawaban, sehingga skor evaluasi mencerminkan kualitas jawaban berdasarkan informasi yang benar-benar dilihat oleh sistem.
+Kedua metrik RAGAS dihitung untuk setiap pertanyaan menggunakan konteks yang sama persis dengan yang dilihat LLM saat menjawab, sehingga skornya benar-benar mencerminkan kualitas jawaban atas dokumen yang dipakai.
 
-Selain evaluasi RAGAS, sistem juga mengukur kualitas \textit{retrieval} secara terpisah menggunakan tiga metrik \textit{Information Retrieval} (IR) standar, yaitu \textit{Recall@5}, \textit{MAP@5}, dan \textit{nDCG@5}. Implementasi metrik ini berada pada modul \texttt{evaluate\_retrieval.py} pada direktori \texttt{notebooks/BM25 Expansion/}. Modul ini membandingkan lima \textit{chunk} teratas hasil \textit{retrieval} dengan \textit{chunk} yang memuat \textit{long\_answer} sebagai \textit{ground truth} relevansi, lalu menghitung ketiga metrik untuk seluruh sampel uji. Hasil pengukuran disimpan ke berkas \texttt{retrieval\_metrics.json} dan dipakai untuk membandingkan kualitas \textit{retrieval} antara konfigurasi BM25 saja, BM25 + \textit{dense} (Hybrid), serta variasi dengan dan tanpa ekspansi akronim.
+Selain RAGAS, kualitas \textit{retrieval} diukur secara terpisah menggunakan tiga metrik \textit{Information Retrieval} (IR) standar, yaitu \textit{Recall@5}, \textit{MAP@5}, dan \textit{nDCG@5}. Pengukuran ini dilakukan oleh modul \texttt{retrieval\_metrics.py} di direktori \texttt{notebooks/scripts/} yang dijalankan melalui \textit{notebook} \texttt{40\_evaluation/retrieval\_metrics\_runner.ipynb}. Modul ini membandingkan lima dokumen teratas hasil \textit{retrieval} dengan dokumen yang memuat jawaban benar (\textit{long\_answer}), lalu menghitung ketiga metrik untuk seluruh pertanyaan uji. Hasilnya disimpan ke berkas \texttt{*\_retrieval\_metrics.json} dan dipakai untuk membandingkan konfigurasi BM25 saja, \textit{Hybrid}, serta versi dengan dan tanpa ekspansi akronim.
+
+
+% ============================================================================================
+\section{Prototipe Antarmuka Demonstrasi}
+\label{sec:impl-prototipe}
+% ============================================================================================
+
+Selain \textit{notebook} eksperimen, dibangun pula sebuah prototipe untuk mendemonstrasikan sistem secara interaktif dan utuh dari ujung ke ujung. Prototipe ini menjalankan konfigurasi terbaik hasil evaluasi, yaitu \textit{Hybrid Retrieval} dengan ekspansi akronim, \textit{Query Rewriting}, dan \textit{Context Reranking} pada model GPT-4.1-mini. Tujuan utamanya adalah memenuhi kebutuhan nonfungsional \textit{explainability} dan \textit{retrieval transparency} yang telah dirancang pada Bab~\ref{chap:analisis-masalah}, yaitu pengguna tidak hanya menerima jawaban akhir, tetapi juga dapat menelusuri proses di baliknya.
+
+\subsection{Arsitektur Prototipe}
+\label{subsec:impl-arsitektur-prototipe}
+
+Prototipe terdiri dari dua bagian yang berjalan terpisah. Bagian \textit{frontend} dibangun menggunakan React, Vite, dan Tailwind CSS pada direktori \texttt{ui/chatbot/}, sedangkan bagian \textit{backend} dibangun menggunakan FastAPI pada direktori \texttt{chatbot\_backend/}. \textit{Backend} membungkus seluruh \textit{pipeline} RAG yang sama dengan yang dipakai pada eksperimen, mulai dari \textit{Query Rewriting}, \textit{hybrid retrieval}, \textit{context reranking}, hingga \textit{generation}, lalu mengeksposnya melalui satu \textit{endpoint} REST \texttt{/api/chat}. Ketika pengguna mengirim pertanyaan, \textit{frontend} memanggil \textit{endpoint} tersebut dan menerima jawaban beserta data pendukung berupa kueri hasil tulis-ulang, daftar dokumen yang ditarik, dan skor relevansi tiap tahap.
+
+Tangkapan layar antarmuka penuh prototipe disajikan pada Gambar~\ref{fig:prototype}. Antarmuka terbagi menjadi tiga panel, yaitu panel kiri berisi riwayat percakapan, panel tengah berisi area tanya jawab, dan panel kanan berisi rincian \textit{pipeline} (\textit{Pipeline Details}). Panel kanan inilah yang mewujudkan \textit{retrieval transparency}, karena menampilkan kueri asli pengguna, kueri hasil \textit{Query Rewriting}, serta daftar dokumen teratas lengkap dengan skor BM25, \textit{dense}, dan \textit{rerank} untuk setiap dokumen.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{image/prototype.jpg}
+  \caption{Antarmuka penuh prototipe BioRAG dengan panel riwayat, area percakapan, dan panel transparansi \textit{pipeline}}
+  \label{fig:prototype}
+\end{figure}
+
+Gambar~\ref{fig:chatbotdetail} memperlihatkan tampilan detail area percakapan ketika sistem menjawab sebuah pertanyaan biomedis. Setiap jawaban dilengkapi penanda tingkat keyakinan (\textit{confidence}) beserta nilai persentasenya, sehingga pengguna memperoleh indikasi seberapa kuat jawaban tersebut didukung oleh dokumen yang ditemukan.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{image/chatbotdetail.jpg}
+  \caption{Tampilan detail percakapan beserta penanda tingkat keyakinan jawaban}
+  \label{fig:chatbotdetail}
+\end{figure}
+
+\subsection{Mekanisme Guard Rail Keyakinan}
+\label{subsec:impl-guardrail}
+
+Untuk mengurangi risiko halusinasi pada pertanyaan yang berada di luar cakupan korpus, prototipe dilengkapi dengan \textit{guard rail} berbasis skor keyakinan. Skor ini dihitung sebagai gabungan tiga sinyal \textit{retrieval}. Pertama, skor \textit{rerank} pada dokumen peringkat satu, yaitu seberapa relevan dokumen terbaik menurut \textit{cross-encoder}. Kedua, kemiripan \textit{dense} pada dokumen peringkat satu, yaitu seberapa dekat makna dokumen terbaik dengan kueri. Ketiga, sinyal konsensus, yaitu rata-rata skor \textit{rerank} pada tiga dokumen teratas. Sinyal konsensus mengukur apakah beberapa dokumen teratas sama-sama relevan, bukan hanya satu dokumen peringkat satu yang kebetulan cocok, sehingga keyakinan sistem tidak bergantung pada satu dokumen saja. Ketiga sinyal digabungkan dengan bobot 0{,}5 untuk \textit{rerank}, 0{,}3 untuk \textit{dense}, dan 0{,}2 untuk konsensus, sehingga menghasilkan skor komposit pada rentang 0 sampai 1. Pembobotan ini ditetapkan berdasarkan tingkat keandalan masing-masing sinyal. Skor \textit{rerank} diberi bobot terbesar (0{,}5) karena \textit{cross-encoder} membaca pasangan kueri dan dokumen secara bersamaan sehingga menjadi penilai relevansi yang paling akurat. Kemiripan \textit{dense} diberi bobot 0{,}3 sebagai sinyal makna yang andal namun lebih kasar, karena membandingkan vektor kueri dan dokumen secara terpisah. Adapun sinyal konsensus diberi bobot terkecil (0{,}2) karena perannya hanya sebagai penyeimbang yang memastikan keyakinan tidak bertumpu pada satu dokumen saja, bukan sebagai penilai relevansi utama.
+
+Berdasarkan skor komposit tersebut, sistem menetapkan tiga tingkat keyakinan beserta perilaku yang berbeda, sebagaimana dirangkum pada Tabel~\ref{tbl:guardrail-threshold}.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Tingkat Keyakinan, Ambang Skor Komposit, dan Perilaku Sistem}
+\label{tbl:guardrail-threshold}
+\begin{tabular}{|p{2.5cm}|p{2.2cm}|p{8.1cm}|}
+\hline
+\textbf{Tingkat} & \textbf{Skor Komposit} & \textbf{Perilaku dan Pesan Sistem} \\ \hline
+Tinggi (\textit{high}) & $\geq 0{,}7$ & Sistem menjawab seperti biasa berdasarkan konteks yang ditemukan, tanpa peringatan tambahan. \\ \hline
+Sedang (\textit{moderate}) & $0{,}4$ sampai $< 0{,}7$ & Sistem tetap menjawab, tetapi LLM diberi instruksi untuk membuka jawaban dengan pernyataan singkat bahwa bukti yang tersedia terbatas atau tidak langsung, lalu hanya menyampaikan hal yang dapat didukung oleh konteks. \\ \hline
+Rendah (\textit{low}) & $< 0{,}4$ & Pemanggilan LLM dilewati. Sistem menampilkan penanda \textit{LLM SKIPPED} dan mengembalikan pesan bahwa bukti yang relevan tidak cukup untuk memberikan jawaban tepercaya, disertai saran agar pengguna berkonsultasi dengan tenaga medis. \\ \hline
+\end{tabular}
+\end{table}
+
+Sebagai contoh perhitungan nyata, pertanyaan pada Gambar~\ref{fig:prototype} (\textit{``Does high blood pressure reduce the risk of chronic low back pain?''}) memperoleh keyakinan sebesar 81\%. Untuk pertanyaan tersebut, sinyal \textit{retrieval} mentah yang dihasilkan adalah skor \textit{rerank} dokumen peringkat satu sekitar $-0{,}93$, kemiripan \textit{dense} dokumen peringkat satu sekitar $0{,}69$, dan rata-rata skor \textit{rerank} tiga dokumen teratas sekitar $-1{,}75$. Ketiga sinyal tersebut dinormalisasi dengan fungsi sigmoid $\sigma(\cdot)$ lalu digabungkan sesuai bobotnya, sebagaimana dirinci pada Tabel~\ref{tbl:confidence-contoh}.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\caption{Contoh Perhitungan Skor Keyakinan untuk Pertanyaan pada Gambar~\ref{fig:prototype}}
+\label{tbl:confidence-contoh}
+\begin{tabular}{l c l c}
+\toprule
+\textbf{Sinyal} & \textbf{Nilai Mentah} & \textbf{Normalisasi} & \textbf{Skor} \\
+\midrule
+\textit{rerank} (dok-1)   & $-0{,}93$ & $\sigma(0{,}5 \times (-0{,}93 + 3))$ & 0{,}738 \\
+\textit{dense} (dok-1)    & $0{,}69$  & $\min(1;\ 0{,}69 / 0{,}7)$          & 0{,}991 \\
+konsensus (\textit{top-3}) & $-1{,}75$ & $\sigma(0{,}4 \times (-1{,}75 + 4))$ & 0{,}711 \\
+\midrule
+\multicolumn{3}{l}{\textbf{Skor komposit} $= 0{,}5(0{,}738) + 0{,}3(0{,}991) + 0{,}2(0{,}711)$} & \textbf{0{,}81} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Karena skor komposit tersebut (0{,}81) berada pada kategori tinggi ($\geq 0{,}7$), sistem menjawab pertanyaan seperti biasa, sesuai dengan penanda keyakinan 81\% yang ditampilkan pada Gambar~\ref{fig:prototype}. Sebaliknya, contoh perilaku \textit{guard rail} pada tingkat rendah ketika menerima pertanyaan di luar cakupan korpus disajikan pada Lampiran~\ref{lamp:prototipe-guardrail}.

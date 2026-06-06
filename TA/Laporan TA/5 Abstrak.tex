@@ -4,9 +4,9 @@
 \begin{center}
 
     \textbf{Mitigasi Halusinasi pada RAG-LLM Biomedis Menggunakan Ekspansi Akronim, \textit{Query Rewriting}, dan \textit{Context Reranking}} \\
-    \vspace{0.4cm}
+    \vspace{0.25cm}
     oleh \\
-    \vspace{0.4cm}
+    \vspace{0.25cm}
     Ricky Wijaya\\
     18222043\\
 \end{center}
@@ -17,7 +17,7 @@
 
 Penelitian ini bertujuan merancang, mengimplementasikan, dan menganalisis sistem mitigasi halusinasi pada RAG-LLM yang menggabungkan tiga teknik komplementer, yaitu \textbf{ekspansi akronim} sebagai praproses dokumen, \textbf{\textit{query rewriting}} untuk memperkaya kueri pengguna, dan \textbf{\textit{context reranking}} untuk memilih konteks yang paling relevan sebelum tahap \textit{generation}. Sistem diuji pada \textit{dataset} PubMedQA dengan korpus 1.000 paper biomedis dan 500 pertanyaan evaluasi menggunakan empat model LLM, yaitu Llama 3.2, Llama 3.3 70B, GPT-4.1-mini, dan Claude Haiku 4.5.
 
-Hasil evaluasi menunjukkan bahwa ekspansi akronim meningkatkan kinerja \textit{retrieval} secara konsisten, yaitu \textit{Recall@5} naik dari 78,65\% menjadi 84,96\%, \textit{Mean Average Precision} (MAP@5) dari 75,32\% menjadi 82,47\%, dan \textit{Normalized Discounted Cumulative Gain} (nDCG@5) dari 83,08\% menjadi 88,45\%. Teknik \textit{context reranking} juga secara konsisten meningkatkan akurasi pada seluruh model LLM yang diuji sebesar 1--3 poin persentase. Konfigurasi terbaik dengan kombinasi ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking} pada GPT-4.1-mini mencapai \textit{accuracy} sebesar 74,8\% dan \textit{faithfulness} sebesar 0,980. Secara keseluruhan, hasil eksperimen menunjukkan bahwa kombinasi praproses dokumen dengan teknik mitigasi pada tahap \textit{retrieval} dan \textit{generation} mampu mengurangi halusinasi dan meningkatkan kualitas jawaban sistem tanya jawab biomedis, yang ditunjukkan oleh peningkatan \textit{accuracy} dan \textit{faithfulness} serta penurunan \textit{hallucination rate} dari 34,6\% menjadi 25,2\%.
+Hasil evaluasi menunjukkan bahwa ekspansi akronim meningkatkan kinerja \textit{retrieval} secara konsisten, yaitu \textit{Recall@5} naik dari 78,65\% menjadi 84,96\%, MAP@5 dari 75,32\% menjadi 82,47\%, dan nDCG@5 dari 83,08\% menjadi 88,45\%. Teknik \textit{context reranking} juga konsisten meningkatkan akurasi pada seluruh model LLM yang diuji sebesar 1--3 poin persentase. Konfigurasi terbaik yang menggabungkan ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking} pada GPT-4.1-mini mencapai \textit{accuracy} 74,8\% dan \textit{faithfulness} 0,980. Secara keseluruhan, hasil eksperimen menunjukkan bahwa kombinasi ketiga teknik mampu menurunkan \textit{hallucination rate} dari 34,6\% menjadi 25,2\% sekaligus meningkatkan kualitas jawaban sistem tanya jawab biomedis.
 
 Kata kunci: \textit{Large Language Models}, \textit{Retrieval-Augmented Generation}, Mitigasi Halusinasi, Sistem Tanya Jawab Biomedis, Ekspansi Akronim.
 \end{spacing}
