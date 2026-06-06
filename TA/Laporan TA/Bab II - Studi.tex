@@ -11,18 +11,16 @@
 \end{enumerate}
 
 
-Tonggak penting dari perkembangan LLM adalah kemunculan ChatGPT (\textit{Chat Generative Pretrained Transformer}) pada tanggal 30 November 2022 \parencite{minaee2024large}. ChatGPT merupakan \textit{chatbot} yang dikembangkan oleh OpenAI yang memungkinkan pengguna untuk menyelesaikan berbagai macam tugas, seperti tanya jawab (\textit{question answering}), pencarian informasi (\textit{information seeking}), perangkuman teks, dan banyak lagi \parencite{minaee2024large}. Saat ini ChatGPT didukung oleh model GPT-5 yang merupakan model terbaru dan terkuat dari varian model GPT \parencite{minaee2024large}.
+Perkembangan LLM berlangsung sangat cepat dalam beberapa tahun terakhir. Tonggak yang paling menonjol adalah peluncuran ChatGPT oleh OpenAI pada akhir tahun 2022 yang mempopulerkan penggunaan LLM untuk tanya jawab, pencarian informasi, dan perangkuman teks \parencite{minaee2024large}. Sejak saat itu bermunculan berbagai keluarga model, baik yang bersifat sumber tertutup seperti seri GPT dari OpenAI dan Claude dari Anthropic, maupun yang bersifat sumber terbuka seperti LLaMa dari Meta dan PaLM dari Google. Tren utama pada tiap generasi adalah peningkatan jumlah parameter, perluasan data pra-pelatihan, dan pelebaran \textit{context window}, yang secara umum meningkatkan kemampuan penalaran dan pemahaman model \parencite{zhao2023survey}; \parencite{minaee2024large}.
 
-Selain OpenAI, Meta dan Google pun ikut berlomba dalam pengembangan model LLM. Meta mengembangkan model bernama LLaMa yang, tidak seperti model GPT, bersifat \textit{open-source} \parencite{minaee2024large}. Karena sifatnya yang \textit{open-source}, LLaMa banyak digunakan oleh grup riset dengan tujuan untuk mengembangkan model \textit{LLM open-source} yang dapat berkompetisi dengan model \textit{closed-source} ataupun mengembangkan model LLM pada tugas-tugas tertentu \parencite{minaee2024large}. Dari variasi LLaMa, LLaMa-2, LLaMa-3, hingga LLaMa-3.1, pembaruan serta pengembangan terus dilakukan \parencite{zhao2023survey}. Dengan parameter yang meningkat (versi terbesarnya memiliki 405 miliar parameter), \textit{pre-training tokens} yang lebih banyak (15 triliun token), serta \textit{context window} yang diperluas (128 ribu), model LLaMa-3.1 telah meningkatkan kemampuannya secara signifikan dan mencapai kinerja yang kompetitif dibandingkan model-model \textit{closed-source} lainnya seperti GPT-4, GPT-4o, dan Claude 3.5 Sonnet pada berbagai patokan tertentu \parencite{zhao2023survey}.
+Walaupun kemampuannya terus meningkat, LLM masih memiliki keterbatasan mendasar yang menjadi latar belakang tugas akhir ini. Ketiga keterbatasan tersebut saling berkaitan dan diuraikan sebagai berikut.
 
-Sementara itu, Google mengembangkan model bernama PaLM (\textit{Pathways Language Model}) yang pertama kali diumumkan pada bulan April 2022 \parencite{minaee2024large}. Model ini merupakan model dengan 540 miliar parameter dan 780 miliar token yang mampu mengerjakan berbagai tugas bahasa alami dan \textit{use case} \parencite{zhao2023survey}. Model generasi berikutnya, yakni PaLM-2, merupakan model yang efisien dalam melakukan komputasi dengan kemampuan multibahasa dan penalaran yang lebih baik dibandingkan generasi sebelumnya \parencite{minaee2024large}. Melalui evaluasi yang ekstensif, model PaLM-2 meningkatkan kinerjanya pada berbagai ukuran model dengan tetap menunjukkan inferensi yang lebih cepat dan lebih efisien daripada PaLM \parencite{minaee2024large}.
-
-Walaupun LLM telah mencapai kemajuan dalam mengambil serta memanfaatkan informasi pengetahuan, model ini masih memiliki dua masalah utama \parencite{zhao2023survey}:
 \begin{enumerate}[1.]
-\item \textbf{\textit{Hallucination}}
-Salah satu isu yang menantang dalam membuat teks faktual adalah halusinasi, yakni ketika informasi yang dihasilkan oleh model LLM bertentangan dengan sumber yang ada atau tidak dapet diverifikasi oleh sumber yang tersedia \parencite{zhao2023survey}. Halusinasi dapat memengaruhi LLM untuk menghasilkan keluaran yang tidak diinginkan dan dapat menurunkan kinerjanya sehingga hal ini dapat menimbulkan risiko saat diterapkan dalam aplikasi dunia nyata \parencite{zhao2023survey}.
-\item \textbf{\textit{Domain Knowledge}}
-Isu lainnya yang dihadapi oleh LLM adalah kesulitan dalam menyelesaikan masalah yang memerlukan pengetahuan terbaru yang ada di luar data pelatihan \parencite{zhao2023survey}. Pendekatan yang dapat dilakukan untuk menghindari isu ini adalah dengan melakukan pembaruan pengetahuan pada LLM dengan data baru \parencite{zhao2023survey}. Namun, pembaruan pengetahuan dengan data baru perlu dilakukan secara efisien dan efektif untuk menghindari biaya yang mahal dalam melakukan \textit{fine tuning} serta menghindari masalah kelupaan yang fatal pada LLM \parencite{zhao2023survey}.
+\item \textbf{Keterbatasan pengetahuan (\textit{knowledge limitation}).} LLM menyimpan pengetahuan secara implisit di dalam parameter yang dipelajari dari data pra-pelatihan yang bersifat statis dan memiliki batas waktu (\textit{knowledge cutoff}). Akibatnya, model kesulitan menjawab pertanyaan yang memerlukan pengetahuan terbaru maupun pengetahuan domain spesifik yang berada di luar data pelatihan \parencite{zhao2023survey}. Pembaruan pengetahuan melalui \textit{fine-tuning} memang memungkinkan, tetapi mahal secara komputasi dan berisiko menimbulkan kelupaan fatal (\textit{catastrophic forgetting}) terhadap pengetahuan yang sudah dimiliki \parencite{zhao2023survey}.
+
+\item \textbf{Halusinasi (\textit{hallucination}).} Ketika dipaksa menjawab di luar batas pengetahuannya, LLM cenderung menghasilkan keluaran yang tampak meyakinkan tetapi bertentangan dengan fakta atau tidak dapat diverifikasi oleh sumber yang tersedia \parencite{zhao2023survey}. Halusinasi dapat menurunkan keandalan sistem dan menimbulkan risiko serius pada penerapan di domain sensitif seperti biomedis, sehingga menjadi masalah utama yang ingin dimitigasi pada tugas akhir ini.
+
+\item \textbf{Ketergantungan pada \textit{retrieval} (\textit{retrieval dependency}).} Untuk mengatasi dua keterbatasan di atas tanpa melatih ulang model, pendekatan yang banyak diadopsi adalah memberi LLM akses ke sumber pengetahuan eksternal pada saat inferensi melalui mekanisme \textit{retrieval}. Dengan menambatkan (\textit{grounding}) jawaban pada bukti yang diambil, kualitas jawaban menjadi sangat bergantung pada kualitas \textit{retrieval}: konteks yang relevan dapat menekan halusinasi, sedangkan \textit{retrieval} yang gagal menyediakan dokumen tepat justru dapat tetap memicu halusinasi. Ketergantungan inilah yang menjadi dasar pendekatan \textit{Retrieval-Augmented Generation} (RAG) yang dibahas pada subbab berikutnya.
 \end{enumerate}
 
 % ==========================================
@@ -32,12 +30,6 @@ Isu lainnya yang dihadapi oleh LLM adalah kesulitan dalam menyelesaikan masalah 
 
 \textit{Retrieval-Augmented Generation} (RAG) merupakan pendekatan yang memperkuat kemampuan \textit{Large Language Model} (LLM) dengan mengakses potongan dokumen yang relevan dari sumber pengetahuan eksternal melalui perhitungan kesamaan semantik \parencite{gao2023rag}. Dengan merujuk pada basis pengetahuan tersebut, RAG mampu mengurangi kecenderungan model menghasilkan konten yang salah secara faktual karena jawaban yang diberikan diarahkan pada bukti tekstual yang dapat diverifikasi.
 
-Secara umum, mekanisme RAG terdiri atas tiga tahapan utama yang saling berkaitan, yaitu \textit{indexing}, \textit{retrieval}, dan \textit{generation}. Pada tahap \textit{indexing}, sistem melakukan ekstraksi serta pembersihan data dari berbagai format dokumen seperti PDF, HTML, Word, maupun Markdown. Seluruh data tersebut dikonversi menjadi teks murni dan kemudian dipecah menjadi segmen-segmen kecil (\textit{chunks}) yang sesuai dengan batas kapasitas konteks model bahasa. Setiap segmen diubah menjadi representasi vektor menggunakan model \textit{embedding}, lalu disimpan ke dalam basis data vektor untuk memungkinkan pencarian berbasis kesamaan secara efisien.
-
-Tahap berikutnya, yaitu \textit{retrieval}, dimulai ketika pengguna memasukkan kueri. Sistem mengonversi kueri tersebut menjadi vektor menggunakan model \textit{embedding} yang sama seperti pada proses indeks. Kueri dalam bentuk vektor kemudian dibandingkan dengan vektor segmen dalam basis data, sehingga sistem dapat mengambil beberapa segmen dengan skor kesamaan tertinggi. Hasil pencarian inilah yang menjadi konteks pengetahuan bagi model.
-
-Tahap terakhir adalah \textit{generation}, di mana kueri dan konteks terpilih digabungkan menjadi sebuah \textit{prompt} yang kemudian diberikan kepada LLM. Model menghasilkan jawaban sesuai tugas yang diberikan, dan pada beberapa kasus, riwayat percakapan dapat digabungkan sehingga mendukung interaksi multi-putaran (\textit{multi-turn dialog}). Dengan cara ini, proses generasi menjadi lebih terarah dan berbasis bukti, mengurangi risiko \textit{hallucination} serta meningkatkan akurasi faktual \parencite{gao2023rag}.
-
 \begin{figure}[H]
   \centering
   \captionsetup{justification=centering}
@@ -46,42 +38,48 @@ Tahap terakhir adalah \textit{generation}, di mana kueri dan konteks terpilih di
   \label{gambar:rag_workflow}
 \end{figure}
 
+Secara umum, mekanisme RAG terdiri atas tiga tahapan utama yang saling berkaitan, yaitu \textit{indexing}, \textit{retrieval}, dan \textit{generation}, sebagaimana diilustrasikan pada Gambar~\ref{gambar:rag_workflow}. Pada tahap \textit{indexing}, sistem melakukan ekstraksi serta pembersihan data dari berbagai format dokumen seperti PDF, HTML, Word, maupun Markdown. Seluruh data tersebut dikonversi menjadi teks murni dan kemudian dipecah menjadi segmen-segmen kecil (\textit{chunks}) yang sesuai dengan batas kapasitas konteks model bahasa. Setiap segmen diubah menjadi representasi vektor menggunakan model \textit{embedding}, lalu disimpan ke dalam basis data vektor untuk memungkinkan pencarian berbasis kesamaan secara efisien.
+
+Tahap berikutnya, yaitu \textit{retrieval}, dimulai ketika pengguna memasukkan kueri. Sistem mengonversi kueri tersebut menjadi vektor menggunakan model \textit{embedding} yang sama seperti pada proses indeks. Kueri dalam bentuk vektor kemudian dibandingkan dengan vektor segmen dalam basis data, sehingga sistem dapat mengambil beberapa segmen dengan skor kesamaan tertinggi. Hasil pencarian inilah yang menjadi konteks pengetahuan bagi model.
+
+Tahap terakhir adalah \textit{generation}, di mana kueri dan konteks terpilih digabungkan menjadi sebuah \textit{prompt} yang kemudian diberikan kepada LLM. Model menghasilkan jawaban sesuai tugas yang diberikan, dan pada beberapa kasus, riwayat percakapan dapat digabungkan sehingga mendukung interaksi multi-putaran (\textit{multi-turn dialog}). Dengan cara ini, proses generasi menjadi lebih terarah dan berbasis bukti, mengurangi risiko halusinasi serta meningkatkan akurasi faktual \parencite{gao2023rag}.
+
 
 % ==========================================
 % 2.1.2 Hallucinations atau Konfabulasi pada Large Language Models
 % ==========================================
 
-\subsection{\textit{Hallucinations} atau Konfabulasi pada \textit{Large Language Models}}
+\subsection{Halusinasi atau Konfabulasi pada \textit{Large Language Models}}
 \label{subsec:hallucinations-llm}
 
-Konsep \textit{hallucination} pada awalnya berasal dari bidang psikologi, yang mengacu pada pengalaman perseptual tanpa adanya rangsangan eksternal atau persepsi yang menyimpang dari realitas. Dalam konteks \textit{Natural Language Processing} (NLP), halusinasi merujuk pada keluaran model bahasa besar (\textit{Large Language Model} atau LLM) yang tidak konsisten dengan fakta atau bahkan tidak masuk akal. Namun, beberapa peneliti menilai bahwa istilah \textit{hallucination} tidak sepenuhnya tepat karena memberikan kesan bahwa model memiliki persepsi sensorik sebagaimana manusia. Sebagai alternatif, istilah \textit{confabulation} dianggap lebih akurat, karena menggambarkan kecenderungan seseorang untuk "mengisi celah memori" dengan informasi yang tampak benar namun sebenarnya keliru, suatu analogi yang sesuai dengan perilaku LLM ketika menghasilkan keluaran yang salah namun tampak meyakinkan \parencite{math2024hallucination}.
+Konsep halusinasi pada awalnya berasal dari bidang psikologi, yang mengacu pada pengalaman perseptual tanpa adanya rangsangan eksternal atau persepsi yang menyimpang dari realitas. Dalam konteks \textit{Natural Language Processing} (NLP), halusinasi merujuk pada keluaran model bahasa besar (\textit{Large Language Model} atau LLM) yang tidak konsisten dengan fakta atau bahkan tidak masuk akal. Namun, beberapa peneliti menilai bahwa istilah halusinasi tidak sepenuhnya tepat karena memberikan kesan bahwa model memiliki persepsi sensorik sebagaimana manusia. Sebagai alternatif, istilah \textit{confabulation} dianggap lebih akurat, karena menggambarkan kecenderungan seseorang untuk "mengisi celah memori" dengan informasi yang tampak benar namun sebenarnya keliru, suatu analogi yang sesuai dengan perilaku LLM ketika menghasilkan keluaran yang salah namun tampak meyakinkan \parencite{math2024hallucination}.
 
-Dalam praktiknya, istilah \textit{hallucination} masih lebih banyak digunakan dalam literatur akademik karena telah menjadi istilah baku untuk menggambarkan fenomena keluaran tidak faktual pada LLM. Secara umum, halusinasi dapat dibedakan menjadi dua kategori utama, yaitu:
+Dalam praktiknya, istilah halusinasi masih lebih banyak digunakan dalam literatur akademik karena telah menjadi istilah baku untuk menggambarkan fenomena keluaran tidak faktual pada LLM. Secara umum, halusinasi dapat dibedakan menjadi dua kategori utama, yaitu:
 \begin{enumerate}[a.]
   \item \textbf{Halusinasi intrinsik}, yaitu ketika keluaran model bertentangan dengan masukan atau konteks sumber. Contohnya, model memberikan angka yang berbeda dari data yang sebenarnya terdapat dalam teks masukan.
   \item \textbf{Halusinasi ekstrinsik}, yaitu ketika keluaran tidak dapat diverifikasi dari masukan namun mungkin benar jika dibandingkan dengan pengetahuan eksternal \parencite{math2024hallucination}.
 \end{enumerate}
 
-Klasifikasi yang lebih mendalam dikemukakan oleh Huang et al. (2023) dengan menambahkan dua dimensi tambahan: halusinasi \textbf{faktualitas} (\textit{factuality hallucination}) dan halusinasi \textbf{kefidelan} (\textit{faithfulness hallucination}). Halusinasi faktualitas terjadi ketika keluaran tidak sesuai dengan fakta dunia nyata, sedangkan halusinasi kefidelan terjadi ketika keluaran menyimpang dari instruksi pengguna, konteks, atau logika internal model.
-Rawte et al. (2024) bahkan mengajukan dua variasi tambahan, yakni \textit{factual mirage} (jawaban salah terhadap pertanyaan yang benar) dan \textit{silver lining} (jawaban tampak benar terhadap pertanyaan yang salah) \parencite{math2024hallucination}.
+Klasifikasi yang lebih mendalam dikemukakan oleh Huang dkk.\ (2023) dengan menambahkan dua dimensi tambahan: halusinasi \textbf{faktualitas} (\textit{factuality hallucination}) dan halusinasi \textbf{kefidelan} (\textit{faithfulness hallucination}). Halusinasi faktualitas terjadi ketika keluaran tidak sesuai dengan fakta dunia nyata, sedangkan halusinasi kefidelan terjadi ketika keluaran menyimpang dari instruksi pengguna, konteks, atau logika internal model.
+Rawte dkk.\ (2024) bahkan mengajukan dua variasi tambahan, yakni \textit{factual mirage} (jawaban salah terhadap pertanyaan yang benar) dan \textit{silver lining} (jawaban tampak benar terhadap pertanyaan yang salah) \parencite{math2024hallucination}.
 
 Dalam konteks
-\textit{Retrieval-Augmented Generation} (RAG), batasan pengetahuan internal LLM dapat dikompensasi dengan pengambilan informasi eksternal. Namun, halusinasi tetap dapat muncul ketika sumber hasil \textit{retrieval} mengandung data yang salah, sudah usang, atau tidak relevan. Misalnya, apabila dokumen hasil pencarian mengandung informasi yang keliru, maka model dapat menghasilkan \textit{factual hallucination}. Sebaliknya, jika kueri pengguna ambigu, maka sistem dapat salah menafsirkan konteks dan menghasilkan \textit{faithfulness hallucination} \parencite{math2024hallucination}.
+\textit{Retrieval-Augmented Generation} (RAG), batasan pengetahuan internal LLM dapat dikompensasi dengan pengambilan informasi eksternal. Namun, halusinasi tetap dapat muncul ketika sumber hasil \textit{retrieval} mengandung data yang salah, sudah usang, atau tidak relevan. Misalnya, apabila dokumen hasil pencarian mengandung informasi yang keliru, maka model dapat menghasilkan halusinasi faktualitas. Sebaliknya, jika kueri pengguna ambigu, maka sistem dapat salah menafsirkan konteks dan menghasilkan halusinasi kefidelan \parencite{math2024hallucination}. Contoh berbagai jenis halusinasi tersebut dirangkum pada Tabel~\ref{tbl:jenis_hallucination_baru}.
 
 \begin{longtable}{|p{2cm}|p{2.5cm}|p{3.5cm}|p{4cm}|}
-\caption{Contoh berbagai jenis \textit{hallucination} pada \textit{Large Language Models (LLM)}}
+\caption{Contoh berbagai jenis halusinasi pada \textit{Large Language Models (LLM)}}
 \label{tbl:jenis_hallucination_baru} \\
 \hline
-\textbf{Jenis \textit{Hallucination}} &
+\textbf{Jenis Halusinasi} &
 \textbf{Contoh Pertanyaan / Instruksi} &
 \textbf{Keluaran Model} &
 \textbf{Penjelasan} \\
 \hline
 \endfirsthead
 
-\caption[]{Contoh jenis - jenis \textit{hallucination} pada \textit{Large Language Models} (lanjutan)} \\
+\caption[]{Contoh jenis - jenis halusinasi pada \textit{Large Language Models} (lanjutan)} \\
 \hline
-\textbf{Jenis \textit{Hallucination}} &
+\textbf{Jenis Halusinasi} &
 \textbf{Contoh Pertanyaan / Instruksi} &
 \textbf{Keluaran Model} &
 \textbf{Penjelasan} \\
@@ -133,14 +131,15 @@ Model menjawab berdasarkan asumsi naratif dari teks yang diberikan, padahal tind
 
 Fenomena halusinasi pada LLM dapat disebabkan oleh tiga faktor utama:
 \begin{enumerate}[a.]
-  \item keterbatasan pengetahuan internal model akibat cakupan data pelatihan yang terbatas;
-  \item ketidaksesuaian antara kueri pengguna dan hasil pencarian pada tahap \textit{retrieval};
-  \item kesalahan integrasi atau interpretasi konteks eksternal pada tahap \textit{generation}.
+\item keterbatasan pengetahuan internal model akibat cakupan data pelatihan yang terbatas;
+\item ketidaksesuaian antara kueri pengguna dan hasil pencarian pada tahap \textit{retrieval};
+\item kesalahan integrasi atau interpretasi konteks eksternal pada tahap \textit{generation}.
 \end{enumerate}
 
-Dengan demikian, deteksi dan mitigasi halusinasi menjadi aspek penting dalam pengembangan sistem berbasis LLM, khususnya pada domain yang menuntut keakuratan dan kredibilitas tinggi seperti kesehatan, keuangan, serta pendidikan \parencite{math2024hallucination}.
+Oleh karena itu, deteksi dan mitigasi halusinasi menjadi aspek penting dalam pengembangan sistem berbasis LLM, terutama pada domain yang menuntut tingkat akurasi dan kredibilitas yang tinggi, seperti medis, keuangan, dan pendidikan \parencite{math2024hallucination}.
 
-Khusus pada domain biomedis, halusinasi pada sistem RAG tidak hanya dipengaruhi oleh keterbatasan model pada tahap \textit{generation}, tetapi juga oleh kegagalan \textit{retrieval} akibat penggunaan akronim yang tidak konsisten antara kueri pengguna dan dokumen ilmiah. Ketika istilah panjang pada kueri tidak cocok dengan akronim yang tertulis pada abstrak (\textit{vocabulary mismatch}), dokumen yang sebenarnya relevan gagal ditemukan, dan kekosongan konteks ini kemudian memicu model menghasilkan jawaban yang tidak \textit{grounded}. Oleh karena itu, mitigasi halusinasi pada domain biomedis perlu memperbaiki dua hal sekaligus, yaitu memastikan dokumen yang relevan berhasil ditemukan pada tahap \textit{retrieval} dan memastikan jawaban tetap setia pada dokumen tersebut pada tahap \textit{generation}.
+Dari ketiga faktor tersebut, dua faktor terakhir, yaitu ketidaksesuaian antara kueri dan hasil pencarian (\textit{retrieval mismatch}) serta kesalahan integrasi konteks pada tahap \textit{generation}, menjadi tantangan yang semakin menonjol pada domain yang banyak menggunakan singkatan dan akronim, seperti medis, keuangan, dan hukum. Pada berbagai literatur di bidang tersebut, istilah yang panjang sering kali direpresentasikan dalam bentuk akronim untuk meningkatkan efisiensi penulisan. Akibatnya, ketika pengguna mengajukan pertanyaan menggunakan istilah lengkap, sementara dokumen sumber hanya memuat bentuk akronimnya, dapat terjadi ketidaksesuaian istilah yang dikenal sebagai \textit{vocabulary mismatch}. Kondisi ini menyebabkan dokumen yang sebenarnya relevan menjadi lebih sulit ditemukan pada tahap \textit{retrieval}, sehingga model memperoleh konteks yang kurang lengkap atau kurang relevan. Keterbatasan konteks tersebut pada akhirnya meningkatkan risiko munculnya halusinasi pada proses \textit{generation}. Dengan demikian, halusinasi pada domain medis, keuangan, maupun hukum tidak hanya dipengaruhi oleh keterbatasan pengetahuan internal model, tetapi juga oleh ketidakcocokan representasi istilah yang terjadi pada tahap pencarian dokumen.
+
 
 % % ==========================================
 % % 2.3 Deteksi Halusinasi Menggunakan LRP4RAG
@@ -241,7 +240,7 @@ Khusus pada domain biomedis, halusinasi pada sistem RAG tidak hanya dipengaruhi 
 
 % Eksperimen menunjukkan bahwa \textit{RAG-HAT} mampu mengurangi tingkat halusinasi pada sistem RAG sebesar 6,3\% hingga 8,7\% dibandingkan baseline GPT-4 yang telah di-\textit{instruction-tuned}. Selain itu, model hasil penyetelan \textit{RAG-HAT} menunjukkan peningkatan pada metrik \textit{faithfulness} dan \textit{factual consistency} tanpa menurunkan kelancaran jawaban.
 
-% Dengan mengintegrasikan proses deteksi, penulisan ulang, dan penyesuaian preferensi secara langsung dalam pipeline, \textit{RAG-HAT} menjadi salah satu pendekatan paling efektif dalam menyeimbangkan antara ketepatan faktual dan kemampuan generatif pada \textit{Large Language Models}. Pendekatan ini memperkuat arah tugas akhir ke depan untuk menghasilkan sistem RAG yang lebih \textit{hallucination-resilient} dan dapat dipercaya \parencite{raghat2024}.
+% Dengan mengintegrasikan proses deteksi, penulisan ulang, dan penyesuaian preferensi secara langsung dalam pipeline, \textit{RAG-HAT} menjadi salah satu pendekatan paling efektif dalam menyeimbangkan antara ketepatan faktual dan kemampuan generatif pada \textit{Large Language Models}. Pendekatan ini memperkuat arah tugas akhir ke depan untuk menghasilkan sistem RAG yang lebih \textit{halusinasi-resilient} dan dapat dipercaya \parencite{raghat2024}.
 
 % ==========================================
 % 2.5 Mitigasi Halusinasi pada Retrieval-Augmented Generation
@@ -250,9 +249,11 @@ Khusus pada domain biomedis, halusinasi pada sistem RAG tidak hanya dipengaruhi 
 \section{Mitigasi Halusinasi pada \textit{Retrieval-Augmented Generation}}
 \label{sec:mitigasi_halusinasi}
 
-Tinjauan oleh Math dkk.\ (2025) memberikan pemetaan komprehensif mengenai fenomena \textit{hallucination} pada \textit{Retrieval-Augmented Generation} (RAG), mulai dari sumber penyebab di setiap tahap \textit{pipeline} hingga teknik mitigasi yang telah diusulkan dalam literatur \parencite{math2024hallucination}. RAG sendiri dirancang untuk mengurangi ketergantungan LLM pada pengetahuan parametris dengan menambahkan konteks eksternal, tetapi dalam praktiknya sistem ini tetap rentan menghasilkan keluaran yang tidak akurat ketika terjadi kegagalan pada tahap \textit{retrieval} maupun \textit{generation}.
+Tinjauan oleh Math dkk.\ (2025) memberikan pemetaan komprehensif mengenai fenomena halusinasi pada \textit{Retrieval-Augmented Generation} (RAG), mulai dari sumber penyebab di setiap tahap \textit{pipeline} hingga teknik mitigasi yang telah diusulkan dalam literatur \parencite{math2024hallucination}. RAG sendiri dirancang untuk mengurangi ketergantungan LLM pada pengetahuan parametris dengan menambahkan konteks eksternal, tetapi dalam praktiknya sistem ini tetap rentan menghasilkan keluaran yang tidak akurat ketika terjadi kegagalan pada tahap \textit{retrieval} maupun \textit{generation}.
 
-Secara garis besar, \textit{hallucination} pada RAG dikelompokkan ke dalam dua sumber utama: \textbf{\textit{retrieval failure}} dan \textbf{\textit{generation deficiency}}. \textit{Retrieval failure} muncul ketika sistem gagal menemukan atau memilih informasi yang relevan, misalnya karena kueri ambigu, pemeringkatan dokumen yang buruk, atau korpus yang berisi data usang. Sementara itu, \textit{generation deficiency} berkaitan dengan ketidakmampuan model untuk menyelaraskan jawaban dengan konteks yang sudah benar, misalnya akibat panjang konteks, konflik antar sumber, atau desain \textit{prompt} yang tidak tegas \parencite{math2024hallucination}.
+Secara garis besar, halusinasi pada RAG dikelompokkan ke dalam dua sumber utama: \textbf{\textit{retrieval failure}} dan \textbf{\textit{generation deficiency}}. \textit{Retrieval failure} muncul ketika sistem gagal menemukan atau memilih informasi yang relevan, misalnya karena kueri ambigu, pemeringkatan dokumen yang buruk, atau korpus yang berisi data usang. Sementara itu, \textit{generation deficiency} berkaitan dengan ketidakmampuan model untuk menyelaraskan jawaban dengan konteks yang sudah benar, misalnya akibat panjang konteks, konflik antar sumber, atau desain \textit{prompt} yang tidak tegas \parencite{math2024hallucination}.
+
+Gambar~\ref{fig:causes_hallucination_rag} memetakan penyebab halusinasi pada RAG-LLM beserta solusi yang diusulkan pada setiap tahap \textit{pipeline}. Berdasarkan pemetaan tersebut, bagian ini menguraikan kerangka RAG yang dibahas oleh Math dkk.\ (2025), teknik mitigasi yang diusulkan pada setiap subtugas, serta ringkasan metrik dan dataset yang digunakan untuk mengevaluasi keberhasilan mitigasi tersebut.
 
 \begin{figure}[H]
   \centering
@@ -261,20 +262,17 @@ Secara garis besar, \textit{hallucination} pada RAG dikelompokkan ke dalam dua s
   \label{fig:causes_hallucination_rag}
 \end{figure}
 
-
-Bagian ini menguraikan kerangka RAG yang dibahas oleh Math dkk.\ (2025), teknik mitigasi yang diusulkan pada setiap subtugas, serta ringkasan metrik dan dataset yang digunakan untuk mengevaluasi keberhasilan mitigasi tersebut, sebagaimana dirangkum pada publikasi tersebut.
-
 % ------------------------------------------
 % 2.5.1 Kerangka RAG dan Titik Munculnya Halusinasi
 % ------------------------------------------
 
-\subsection{Kerangka RAG dan Titik Munculnya \textit{Hallucination}}
+\subsection{Kerangka RAG dan Titik Munculnya Halusinasi}
 \label{subsec:rag-framework-math}
 
 Math dkk.\ memodelkan sistem RAG sebagai rangkaian subtugas yang tersebar di beberapa tahap utama \parencite{math2024hallucination}:
 
 \begin{enumerate}[1.]
-  \item \textbf{Pemahaman kueri} (\textit{query understanding})
+  \item \textbf{Pemahaman kueri} (\textit{kueri understanding})
   Sistem menafsirkan pertanyaan atau instruksi pengguna dan membentuk kueri yang akan digunakan pada modul \textit{retrieval}. Ambiguitas, ketidaklengkapan, atau pemilihan kata yang keliru pada tahap ini dapat berujung pada \textit{retrieval failure}.
 
   \item \textbf{Pengambilan dokumen} (\textit{document retrieval})
@@ -284,7 +282,7 @@ Math dkk.\ memodelkan sistem RAG sebagai rangkaian subtugas yang tersebar di beb
   Sistem memilih subset konteks yang akan dimasukkan ke dalam \textit{prompt}, sering kali dengan melakukan pemotongan, pemeringkatan ulang, atau kompresi. Di sini dapat muncul masalah seperti konteks terlalu panjang, informasi penting terpotong, atau kebisingan yang tidak tersaring.
 
   \item \textbf{Integrasi pengetahuan} (\textit{knowledge integration})
-  LLM menggabungkan pengetahuan parametris internal dengan konteks eksternal yang diambil melalui \textit{retrieval}. Konflik antara pengetahuan internal dan eksternal, atau kegagalan dalam mengutamakan bukti dari konteks, dapat memicu \textit{hallucination}.
+  LLM menggabungkan pengetahuan parametris internal dengan konteks eksternal yang diambil melalui \textit{retrieval}. Konflik antara pengetahuan internal dan eksternal, atau kegagalan dalam mengutamakan bukti dari konteks, dapat memicu halusinasi.
 
   \item \textbf{Generasi jawaban} (\textit{answer generation})
   Pada tahap ini, model menghasilkan teks akhir yang akan diterima pengguna. Desain \textit{prompt}, strategi decoding, dan tidak adanya mekanisme verifikasi dapat membuat model memproduksi pernyataan yang tidak didukung dokumen.
@@ -305,11 +303,11 @@ Pada tahap \textit{retrieval}, halusinasi umumnya berasal dari kueri yang tidak 
 
 Jika kueri pengguna terlalu pendek, ambigu, atau mengandung istilah yang tidak spesifik, \textit{retriever} dapat mengembalikan dokumen yang tidak relevan. Untuk mengurangi masalah ini, beberapa studi mengusulkan:
 
-\begin{itemize}
-  \item \textbf{\textit{Query rewriting}} berbasis LLM, yaitu menulis ulang pertanyaan pengguna menjadi kueri yang lebih terstruktur, eksplisit, dan kaya konteks.
+\begin{enumerate}[a.]
+  \item \textbf{\textit{Query Rewriting}} berbasis LLM, yaitu menulis ulang pertanyaan pengguna menjadi kueri yang lebih terstruktur, eksplisit, dan kaya konteks.
   \item \textbf{Ekspansi kueri} (\textit{query expansion}) dengan menambahkan sinonim, istilah teknis terkait, atau entitas yang relevan.
   \item \textbf{\textit{Decontextualization}}, yaitu mengubah pertanyaan yang bergantung pada konteks percakapan menjadi bentuk mandiri sehingga lebih mudah dicocokkan dengan dokumen.
-\end{itemize}
+\end{enumerate}
 
 Teknik-teknik ini bertujuan mengurangi \textit{retrieval failure} yang muncul semata-mata karena formulasi kueri yang kurang baik. Dalam konteks tugas akhir ini, modul \textit{query rewriting} dapat ditempatkan sebelum \textit{retriever} untuk memastikan bahwa kueri yang masuk ke tahap berikutnya sudah dioptimalkan.
 
@@ -317,23 +315,23 @@ Teknik-teknik ini bertujuan mengurangi \textit{retrieval failure} yang muncul se
 
 Selain memperbaiki kueri, banyak penelitian fokus pada peningkatan kualitas \textit{retriever} itu sendiri. Pendekatan yang dibahas dalam tinjauan tersebut meliputi:
 
-\begin{itemize}
+\begin{enumerate}[a.]
   \item Penggunaan \textbf{\textit{dense retriever}} berbasis \textit{embedding}, yang menangkap kedekatan semantik di luar kecocokan kata kunci.
   \item \textbf{\textit{Hybrid retrieval}} yang menggabungkan metode klasik seperti BM25 dengan \textit{dense retriever} untuk menyeimbangkan presisi dan jangkauan.
   \item \textbf{\textit{Reranking}} dokumen menggunakan model yang lebih kuat (misalnya model \textit{cross-encoder}) untuk menilai kembali relevansi top-$k$ hasil awal.
-\end{itemize}
+\end{enumerate}
 
-\textit{Reranking} menjadi penting ketika \textit{retriever} bekerja pada skala besar: alih-alih mencoba mengoptimalkan seluruh daftar hasil, sistem fokus pada memeringkat ulang sejumlah kecil kandidat teratas. Dengan demikian, konteks yang akhirnya dimasukkan ke \textit{prompt} memiliki probabilitas lebih tinggi untuk benar-benar relevan, yang pada gilirannya mengurangi risiko \textit{hallucination} di tahap \textit{generation}.
+\textit{Reranking} menjadi penting ketika \textit{retriever} bekerja pada skala besar. Alih-alih mencoba mengoptimalkan seluruh daftar hasil, sistem fokus pada memeringkat ulang sejumlah kecil kandidat teratas. Dengan demikian, konteks yang akhirnya dimasukkan ke \textit{prompt} memiliki probabilitas lebih tinggi untuk benar-benar relevan, yang pada gilirannya mengurangi risiko halusinasi di tahap \textit{generation}.
 
 \subsubsection{Seleksi dan Kompresi Konteks}
 
 Masalah lain yang disorot adalah \textit{lost in the middle}, di mana LLM cenderung mengabaikan bagian tengah konteks yang panjang. Untuk mengatasi hal ini, beberapa teknik yang dibahas antara lain:
 
-\begin{itemize}
+\begin{enumerate}[a.]
   \item \textbf{Kompresi semantik} (\textit{semantic compression}), misalnya melalui model seperti \textit{LLMLingua}, yang merangkum konteks menjadi bentuk lebih ringkas namun tetap informatif.
   \item \textbf{Seleksi kontekstual} (\textit{selective context selection}), yaitu memilih hanya kalimat atau paragraf yang paling relevan terhadap pertanyaan.
   \item \textbf{\textit{Chunking} dan pengurutan adaptif}, di mana dokumen dipecah menjadi segmen-segmen kecil dan diurutkan ulang berdasarkan kedekatan dengan kueri.
-\end{itemize}
+\end{enumerate}
 
 Teknik seleksi dan kompresi ini menurunkan tingkat kebisingan pada konteks, sehingga model tidak terdorong membuat asumsi ketika berhadapan dengan informasi yang tidak relevan atau terlalu banyak.
 
@@ -346,13 +344,13 @@ Teknik seleksi dan kompresi ini menurunkan tingkat kebisingan pada konteks, sehi
 
 Pada tahap integrasi pengetahuan, LLM harus menggabungkan pengetahuan internal dengan bukti eksternal. Math dkk.\ menyoroti beberapa tantangan utama: konflik antar sumber, konsistensi logika, dan pemilihan bukti yang tepat \parencite{math2024hallucination}.
 
-Untuk mengurangi \textit{hallucination} pada tahap ini, beberapa pendekatan yang dibahas antara lain:
+Untuk mengurangi halusinasi pada tahap ini, beberapa pendekatan yang dibahas antara lain:
 
-\begin{itemize}
+\begin{enumerate}[a.]
   \item \textbf{Konsolidasi pengetahuan} (\textit{knowledge consolidation}), di mana sistem menyusun representasi terstruktur dari bukti sebelum generasi jawaban akhir.
   \item \textbf{Resolusi konflik} antar dokumen dengan meminta model mengidentifikasi perbedaan dan memilih bukti yang paling kredibel.
   \item \textbf{Mekanisme memori} (\textit{memory mechanisms}) yang menyimpan fakta penting dari konteks sehingga tidak hilang ketika model memproses konteks yang panjang.
-\end{itemize}
+\end{enumerate}
 
 Meskipun tugas akhir ini tidak secara langsung mengimplementasikan modul integrasi pengetahuan khusus, pemahaman terhadap tahap ini penting untuk menjelaskan bahwa mitigasi di tingkat \textit{retrieval} dan \textit{generation} perlu didesain agar selaras.
 
@@ -369,11 +367,11 @@ Pada tahap \textit{generation}, Math dkk.\ mengkaji berbagai teknik yang berfoku
 
 Berbagai teknik \textit{prompting} digunakan untuk memandu model agar lebih berhati-hati, antara lain:
 
-\begin{itemize}
+\begin{enumerate}[a.]
   \item \textbf{\textit{Chain-of-thought}} dan penalaran bertahap yang mendorong model menjelaskan langkah berpikirnya.
   \item \textbf{\textit{Vigilant prompting}} yang secara eksplisit menginstruksikan model untuk hanya menggunakan informasi dari konteks dan menyatakan ``tidak tahu'' jika bukti tidak memadai.
-  \item \textbf{Teknik lanjutan} seperti \textit{ReAct}, CoVe, CoN, dan CoK yang memadukan penalaran, aksi, verifikasi, dan pengelolaan dokumen untuk menekan \textit{hallucination}.
-\end{itemize}
+  \item \textbf{Teknik lanjutan} seperti \textit{ReAct}, CoVe, CoN, dan CoK yang memadukan penalaran, aksi, verifikasi, dan pengelolaan dokumen untuk menekan halusinasi.
+\end{enumerate}
 
 Teknik-teknik ini tidak mengubah parameter model, tetapi mengatur perilaku generasi melalui desain \textit{prompt} yang cermat.
 
@@ -381,11 +379,11 @@ Teknik-teknik ini tidak mengubah parameter model, tetapi mengatur perilaku gener
 
 Selain mengarahkan proses generasi, banyak tugas akhir yang menambahkan lapisan verifikasi setelah jawaban dihasilkan. Contoh pendekatan yang dibahas dalam tinjauan tersebut meliputi:
 
-\begin{itemize}
+\begin{enumerate}[a.]
   \item \textbf{Pemeriksaan berbasis konsistensi}, seperti \textit{SelfCheckGPT}, yang membandingkan beberapa sampel generasi untuk menilai stabilitas klaim \parencite{selfcheckgpt2023}.
   \item \textbf{Verifikasi berbasis sumber}, misalnya dengan memformulasikan ulang jawaban menjadi serangkaian pertanyaan dan memeriksanya terhadap konteks \textit{retrieval}.
   \item \textbf{Deteksi segmen halusinatif}, di mana model atau klasifikator tambahan menandai kalimat atau frasa yang tidak didukung bukti, untuk kemudian ditulis ulang atau dihapus.
-\end{itemize}
+\end{enumerate}
 
 Pendekatan-pendekatan verifikasi tersebut menggambarkan bahwa keluaran model masih dapat diperiksa ulang melalui lapisan tambahan setelah generasi sebagai salah satu arah mitigasi halusinasi pada sistem RAG. Pada tugas akhir ini, fokus mitigasi diarahkan pada tahap praproses dokumen, \textit{retrieval}, dan pemilihan konteks, sehingga lapisan verifikasi pascagenerasi berada di luar cakupan dan dibahas hanya sebagai konteks pustaka.
 
@@ -417,6 +415,7 @@ Skor BM25 untuk pasangan dokumen $D$ dan kueri $Q$ dirumuskan sebagai berikut.
 \label{eq:bm25}
 \text{BM25}(D, Q) = \sum_{q \in Q} \text{IDF}(q) \cdot \frac{f(q, D) \cdot (k_1 + 1)}{f(q, D) + k_1 \cdot \left(1 - b + b \cdot \dfrac{|D|}{\text{avgdl}}\right)}
 \end{equation}
+\eqcaption{Skor BM25}
 
 Pada Persamaan~\ref{eq:bm25}, $f(q, D)$ menyatakan jumlah kemunculan istilah $q$ pada dokumen $D$, $|D|$ adalah panjang dokumen $D$ dalam jumlah kata, dan $\text{avgdl}$ adalah rata-rata panjang dokumen pada korpus. Sementara itu, $\text{IDF}(q)$ adalah komponen \textit{inverse document frequency} yang dihitung sebagai berikut.
 
@@ -424,6 +423,7 @@ Pada Persamaan~\ref{eq:bm25}, $f(q, D)$ menyatakan jumlah kemunculan istilah $q$
 \label{eq:bm25-idf}
 \text{IDF}(q) = \ln \left( \dfrac{N - n(q) + 0{,}5}{n(q) + 0{,}5} + 1 \right)
 \end{equation}
+\eqcaption{\textit{Inverse Document Frequency} (IDF) pada BM25}
 
 Pada Persamaan~\ref{eq:bm25-idf}, $N$ adalah jumlah total dokumen pada korpus dan $n(q)$ adalah jumlah dokumen yang memuat istilah $q$ minimal sekali. Persamaan ini memberikan bobot yang lebih besar pada istilah langka, sehingga kemunculan istilah seperti ``hyperbaric'' lebih berkontribusi terhadap skor dibandingkan istilah umum seperti ``patient'' atau ``study''.
 
@@ -446,6 +446,7 @@ Kemiripan antara vektor kueri $\vec{q}$ dan vektor dokumen $\vec{d}$ dihitung me
 \label{eq:cosine-similarity}
 \text{cosine}(\vec{q}, \vec{d}) = \dfrac{\vec{q} \cdot \vec{d}}{\|\vec{q}\| \cdot \|\vec{d}\|}
 \end{equation}
+\eqcaption{\textit{Cosine Similarity}}
 
 Pada Persamaan~\ref{eq:cosine-similarity}, $\vec{q} \cdot \vec{d}$ adalah \textit{dot product} antara kedua vektor, sedangkan $\|\vec{q}\|$ dan $\|\vec{d}\|$ adalah norma Euclidean dari masing-masing vektor. Nilai \textit{cosine similarity} berada pada rentang $[-1, 1]$, dengan nilai mendekati satu menandakan kemiripan makna yang tinggi, nilai mendekati nol menandakan tidak ada hubungan, dan nilai negatif menandakan makna yang bertolak belakang. Pada konteks pencarian dokumen, hanya dokumen dengan skor kemiripan tertinggi yang dipilih sebagai kandidat.
 
@@ -500,11 +501,11 @@ Berikut beberapa contoh hasil transformasi kueri menggunakan \textit{query rewri
 \end{itemize}
 
 Berdasarkan eksperimen dalam Ma dkk.\ (2023), teknik ini memberikan keuntungan berikut:
-\begin{itemize}
+\begin{enumerate}[a.]
   \item \textbf{Peningkatan relevansi konteks} melalui kueri yang lebih kaya informasi.
   \item \textbf{Penurunan \textit{retrieval failure}}, khususnya pada kueri pendek.
   \item \textbf{Peningkatan \textit{faithfulness}} jawaban karena LLM memperoleh konteks yang lebih akurat.
-\end{itemize}
+\end{enumerate}
 
 Dalam konteks ini, \textit{query rewriting} berfungsi sebagai \textbf{mekanisme mitigasi pada tahap retrieval}. Dengan mengolah ulang kueri pengguna sebelum proses pencarian dokumen, sistem RAG menjadi lebih stabil dan lebih tahan terhadap halusinasi baik intrinsik maupun ekstrinsik.
 
@@ -517,7 +518,7 @@ Dalam konteks ini, \textit{query rewriting} berfungsi sebagai \textbf{mekanisme 
 \section{\textit{Context Reranking} untuk Mengurangi Kebisingan}
 \label{sec:context-reranking}
 
-Pada sistem \textit{Retrieval-Augmented Generation} (RAG), tahap \textit{retrieval} sering menghasilkan sekumpulan potongan dokumen (\textit{chunk}) yang tidak hanya relevan, tetapi juga mengandung informasi yang berulang, terlalu umum, atau bahkan tidak terkait dengan maksud kueri. Kondisi ini dikenal sebagai \textit{konteks berisik} dan dapat mendorong \textit{Large Language Model} (LLM) untuk melakukan \textit{hallucination}, karena model berusaha menyintesis jawaban dari bukti yang sebagian tidak tepat sasaran.
+Pada sistem \textit{Retrieval-Augmented Generation} (RAG), tahap \textit{retrieval} sering menghasilkan sekumpulan potongan dokumen (\textit{chunk}) yang tidak hanya relevan, tetapi juga mengandung informasi yang berulang, terlalu umum, atau bahkan tidak terkait dengan maksud kueri. Kondisi ini dikenal sebagai \textit{konteks berisik} dan dapat mendorong \textit{Large Language Model} (LLM) untuk melakukan halusinasi, karena model berusaha menyintesis jawaban dari bukti yang sebagian tidak tepat sasaran.
 
 Gambar~\ref{fig:context-reranking-flow} mengilustrasikan posisi \textit{context reranking} pada alur RAG. Setelah kueri dipakai untuk menarik sejumlah dokumen kandidat (\textit{top-k}) dari basis data vektor melalui \textit{semantic search}, sebuah modul \textit{reranker} menilai ulang relevansi tiap dokumen terhadap kueri, lalu menyusun ulang urutannya sehingga dokumen yang paling relevan menempati peringkat teratas sebelum diteruskan ke tahap \textit{generation} \parencite{chitika2025reranking}.
 
@@ -546,21 +547,21 @@ Untuk mengurangi kebisingan dan meningkatkan kualitas konteks yang dikonsumsi ol
   Berdasarkan skor komposit, sistem memilih \textit{top-m} \textit{chunk} terbaik sebagai konteks akhir yang akan diberikan kepada LLM. Nilai $m$ biasanya lebih kecil daripada $k$ sehingga konteks menjadi lebih ringkas, fokus, dan relevan.
 
   \item \textbf{Generasi jawaban berbasis konteks yang telah disaring} \\
-  LLM kemudian menghasilkan jawaban dengan mengandalkan \textit{top-m} konteks terpilih tersebut. Karena kebisingan berkurang dan sudut pandang kueri tercakup dengan lebih seimbang, kecenderungan \textit{hallucination} dapat ditekan.
+  LLM kemudian menghasilkan jawaban dengan mengandalkan \textit{top-m} konteks terpilih tersebut. Karena kebisingan berkurang dan sudut pandang kueri tercakup dengan lebih seimbang, kecenderungan halusinasi dapat ditekan.
 \end{enumerate}
 
-Pendekatan \textit{context reranking} ini relevan karena berfokus pada deteksi dan mitigasi \textit{hallucination} pada sistem RAG. Pada tahap \textit{retrieval}, modul \textit{reranker} berperan sebagai filter kualitas yang memastikan hanya konteks yang paling relevan dan informatif yang diteruskan ke model generatif. Dengan demikian, \textit{hallucination} yang disebabkan oleh \textit{retrieval failure} berupa pemilihan dokumen yang salah atau berisik dapat dikurangi sebelum memasuki tahap \textit{generation} \parencite{math2024hallucination,craft2023richresponses}.
+Pendekatan \textit{context reranking} ini relevan karena berfokus pada deteksi dan mitigasi halusinasi pada sistem RAG. Pada tahap \textit{retrieval}, modul \textit{reranker} berperan sebagai filter kualitas yang memastikan hanya konteks yang paling relevan dan informatif yang diteruskan ke model generatif. Dengan demikian, halusinasi yang disebabkan oleh \textit{retrieval failure} berupa pemilihan dokumen yang salah atau berisik dapat dikurangi sebelum memasuki tahap \textit{generation} \parencite{math2024hallucination,craft2023richresponses}.
 
 % ==========================================
 % 2.X Active Detection untuk Mitigasi Halusinasi
 % ==========================================
 
-\section{\textit{Active Detection} untuk Mitigasi \textit{Hallucination}}
+\section{\textit{Active Detection} untuk Mitigasi Halusinasi}
 \label{sec:active-detection}
 
-Varshney dkk.\ (2023) mengusulkan pendekatan \textit{active detection} sebagai mekanisme deteksi dan mitigasi \textit{hallucination} secara langsung selama proses generasi, bukan setelah teks sepenuhnya dihasilkan. Ide utamanya adalah bahwa \textit{Large Language Model} (LLM) menunjukkan pola tertentu ketika berada pada kondisi berisiko tinggi menghasilkan \textit{hallucination}, terutama ketika model menghasilkan token dengan tingkat kepercayaan rendah. Dengan melakukan pemeriksaan terhadap bagian yang memiliki \textit{low-confidence}, sistem dapat menghentikan proses generasi sementara dan memicu langkah verifikasi atau koreksi sebelum melanjutkan \parencite{varshney2023stitch}.
+Varshney dkk.\ (2023) mengusulkan pendekatan \textit{active detection} sebagai mekanisme deteksi dan mitigasi halusinasi secara langsung selama proses generasi, bukan setelah teks sepenuhnya dihasilkan. Ide utamanya adalah bahwa \textit{Large Language Model} (LLM) menunjukkan pola tertentu ketika berada pada kondisi berisiko tinggi menghasilkan halusinasi, terutama ketika model menghasilkan token dengan tingkat kepercayaan rendah. Dengan melakukan pemeriksaan terhadap bagian yang memiliki \textit{low-confidence}, sistem dapat menghentikan proses generasi sementara dan memicu langkah verifikasi atau koreksi sebelum melanjutkan \parencite{varshney2023stitch}.
 
-Pendekatan ini sangat relevan dalam konteks tugas akhir mengenai deteksi dan mitigasi \textit{hallucination} pada sistem \textit{Retrieval-Augmented Generation} (RAG), karena banyak \textit{hallucination} muncul pada bagian tertentu dari keluaran model, terutama ketika konteks eksternal kurang kuat atau ambigu.
+Pendekatan ini sangat relevan dalam konteks tugas akhir mengenai deteksi dan mitigasi halusinasi pada sistem \textit{Retrieval-Augmented Generation} (RAG), karena banyak halusinasi muncul pada bagian tertentu dari keluaran model, terutama ketika konteks eksternal kurang kuat atau ambigu.
 
 \subsection{Prinsip Dasar \textit{Active Detection}}
 
@@ -568,7 +569,7 @@ Metode \textit{active detection} berangkat dari dua pengamatan kunci:
 
 \begin{enumerate}[1.]
     \item \textbf{Token berisiko tinggi biasanya memiliki probabilitas rendah}.
-    Model cenderung berada pada kondisi tidak pasti ketika menemukan konteks yang tidak jelas, dan hal ini tercermin melalui distribusi probabilitas token yang melebar. Token yang dipilih pada kondisi ini berpotensi menyebabkan \textit{hallucination}.
+    Model cenderung berada pada kondisi tidak pasti ketika menemukan konteks yang tidak jelas, dan hal ini tercermin melalui distribusi probabilitas token yang melebar. Token yang dipilih pada kondisi ini berpotensi menyebabkan halusinasi.
 
     \item \textbf{Verifikasi lokal dapat mencegah kesalahan global}.
     Dengan menghentikan generasi pada momen ketidakpastian dan melakukan pemeriksaan tambahan, sistem mampu memperbaiki kesalahan sebelum menjadi bagian dari keluaran akhir.
@@ -591,38 +592,38 @@ Berdasarkan Varshney dkk.\ (2023), proses \textit{active detection} mencakup tig
     \end{itemize}
 
     \item \textbf{Koreksi sebelum melanjutkan generasi}
-    Jika token berisiko dianggap tidak valid atau tidak didukung oleh konteks, model memilih alternatif token dengan probabilitas yang lebih tinggi atau mengulang prediksi. Dengan cara ini, kesalahan dicegah sebelum berkembang menjadi \textit{hallucination} yang lebih besar.
+    Jika token berisiko dianggap tidak valid atau tidak didukung oleh konteks, model memilih alternatif token dengan probabilitas yang lebih tinggi atau mengulang prediksi. Dengan cara ini, kesalahan dicegah sebelum berkembang menjadi halusinasi yang lebih besar.
 \end{enumerate}
 
 \subsection{Kelebihan Metode \textit{Active Detection}}
 
 Pendekatan ini menawarkan beberapa manfaat penting:
 
-\begin{itemize}
+\begin{enumerate}[a.]
     \item \textbf{Mitigasi proaktif}.
-    Berbeda dengan metode pascagenerasi, \textit{active detection} mencegah \textit{hallucination} saat proses generasi berlangsung.
+    Berbeda dengan metode pascagenerasi, \textit{active detection} mencegah halusinasi saat proses generasi berlangsung.
 
     \item \textbf{Tidak memerlukan model verifikator besar}.
     Seluruh proses berjalan dengan memanfaatkan informasi internal model, terutama distribusi probabilitas token.
 
     \item \textbf{Dapat dikombinasikan dengan RAG}.
     Dalam sistem RAG, metode ini dapat melengkapi pendekatan lain seperti \textit{context reranking} atau \textit{query rewriting}, sehingga mitigasi dapat dilakukan baik pada sisi \textit{retrieval} maupun pada saat generasi \parencite{math2024hallucination}.
-\end{itemize}
+\end{enumerate}
 
 \subsection{Keterbatasan}
 
 Walaupun efektif, \textit{active detection} memiliki beberapa keterbatasan:
 
-\begin{itemize}
+\begin{enumerate}[a.]
     \item \textbf{Membutuhkan akses probabilitas token}.
-    Pendekatan ini hanya dapat diterapkan pada model yang menyediakan \textit{logits} atau probabilitas token, sehingga tidak berlaku untuk model \textit{closed-source} tertentu.
+    Pendekatan ini hanya dapat diterapkan pada model yang menyediakan \textit{logits} atau probabilitas token, sehingga tidak berlaku untuk model sumber tertutup tertentu.
 
     \item \textbf{Penentuan ambang yang sensitif}.
     Ambang probabilitas terlalu rendah gagal mendeteksi kesalahan, sedangkan ambang terlalu tinggi menyebabkan verifikasi berlebihan yang meningkatkan latensi.
 
     \item \textbf{Tidak selalu menangkap halusinasi semantik kompleks}.
     Token dengan probabilitas tinggi pun dapat menghasilkan klaim salah jika konteks \textit{retrieval} tidak relevan.
-\end{itemize}
+\end{enumerate}
 
 
 % % % ==========================================
@@ -631,7 +632,7 @@ Walaupun efektif, \textit{active detection} memiliki beberapa keterbatasan:
 % \section{Dataset RAGTruth (2025)}
 % \label{sec:ragtruth}
 
-% Untuk memahami dan mengukur fenomena \textit{hallucination} pada sistem \textit{Retrieval-Augmented Generation (RAG)}, diperlukan dataset dengan anotasi yang eksplisit terhadap kesalahan faktual dan ketidaksetiaan (\textit{unfaithfulness}) keluaran model. Salah satu dataset paling komprehensif yang dikembangkan untuk tujuan ini adalah \textbf{RAGTruth}, yang diperkenalkan oleh Niu et al. (2025) \parencite{ragtruth2025}. Dataset ini dirancang untuk memberikan dasar evaluasi yang lebih objektif terhadap fenomena halusinasi pada sistem berbasis LLM dengan pendekatan \textit{retrieval}.
+% Untuk memahami dan mengukur fenomena halusinasi pada sistem \textit{Retrieval-Augmented Generation (RAG)}, diperlukan dataset dengan anotasi yang eksplisit terhadap kesalahan faktual dan ketidaksetiaan (\textit{unfaithfulness}) keluaran model. Salah satu dataset paling komprehensif yang dikembangkan untuk tujuan ini adalah \textbf{RAGTruth}, yang diperkenalkan oleh Niu et al. (2025) \parencite{ragtruth2025}. Dataset ini dirancang untuk memberikan dasar evaluasi yang lebih objektif terhadap fenomena halusinasi pada sistem berbasis LLM dengan pendekatan \textit{retrieval}.
 
 % \textit{RAGTruth} menggabungkan tiga kategori tugas utama yang mencerminkan aplikasi nyata dari sistem berbasis RAG, yaitu:
 % \begin{enumerate}[1.]
@@ -698,17 +699,17 @@ Walaupun efektif, \textit{active detection} memiliki beberapa keterbatasan:
 % \section{SelfCheckGPT: Deteksi Halusinasi Tanpa Sumber Eksternal}
 % \label{sec:selfcheckgpt}
 
-% \textbf{SelfCheckGPT} diperkenalkan sebagai pendekatan \textit{zero-resource} dan \textit{black-box} untuk mendeteksi \textit{hallucination} pada keluaran \textit{Large Language Models} (LLM) tanpa memerlukan data pelatihan khusus, model verifikator terpisah, ataupun korpus rujukan eksternal \parencite{selfcheckgpt2023}. Intuisi utamanya adalah memanfaatkan \textit{self-consistency}: jika suatu pernyataan benar dan stabil, maka beberapa sampel generasi yang dihasilkan dengan \textit{stochastic sampling} (misalnya pengaturan \textit{temperature} $>0$) cenderung saling bersepakat; sebaliknya, pernyataan halusinator akan menunjukkan ketidakselarasan antarsampel.
+% \textbf{SelfCheckGPT} diperkenalkan sebagai pendekatan \textit{zero-resource} dan \textit{black-box} untuk mendeteksi halusinasi pada keluaran \textit{Large Language Models} (LLM) tanpa memerlukan data pelatihan khusus, model verifikator terpisah, ataupun korpus rujukan eksternal \parencite{selfcheckgpt2023}. Intuisi utamanya adalah memanfaatkan \textit{self-consistency}: jika suatu pernyataan benar dan stabil, maka beberapa sampel generasi yang dihasilkan dengan \textit{stochastic sampling} (misalnya pengaturan \textit{temperature} $>0$) cenderung saling bersepakat; sebaliknya, pernyataan halusinator akan menunjukkan ketidakselarasan antarsampel.
 
 % Secara ringkas, prosedur \textit{SelfCheckGPT} meliputi:
 % \begin{enumerate}[1.]
 %   \item \textbf{Pembangkitan multi-sampel} (\textit{stochastic generations}) :model menghasilkan beberapa respons alternatif atas \textit{prompt} yang sama.
 %   \item \textbf{Ekstraksi klaim/kalimat} :keluaran awal diurai menjadi klaim/kalimat kandidat untuk dicek.
 %   \item \textbf{Pemeriksaan konsistensi} :setiap klaim dibandingkan dengan himpunan sampel alternatif menggunakan gabungan ukuran kesepakatan (\textit{overlap} leksikal), kesemestaan semantik (misalnya \textit{embedding similarity}), dan/atau pengujian \textit{entailment} berbasis \textit{Natural Language Inference (NLI)}.
-%   \item \textbf{Skoring kehalusan} :derajat ketidakselarasan antarsampel dirangkum menjadi skor risiko \textit{hallucination} pada level kalimat atau keluaran.
+%   \item \textbf{Skoring kehalusan} :derajat ketidakselarasan antarsampel dirangkum menjadi skor risiko halusinasi pada level kalimat atau keluaran.
 % \end{enumerate}
 
-% Karena bersifat \textit{black-box}, \textit{SelfCheckGPT} tidak mengakses probabilitas token internal dan tidak mengubah parameter model, cocok untuk skenario produksi yang membatasi akses model. Dalam pengujian pada berbagai \textit{benchmark} (misalnya \textit{question answering} dan \textit{summarization}), pendekatan ini menunjukkan kemampuan deteksi \textit{hallucination} yang kompetitif terhadap metrik berbasis probabilitas maupun metode verifikasi yang memerlukan \textit{retrieval} \parencite{selfcheckgpt2023}.
+% Karena bersifat \textit{black-box}, \textit{SelfCheckGPT} tidak mengakses probabilitas token internal dan tidak mengubah parameter model, cocok untuk skenario produksi yang membatasi akses model. Dalam pengujian pada berbagai \textit{benchmark} (misalnya \textit{question answering} dan \textit{summarization}), pendekatan ini menunjukkan kemampuan deteksi halusinasi yang kompetitif terhadap metrik berbasis probabilitas maupun metode verifikasi yang memerlukan \textit{retrieval} \parencite{selfcheckgpt2023}.
 
 % % ------------------------------------------
 % % 2.6.1 Kelebihan dan Keterbatasan
@@ -720,7 +721,7 @@ Walaupun efektif, \textit{active detection} memiliki beberapa keterbatasan:
 % \textit{SelfCheckGPT} menawarkan sejumlah kelebihan:
 % \begin{enumerate}[a.]
 %   \item \textbf{Tanpa sumber eksternal} :tidak membutuhkan dokumen rujukan atau \textit{knowledge base}; murni mengandalkan variansi generasi model.
-%   \item \textbf{Model-agnostic dan \textit{deployment-friendly}} :dapat diterapkan pada model tertutup (\textit{closed-source}) dan mudah diintegrasikan ke dalam \textit{pipeline} yang sudah ada.
+%   \item \textbf{Model-agnostic dan \textit{deployment-friendly}} :dapat diterapkan pada model tertutup (sumber tertutup) dan mudah diintegrasikan ke dalam \textit{pipeline} yang sudah ada.
 %   \item \textbf{Granularitas fleksibel} :dapat memberikan penilaian pada level kalimat/klaim maupun keseluruhan jawaban.
 % \end{enumerate}
 
@@ -746,27 +747,27 @@ Walaupun efektif, \textit{active detection} memiliki beberapa keterbatasan:
 
 
 % ==========================================
-% 2.7 Prompt Engineering untuk Reduksi Hallucination
+% 2.7 Prompt Engineering untuk Reduksi Halusinasi
 % ==========================================
 
-\section{\textit{Prompt Engineering} untuk Reduksi \textit{Hallucination}}
-\label{sec:prompt-reduce-hallucination}
+\section{\textit{Prompt Engineering} untuk Reduksi Halusinasi}
+\label{sec:prompt-reduce-halusinasi}
 
-Selain arsitektur model dan kualitas data, perancangan \textit{prompt} juga berperan besar dalam memicu maupun mengurangi \textit{hallucination} pada LLM. Studi survei oleh Sahoo dkk.\ (2024) menunjukkan bahwa \textit{prompt engineering} tidak hanya berfungsi sebagai antarmuka instruksi, tetapi juga sebagai mekanisme pengendali perilaku model, termasuk dalam mengarahkan model agar lebih berhati-hati terhadap fakta dan sumber informasi \parencite{sahoo2024prompt}.
+Selain arsitektur model dan kualitas data, perancangan \textit{prompt} juga berperan besar dalam memicu maupun mengurangi halusinasi pada LLM. Studi survei oleh Sahoo dkk.\ (2024) menunjukkan bahwa \textit{prompt engineering} tidak hanya berfungsi sebagai antarmuka instruksi, tetapi juga sebagai mekanisme pengendali perilaku model, termasuk dalam mengarahkan model agar lebih berhati-hati terhadap fakta dan sumber informasi \parencite{sahoo2024prompt}.
 
-Secara umum, teknik \textit{prompting} untuk mengurangi \textit{hallucination} dapat dikelompokkan ke dalam beberapa pendekatan: (i) memperkaya konteks dengan informasi yang relevan melalui \textit{Retrieval-Augmented Generation} (RAG), (ii) menggabungkan penalaran dan aksi secara eksplisit seperti pada \textit{ReAct}, (iii) menambahkan tahapan verifikasi terstruktur seperti pada \textit{Chain-of-Verification (CoVe)}, (iv) mengelola dokumen hasil \textit{retrieval} yang berisik seperti pada \textit{Chain-of-Note (CoN)}, dan (v) mengintegrasikan pengetahuan secara bertahap seperti pada \textit{Chain-of-Knowledge (CoK)} \parencite{sahoo2024prompt}. Pendekatan-pendekatan ini memanfaatkan \textit{prompt} bukan hanya sebagai instruksi tunggal, melainkan sebagai rangkaian langkah yang membantu model menelusuri bukti, memeriksa konsistensi, dan menolak menjawab ketika informasi tidak memadai.
+Secara umum, teknik \textit{prompting} untuk mengurangi halusinasi dapat dikelompokkan ke dalam beberapa pendekatan: (i) memperkaya konteks dengan informasi yang relevan melalui \textit{Retrieval-Augmented Generation} (RAG), (ii) menggabungkan penalaran dan aksi secara eksplisit seperti pada \textit{ReAct}, (iii) menambahkan tahapan verifikasi terstruktur seperti pada \textit{Chain-of-Verification (CoVe)}, (iv) mengelola dokumen hasil \textit{retrieval} yang berisik seperti pada \textit{Chain-of-Note (CoN)}, dan (v) mengintegrasikan pengetahuan secara bertahap seperti pada \textit{Chain-of-Knowledge (CoK)} \parencite{sahoo2024prompt}. Pendekatan-pendekatan ini memanfaatkan \textit{prompt} bukan hanya sebagai instruksi tunggal, melainkan sebagai rangkaian langkah yang membantu model menelusuri bukti, memeriksa konsistensi, dan menolak menjawab ketika informasi tidak memadai.
 
 Pada RAG, \textit{prompt} dirancang untuk memasukkan potongan dokumen hasil \textit{retrieval} ke dalam instruksi sehingga model terdorong mendasarkan jawabannya pada konteks eksternal, bukan hanya pada memori parametrik. \textit{Prompt} yang menekankan frasa seperti ``gunakan hanya informasi dari konteks berikut'' atau ``kutip sumber yang mendukung jawaban'' terbukti meningkatkan \textit{faithfulness} karena model diarahkan untuk menghasilkan jawaban berbasis bukti \parencite{lewis2020retrieval,ragtruth2025}.
 
 Pendekatan \textit{ReAct} (\textit{Reasoning and Acting}) memadukan langkah penalaran (\textit{thought}) dan tindakan (\textit{action}) di dalam \textit{prompt}. Alih-alih langsung menghasilkan jawaban akhir, LLM diminta untuk menuliskan jejak penalaran singkat, memutuskan kapan perlu memanggil alat eksternal (misalnya API pencarian), lalu memperbarui rencana berdasarkan informasi baru \parencite{yao2022react}. Pola \textit{prompt} seperti ``\textit{Thought:} ...'', ``\textit{Action: Search[...]}'', dan ``\textit{Observation:} ...'' membantu model menyadari keterbatasannya dan mengurangi kecenderungan mengarang informasi.
 
-\textit{Chain-of-Verification (CoVe)} menambahkan tahap verifikasi eksplisit. \textit{Prompt} meminta model untuk: (i) menghasilkan jawaban awal, (ii) menyusun daftar pertanyaan verifikasi, (iii) menjawab pertanyaan tersebut secara independen, dan (iv) merevisi jawaban sesuai hasil verifikasi \parencite{dhuliawala2024cove}. Pendekatan ini meniru metode pemeriksaan ulang yang dilakukan manusia, sehingga efektif dalam mengurangi \textit{hallucination} faktual.
+\textit{Chain-of-Verification (CoVe)} menambahkan tahap verifikasi eksplisit. \textit{Prompt} meminta model untuk: (i) menghasilkan jawaban awal, (ii) menyusun daftar pertanyaan verifikasi, (iii) menjawab pertanyaan tersebut secara independen, dan (iv) merevisi jawaban sesuai hasil verifikasi \parencite{dhuliawala2024cove}. Pendekatan ini meniru metode pemeriksaan ulang yang dilakukan manusia, sehingga efektif dalam mengurangi halusinasi faktual.
 
 \textit{Chain-of-Note (CoN)} berfokus pada pengelolaan dokumen hasil \textit{retrieval} yang berisik. Melalui \textit{prompt} yang meminta model menyoroti poin penting, mengabaikan dokumen tidak relevan, serta menandai ketidakpastian, CoN menjadikan model lebih selektif terhadap bukti yang digunakan \parencite{yu2024con}.
 
-Sementara itu, \textit{Chain-of-Knowledge (CoK)} memecah masalah kompleks menjadi langkah penalaran bertahap. Mulai dari persiapan konteks, pengumpulan bukti dari sumber heterogen, hingga integrasi dan koreksi progresif. \textit{Prompt} mengarahkan model untuk tidak langsung melompat ke jawaban akhir, melainkan membangun penalaran yang terstruktur \parencite{li2023cok}. CoK mengurangi \textit{hallucination} yang muncul akibat penalaran terburu-buru dan tidak ter-grounding.
+Sementara itu, \textit{Chain-of-Knowledge (CoK)} memecah masalah kompleks menjadi langkah penalaran bertahap. Mulai dari persiapan konteks, pengumpulan bukti dari sumber heterogen, hingga integrasi dan koreksi progresif. \textit{Prompt} mengarahkan model untuk tidak langsung melompat ke jawaban akhir, melainkan membangun penalaran yang terstruktur \parencite{li2023cok}. CoK mengurangi halusinasi yang muncul akibat penalaran terburu-buru dan tidak ter-grounding.
 
-Secara keseluruhan, literatur menegaskan bahwa \textit{prompt} yang terstruktur, eksplisit, dan berlapis lebih mampu mengurangi \textit{hallucination} dibandingkan \textit{prompt} sederhana yang hanya berupa satu instruksi. Dengan demikian, \textit{prompt engineering} merupakan komponen penting dalam rancangan sistem LLM yang andal dan \textit{faithful}.
+Secara keseluruhan, literatur menegaskan bahwa \textit{prompt} yang terstruktur, eksplisit, dan berlapis lebih mampu mengurangi halusinasi dibandingkan \textit{prompt} sederhana yang hanya berupa satu instruksi. Dengan demikian, \textit{prompt engineering} merupakan komponen penting dalam rancangan sistem LLM yang andal dan \textit{faithful}.
 
 % ------------------------------------------
 % 2.7.1 Zero-shot dan Few-shot Prompting
@@ -777,11 +778,11 @@ Secara keseluruhan, literatur menegaskan bahwa \textit{prompt} yang terstruktur,
 
 Dua paradigma mendasar dalam \textit{prompting} adalah \textit{zero-shot prompting} dan \textit{few-shot prompting}. Keduanya menjadi fondasi bagi teknik lanjutan seperti \textit{ReAct}, CoVe, CoN, dan CoK.
 
-\textit{Zero-shot prompting} adalah skenario ketika LLM diminta menyelesaikan suatu tugas hanya berdasarkan instruksi natural tanpa diberikan contoh format sebelumnya. Misalnya instruksi: ``Jelaskan perbedaan antara \textit{AHA} dan \textit{BHA} untuk kulit berjerawat.'' Model mengandalkan kemampuan generalisasi dari \textit{pre-training} dan \textit{instruction tuning}. Pendekatan ini fleksibel, tetapi rentan memicu \textit{hallucination} jika instruksinya ambigu atau tidak menyertakan batasan konteks.
+\textit{Zero-shot prompting} adalah skenario ketika LLM diminta menyelesaikan suatu tugas hanya berdasarkan instruksi natural tanpa diberikan contoh format sebelumnya. Misalnya instruksi: ``Jelaskan perbedaan antara \textit{AHA} dan \textit{BHA} untuk kulit berjerawat.'' Model mengandalkan kemampuan generalisasi dari \textit{pre-training} dan \textit{instruction tuning}. Pendekatan ini fleksibel, tetapi rentan memicu halusinasi jika instruksinya ambigu atau tidak menyertakan batasan konteks.
 
-Sebaliknya, \textit{few-shot prompting} memberikan beberapa contoh tugas--jawaban sebelum model diminta menjawab pertanyaan baru. Contohnya, dua atau tiga contoh penjelasan bahan aktif \textit{skincare} berbasis jurnal dapat disertakan dalam \textit{prompt}. Model kemudian belajar dari pola tersebut melalui mekanisme \textit{in-context learning} \parencite{zhao2023survey}. Ketika contoh yang diberikan \textit{faithful}, teknik ini dapat mengurangi \textit{hallucination} karena model meniru gaya jawaban yang berbasis bukti.
+Sebaliknya, \textit{few-shot prompting} memberikan beberapa contoh tugas--jawaban sebelum model diminta menjawab pertanyaan baru. Contohnya, dua atau tiga contoh penjelasan bahan aktif \textit{skincare} berbasis jurnal dapat disertakan dalam \textit{prompt}. Model kemudian belajar dari pola tersebut melalui mekanisme \textit{in-context learning} \parencite{zhao2023survey}. Ketika contoh yang diberikan \textit{faithful}, teknik ini dapat mengurangi halusinasi karena model meniru gaya jawaban yang berbasis bukti.
 
-Dalam konteks mitigasi \textit{hallucination}, kedua paradigma ini sering dipadukan dengan instruksi tambahan. Misalnya, \textit{zero-shot} dilengkapi klausa: ``jawablah hanya berdasarkan konteks berikut dan nyatakan jika informasi tidak tersedia.'' Sedangkan \textit{few-shot} dapat menambahkan contoh jawaban yang menunjukkan bagaimana model harus menolak menjawab ketika bukti tidak memadai. Dengan demikian, baik \textit{zero-shot} maupun \textit{few-shot prompting} tidak hanya mengarahkan model memahami tugas, tetapi juga mengelola ketidakpastian dan mencegah \textit{hallucination}.
+Dalam konteks mitigasi halusinasi, kedua paradigma ini sering dipadukan dengan instruksi tambahan. Misalnya, \textit{zero-shot} dilengkapi klausa: ``jawablah hanya berdasarkan konteks berikut dan nyatakan jika informasi tidak tersedia.'' Sedangkan \textit{few-shot} dapat menambahkan contoh jawaban yang menunjukkan bagaimana model harus menolak menjawab ketika bukti tidak memadai. Dengan demikian, baik \textit{zero-shot} maupun \textit{few-shot prompting} tidak hanya mengarahkan model memahami tugas, tetapi juga mengelola ketidakpastian dan mencegah halusinasi.
 
 % ==========================================
 % 2.8 Kerangka Kerja Evaluasi Sistem RAG
@@ -807,26 +808,29 @@ Metrik evaluasi \textit{retrieval} mengukur kualitas pencarian dokumen pada korp
 \begin{equation}
 \text{Recall@}k = \frac{|\{d \in R_q\} \cap \{d_1, d_2, \dots, d_k\}|}{|R_q|}
 \end{equation}
+\eqcaption{\textit{Recall@k}}
 
-dengan $R_q$ adalah himpunan seluruh dokumen relevan untuk \textit{query} $q$ pada korpus, dan $\{d_1, d_2, \dots, d_k\}$ adalah $k$ dokumen teratas yang dikembalikan oleh sistem \textit{retrieval}. Nilai \textit{Recall@k} berkisar antara 0 dan 1, di mana nilai 1 menunjukkan bahwa seluruh dokumen relevan berhasil ter-\textit{retrieve} dalam $k$ teratas.
+dengan $R_q$ adalah himpunan seluruh dokumen relevan untuk kueri $q$ pada korpus, dan $\{d_1, d_2, \dots, d_k\}$ adalah $k$ dokumen teratas yang dikembalikan oleh sistem \textit{retrieval}. Nilai \textit{Recall@k} berkisar antara 0 dan 1, di mana nilai 1 menunjukkan bahwa seluruh dokumen relevan berhasil ter-\textit{retrieve} dalam $k$ teratas.
 
 \subsubsection{\textit{Mean Average Precision} (MAP@k)}
 
 \textit{Mean Average Precision} mengukur kualitas peringkat hasil \textit{retrieval} secara menyeluruh dengan mempertimbangkan posisi setiap dokumen relevan pada daftar hasil. Berbeda dengan \textit{Recall@k} yang hanya menghitung jumlah dokumen relevan, MAP@k juga memperhatikan apakah dokumen relevan tersebut ditempatkan pada posisi atas atau bawah. Metrik ini menjadi metrik utama pada paper \textit{Reciprocal Rank Fusion} oleh Cormack dkk.\ \parencite{cormack2009reciprocal}.
 
-MAP@k dihitung dengan terlebih dahulu menghitung \textit{Average Precision} (AP) untuk setiap \textit{query}, kemudian merata-ratakannya di seluruh \textit{query}. Rumus \textit{Average Precision} pada $k$ teratas ditulis sebagai berikut:
+MAP@k dihitung dengan terlebih dahulu menghitung \textit{Average Precision} (AP) untuk setiap kueri, kemudian merata-ratakannya di seluruh kueri. Rumus \textit{Average Precision} pada $k$ teratas ditulis sebagai berikut:
 
 \begin{equation}
 \text{AP@}k = \frac{1}{|R_q|} \sum_{i=1}^{k} \text{Precision@}i \cdot \mathbb{1}[d_i \in R_q]
 \end{equation}
+\eqcaption{\textit{Average Precision} (AP@k)}
 
-dengan $\text{Precision@}i$ adalah \textit{precision} pada $i$ dokumen teratas, $\mathbb{1}[d_i \in R_q]$ adalah fungsi indikator yang bernilai 1 jika dokumen pada peringkat ke-$i$ relevan, serta $|R_q|$ adalah jumlah dokumen relevan untuk \textit{query} $q$. Selanjutnya \textit{Mean Average Precision} dihitung dengan merata-ratakan AP@k di seluruh \textit{query} pada himpunan uji:
+dengan $\text{Precision@}i$ adalah \textit{precision} pada $i$ dokumen teratas, $\mathbb{1}[d_i \in R_q]$ adalah fungsi indikator yang bernilai 1 jika dokumen pada peringkat ke-$i$ relevan, serta $|R_q|$ adalah jumlah dokumen relevan untuk kueri $q$. Selanjutnya \textit{Mean Average Precision} dihitung dengan merata-ratakan AP@k di seluruh kueri pada himpunan uji:
 
 \begin{equation}
 \text{MAP@}k = \frac{1}{|Q|} \sum_{q \in Q} \text{AP@}k(q)
 \end{equation}
+\eqcaption{\textit{Mean Average Precision} (MAP@k)}
 
-dengan $Q$ adalah himpunan seluruh \textit{query} yang dievaluasi. Nilai MAP@k berkisar antara 0 dan 1, dengan nilai mendekati 1 menunjukkan bahwa sistem konsisten menempatkan dokumen relevan pada posisi atas di seluruh \textit{query}.
+dengan $Q$ adalah himpunan seluruh kueri yang dievaluasi. Nilai MAP@k berkisar antara 0 dan 1, dengan nilai mendekati 1 menunjukkan bahwa sistem konsisten menempatkan dokumen relevan pada posisi atas di seluruh kueri.
 
 \subsubsection{\textit{Normalized Discounted Cumulative Gain} (nDCG@k)}
 
@@ -837,6 +841,7 @@ Perhitungan nDCG@k dilakukan dalam tiga tahap. Pertama, hitung \textit{Discounte
 \begin{equation}
 \text{DCG@}k = \sum_{i=1}^{k} \frac{\text{rel}_i}{\log_2(i+1)}
 \end{equation}
+\eqcaption{\textit{Discounted Cumulative Gain} (DCG@k)}
 
 dengan $\text{rel}_i$ adalah skor relevansi dokumen pada peringkat ke-$i$. Pada kasus relevansi biner, $\text{rel}_i$ bernilai 1 jika dokumen relevan dan 0 jika tidak. Faktor pembagi $\log_2(i+1)$ memberikan diskon yang semakin besar untuk dokumen pada peringkat bawah, sehingga dokumen pada posisi atas memberikan kontribusi yang lebih besar terhadap skor.
 
@@ -845,12 +850,14 @@ Kedua, hitung \textit{Ideal DCG} (IDCG), yaitu nilai DCG maksimum yang dapat dic
 \begin{equation}
 \text{IDCG@}k = \sum_{i=1}^{\min(k, |R_q|)} \frac{1}{\log_2(i+1)}
 \end{equation}
+\eqcaption{\textit{Ideal Discounted Cumulative Gain} (IDCG@k)}
 
 Ketiga, normalisasi DCG dengan IDCG untuk memperoleh nDCG@k:
 
 \begin{equation}
 \text{nDCG@}k = \frac{\text{DCG@}k}{\text{IDCG@}k}
 \end{equation}
+\eqcaption{\textit{Normalized Discounted Cumulative Gain} (nDCG@k)}
 
 Nilai nDCG@k berkisar antara 0 dan 1, di mana nilai 1 menunjukkan bahwa peringkat yang dihasilkan sistem identik dengan peringkat ideal. Metrik ini sangat berguna untuk membandingkan sistem \textit{retrieval} yang berbeda karena dapat menangkap perbedaan kualitas peringkat meskipun jumlah dokumen relevan yang ditemukan sama.
 
@@ -860,59 +867,33 @@ Pada tugas akhir ini, ketiga metrik tersebut dievaluasi pada $k=5$ karena lima d
 \subsection{Kerangka Kerja RAGAS untuk Evaluasi \textit{Generation}}
 \label{subsec:ragas-framework}
 
-Berbagai metode dan perkakas evaluasi telah diusulkan oleh beberapa tugas akhir sebelumnya untuk memfasilitasi proses penilaian sistem RAG, misalnya oleh Y. Gao dkk.\ (2023) dan Es dkk.\ (2024). Namun demikian, banyak strategi evaluasi yang masih bergantung pada probabilitas token dari model bahasa. Pendekatan tersebut menjadi tidak praktis untuk diterapkan pada model \textit{closed-source} seperti GPT-4, karena model tersebut tidak memberikan akses langsung terhadap probabilitas internalnya. Alternatif lain berupa penilaian berbasis sistem tanya-jawab dengan tipe jawaban singkat juga dinilai tidak representatif terhadap cara kerja sistem RAG secara keseluruhan \parencite{gao2023rag-eval}.
+Berbagai metode dan perkakas evaluasi telah diusulkan oleh beberapa tugas akhir sebelumnya untuk memfasilitasi proses penilaian sistem RAG, misalnya oleh Y. Gao dkk.\ (2023) dan Es dkk.\ (2024). Namun demikian, banyak strategi evaluasi yang masih bergantung pada probabilitas token dari model bahasa. Pendekatan tersebut menjadi tidak praktis untuk diterapkan pada model sumber tertutup seperti GPT-4, karena model tersebut tidak memberikan akses langsung terhadap probabilitas internalnya. Alternatif lain berupa penilaian berbasis sistem tanya-jawab dengan tipe jawaban singkat juga dinilai tidak representatif terhadap cara kerja sistem RAG secara keseluruhan \parencite{gao2023rag-eval}.
 
-Untuk mengatasi keterbatasan tersebut, dikembangkanlah kerangka kerja bernama \textbf{RAGAS} (\textit{Retrieval-Augmented Generation Assessment System}). RAGAS merupakan kerangka kerja evaluasi otomatis yang dirancang untuk menilai kinerja sistem RAG dengan cara memanfaatkan kemampuan LLM dalam melakukan penilaian berbasis \textit{prompt}. Kerangka ini dikembangkan oleh tim peneliti dari Cardiff University dengan tujuan untuk mengukur kualitas sistem RAG dari tiga aspek utama, yaitu \textit{faithfulness}, \textit{answer relevance}, dan \textit{context relevance} \parencite{es2024ragas}. RAGAS dipilih sebagai kerangka evaluasi pada tugas akhir ini karena mampu menilai kualitas \textit{generation} berbasis \textit{retrieval} secara otomatis tanpa memerlukan anotasi manusia dalam skala besar, sehingga sesuai untuk eksperimen lintas-konfigurasi yang melibatkan ribuan pasangan pertanyaan dan jawaban.
+Untuk mengatasi keterbatasan tersebut, dikembangkanlah kerangka kerja bernama \textbf{RAGAS} (\textit{Retrieval-Augmented Generation Assessment System}). RAGAS merupakan kerangka kerja evaluasi otomatis yang dirancang untuk menilai kinerja sistem RAG dengan cara memanfaatkan kemampuan LLM dalam melakukan penilaian berbasis \textit{prompt}. Kerangka ini dikembangkan untuk mengukur kualitas sistem RAG secara otomatis berbasis penilaian LLM, baik pada sisi \textit{generation} maupun \textit{retrieval} \parencite{es2024ragas}. RAGAS dipilih sebagai kerangka evaluasi pada tugas akhir ini karena mampu menilai kualitas \textit{generation} berbasis \textit{retrieval} secara otomatis tanpa memerlukan anotasi manusia dalam skala besar, sehingga sesuai untuk eksperimen lintas-konfigurasi yang melibatkan ribuan pasangan pertanyaan dan jawaban.
 
-\subsubsection{Aspek Penilaian dalam RAGAS}
+Dari beberapa metrik yang disediakan RAGAS, tugas akhir ini menggunakan dua metrik yang paling relevan dengan tujuan mitigasi halusinasi, yaitu \textit{faithfulness} pada sisi \textit{generation} dan \textit{context recall} pada sisi \textit{retrieval}.
+
+\subsubsection{Faithfulness}
 
 Aspek \textit{faithfulness} mengukur sejauh mana jawaban yang dihasilkan oleh sistem RAG didasarkan pada konteks yang diberikan. Dalam praktiknya, LLM digunakan untuk mengekstraksi satu atau lebih pernyataan dari setiap kalimat pada jawaban sistem, kemudian memverifikasi apakah pernyataan tersebut terdapat dalam konteks hasil \textit{retrieval}. Nilai \textit{faithfulness} dihitung dengan rumus berikut:
 
 \begin{equation}
 F = \frac{|V|}{|S|}
 \end{equation}
+\eqcaption{\textit{Faithfulness}}
 
-dengan $|V|$ menyatakan jumlah pernyataan yang didukung oleh konteks (berdasarkan hasil evaluasi LLM), sedangkan $|S|$ adalah jumlah total pernyataan yang dihasilkan sistem RAG.
+dengan $|V|$ menyatakan jumlah pernyataan yang didukung oleh konteks (berdasarkan hasil evaluasi LLM), sedangkan $|S|$ adalah jumlah total pernyataan yang dihasilkan sistem RAG. Nilai \textit{faithfulness} yang tinggi menandakan jawaban yang lebih konsisten dengan dokumen sumber, sehingga metrik ini menjadi indikator langsung berkurangnya halusinasi intrinsik.
 
-Aspek kedua, yaitu \textit{answer relevance}, menilai sejauh mana jawaban yang dihasilkan mampu menjawab pertanyaan secara langsung dan tepat. LLM menghasilkan beberapa variasi pertanyaan baru yang diturunkan dari jawaban sistem, kemudian tingkat kesamaan semantik antara pertanyaan-pertanyaan tersebut dan pertanyaan asli dihitung menggunakan ukuran \textit{cosine similarity}. Nilai relevansi jawaban dihitung dengan rumus:
+\subsubsection{Context Recall}
 
-\begin{equation}
-AR = \frac{1}{n} \sum_{i=1}^{n} \text{sim}(q, q_i)
-\end{equation}
-
-dengan $q$ merupakan pertanyaan asli, $q_i$ adalah pertanyaan yang dihasilkan oleh LLM, dan $n$ menyatakan jumlah pertanyaan yang dihasilkan.
-
-Aspek ketiga adalah \textit{context relevance}, yang berfokus pada relevansi antara konteks hasil \textit{retrieval} dan kebutuhan jawaban. LLM mengekstraksi kalimat-kalimat dari konteks yang relevan untuk menjawab pertanyaan. Skor \textit{context relevance} dihitung melalui rasio antara jumlah kalimat relevan dengan jumlah total kalimat dalam konteks, seperti ditunjukkan pada persamaan berikut:
-
-\begin{equation}
-CR = \frac{\text{Jumlah kalimat relevan}}{\text{Jumlah total kalimat dalam konteks}}
-\end{equation}
-
-\subsubsection{Metrik Turunan dalam RAGAS}
-
-\textbf{a. Context Precision}
-
-Metode ini mengukur proporsi segmen (\textit{chunk}) konteks yang relevan terhadap pertanyaan. Nilainya dihitung sebagai rata-rata nilai presisi untuk setiap segmen yang dievaluasi:
-
-\begin{equation}
-\text{Context Precision@K} = \frac{1}{K} \sum_{k=1}^{K} (\text{Precision@k} \times v_k)
-\end{equation}
-
-dengan $K$ merupakan jumlah total segmen yang diuji dan $v_k \in \{0,1\}$ adalah indikator relevansi pada segmen ke-$k$.
-
-Presisi setiap segmen dihitung menggunakan formula berikut:
-
-\begin{equation}
-\text{Precision@k} = \frac{\text{True Positives@k}}{\text{True Positives@k} + \text{False Positives@k}}
-\end{equation}
-
-\textbf{b. Context Recall}
-
-Metrik ini mengukur seberapa banyak dokumen relevan yang berhasil ditemukan oleh sistem RAG. LLM menghasilkan sejumlah klaim berdasarkan jawaban atau referensi \textit{ground truth}, lalu menghitung proporsi klaim yang dapat dikaitkan dengan konteks yang diambil oleh sistem:
+Metrik \textit{context recall} mengukur seberapa banyak informasi relevan yang berhasil dihadirkan pada konteks hasil \textit{retrieval}. LLM menghasilkan sejumlah klaim berdasarkan jawaban referensi (\textit{ground truth}), lalu menghitung proporsi klaim yang dapat didukung oleh konteks yang diambil oleh sistem:
 
 \begin{equation}
 \text{Context Recall} = \frac{\text{Jumlah klaim yang sesuai dengan konteks}}{\text{Jumlah total klaim}}
 \end{equation}
+\eqcaption{\textit{Context Recall}}
+
+Walaupun kedua metrik ini sama-sama membandingkan klaim dengan konteks, keduanya mengukur tahap yang berbeda. \textit{Faithfulness} mengukur tahap \textit{generation}, yaitu apakah jawaban yang ditulis LLM benar-benar bersumber dari konteks yang diberikan atau justru mengarang di luar konteks. Sebaliknya, \textit{context recall} mengukur tahap \textit{retrieval}, yaitu apakah dokumen yang berhasil ditarik sudah memuat informasi yang dibutuhkan untuk menjawab dengan benar. Dengan kata lain, \textit{faithfulness} menilai kualitas jawaban LLM, sedangkan \textit{context recall} menilai kualitas pencarian dokumen. Karena itu, sebuah sistem dapat memiliki \textit{context recall} yang tinggi (dokumen yang tepat sudah ditemukan) tetapi \textit{faithfulness} yang rendah (LLM tetap mengarang), sehingga kedua metrik bersifat saling melengkapi dan tidak tumpang tindih.
 
 Pendekatan evaluasi berbasis RAGAS memberikan beberapa keunggulan penting. Pertama, kerangka ini mampu melakukan penilaian yang objektif karena seluruh proses evaluasi dilakukan secara otomatis melalui LLM, sehingga mengurangi bias subjektif dari evaluator manusia. Kedua, RAGAS bersifat adaptif dan dapat diterapkan pada berbagai konfigurasi sistem RAG tanpa memerlukan akses terhadap probabilitas token internal. Ketiga, RAGAS memberikan evaluasi yang komprehensif dengan mempertimbangkan baik aspek \textit{retrieval} maupun \textit{generation}, sehingga menghasilkan pemahaman yang lebih menyeluruh terhadap kinerja sistem.
 
@@ -922,13 +903,13 @@ Pendekatan evaluasi berbasis RAGAS memberikan beberapa keunggulan penting. Perta
 \section{Justifikasi Pemilihan Teknik Mitigasi}
 \label{sec:justifikasi-teknik}
 
-Berdasarkan seluruh tinjauan pustaka pada bab ini, terdapat banyak teknik yang dapat dipakai untuk menekan halusinasi pada sistem RAG, mulai dari teknik pada tahap praproses dokumen, tahap \textit{retrieval}, hingga tahap \textit{generation}. Dari sekian banyak pilihan tersebut, tugas akhir ini memilih tiga teknik utama, yaitu \textbf{ekspansi akronim}, \textbf{\textit{query rewriting}}, dan \textbf{\textit{context reranking}}. Pemilihan ketiganya tidak dilakukan secara acak, melainkan didasari oleh satu prinsip sederhana, yaitu halusinasi pada sistem RAG dapat muncul dari beberapa titik kegagalan yang berbeda, sehingga mitigasi yang baik perlu menutup titik-titik kegagalan tersebut secara bertahap dan saling melengkapi. Penjelasan alasan pemilihan setiap teknik diuraikan sebagai berikut.
+Berdasarkan seluruh tinjauan pustaka pada bab ini, terdapat banyak teknik yang dapat dipakai untuk menekan halusinasi pada sistem RAG, mulai dari teknik pada tahap praproses dokumen, tahap \textit{retrieval}, hingga tahap \textit{generation}. Dari sekian banyak pilihan tersebut, tugas akhir ini memilih tiga teknik utama, yaitu ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking}. Pemilihan ketiganya tidak dilakukan secara acak, melainkan didasari oleh satu prinsip sederhana, yaitu halusinasi pada sistem RAG dapat muncul dari beberapa titik kegagalan yang berbeda, sehingga mitigasi yang baik perlu menutup titik-titik kegagalan tersebut secara bertahap dan saling melengkapi. Alasan pemilihan masing-masing teknik dapat dilihat dari peran spesifiknya pada setiap tahap alur sistem.
 
-\textbf{Ekspansi akronim} dipilih karena menangani akar masalah yang khas pada domain biomedis, yaitu \textit{vocabulary mismatch}. Pada literatur biomedis, satu istilah panjang sering kali lebih sering dituliskan dalam bentuk akronim, misalnya \textit{Hyperbaric Oxygen} yang ditulis HBO atau \textit{Body Mass Index} yang ditulis BMI. Apabila dokumen yang hanya memuat akronim langsung diindeks tanpa pengayaan, maka representasi dokumen tersebut tidak memuat bentuk panjang istilahnya. Akibatnya, ketika pengguna bertanya menggunakan istilah lengkap, dokumen yang sebenarnya relevan dapat gagal ditemukan. Ekspansi akronim mengatasi hal ini sejak tahap paling awal, yaitu saat dokumen disiapkan dan diindeks, sehingga masalah tidak menumpuk ke tahap berikutnya. Teknik ini juga dipilih karena ringan dan murah, sebab hanya dijalankan sekali pada saat praproses dan tidak menambah beban komputasi ketika sistem menjawab pertanyaan.
+Ekspansi akronim dipilih karena menangani akar masalah yang khas pada domain biomedis, yaitu \textit{vocabulary mismatch}. Pada literatur biomedis, satu istilah panjang sering kali lebih sering dituliskan dalam bentuk akronim, misalnya \textit{Hyperbaric Oxygen} yang ditulis HBO atau \textit{Body Mass Index} yang ditulis BMI. Apabila dokumen yang hanya memuat akronim langsung diindeks tanpa pengayaan, maka representasi dokumen tersebut tidak memuat bentuk panjang istilahnya. Akibatnya, ketika pengguna bertanya menggunakan istilah lengkap, dokumen yang sebenarnya relevan dapat gagal ditemukan. Ekspansi akronim mengatasi hal ini sejak tahap paling awal, yaitu saat dokumen disiapkan dan diindeks, sehingga masalah tidak menumpuk ke tahap berikutnya. Teknik ini juga dipilih karena ringan dan murah, sebab hanya dijalankan sekali pada saat praproses dan tidak menambah beban komputasi ketika sistem menjawab pertanyaan.
 
-\textbf{\textit{Query rewriting}} dipilih karena memperbaiki kualitas pertanyaan dari sisi pengguna sebelum proses pencarian dilakukan. Pertanyaan asli pengguna sering kali singkat, ambigu, atau tidak memakai istilah yang persis sama dengan yang tertulis pada dokumen. Dengan menulis ulang pertanyaan menjadi bentuk yang lebih spesifik dan kaya istilah medis, peluang sistem menemukan dokumen yang tepat menjadi lebih besar. Jika ekspansi akronim memperbaiki masalah dari sisi dokumen, maka \textit{query rewriting} memperbaiki masalah dari sisi kueri, sehingga keduanya bekerja pada dua sisi yang saling berlawanan namun saling menguatkan dalam menutup celah \textit{vocabulary mismatch}.
+\textit{Query Rewriting} dipilih karena memperbaiki kualitas pertanyaan dari sisi pengguna sebelum proses pencarian dilakukan. Pertanyaan asli pengguna sering kali singkat, ambigu, atau tidak memakai istilah yang persis sama dengan yang tertulis pada dokumen. Dengan menulis ulang pertanyaan menjadi bentuk yang lebih spesifik dan kaya istilah medis, peluang sistem menemukan dokumen yang tepat menjadi lebih besar. Jika ekspansi akronim memperbaiki masalah dari sisi dokumen, maka \textit{query rewriting} memperbaiki masalah dari sisi kueri, sehingga keduanya bekerja pada dua sisi yang saling berlawanan namun saling menguatkan dalam menutup celah \textit{vocabulary mismatch}.
 
-\textbf{\textit{Context reranking}} dipilih karena bekerja sebagai penyaring kualitas terakhir sebelum dokumen diberikan ke model bahasa. Meskipun tahap \textit{retrieval} telah berhasil menarik sejumlah dokumen, tidak semua dokumen tersebut memiliki tingkat relevansi yang sama; sebagian dapat bersifat terlalu umum, berulang, atau hanya menyentuh sebagian kecil maksud pertanyaan. Dokumen yang kurang relevan ini menjadi kebisingan (\textit{noise}) yang dapat menyesatkan model saat menyusun jawaban. \textit{Context reranking} menilai ulang setiap dokumen kandidat menggunakan \textit{cross-encoder} yang membaca pasangan kueri dan dokumen secara bersamaan, lalu hanya meneruskan dokumen yang paling relevan ke tahap \textit{generation}. Dengan demikian, model bekerja dengan konteks yang lebih bersih dan terfokus.
+\textit{Context reranking} dipilih karena bekerja sebagai penyaring kualitas terakhir sebelum dokumen diberikan ke model bahasa. Meskipun tahap \textit{retrieval} telah berhasil menarik sejumlah dokumen, tidak semua dokumen tersebut memiliki tingkat relevansi yang sama; sebagian dapat bersifat terlalu umum, berulang, atau hanya menyentuh sebagian kecil maksud pertanyaan. Dokumen yang kurang relevan ini menjadi kebisingan (\textit{noise}) yang dapat menyesatkan model saat menyusun jawaban. \textit{Context reranking} menilai ulang setiap dokumen kandidat menggunakan \textit{cross-encoder} yang membaca pasangan kueri dan dokumen secara bersamaan, lalu hanya meneruskan dokumen yang paling relevan ke tahap \textit{generation}. Dengan demikian, model bekerja dengan konteks yang lebih bersih dan terfokus.
 
 Ketiga teknik tersebut dipilih karena bekerja pada tiga tahap yang berbeda namun berurutan, yaitu praproses dokumen, sebelum \textit{retrieval}, dan setelah \textit{retrieval}, sehingga membentuk lapisan mitigasi yang saling melengkapi dari hulu hingga hilir. Pendekatan berlapis ini lebih kuat dibandingkan penerapan satu teknik saja, karena kelemahan pada satu tahap dapat ditutupi oleh tahap lainnya. Sebagai contoh, apabila ekspansi akronim belum sepenuhnya menutup perbedaan istilah, \textit{query rewriting} masih dapat membantu menyelaraskan kueri dengan dokumen, dan apabila masih terdapat dokumen kurang relevan yang lolos, \textit{context reranking} akan menyaringnya sebelum sampai ke model. 
 

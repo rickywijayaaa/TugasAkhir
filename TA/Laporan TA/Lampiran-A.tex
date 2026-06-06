@@ -43,13 +43,13 @@ Answer:
 Variabel \texttt{\{context\}} pada \textit{Listing}~\ref{lst:generation-prompt} diisi dengan lima \textit{chunk} hasil \textit{retrieval} yang sudah disusun secara berurutan dan diberi penanda nomor serta label \textit{section} sumber paper. Format penyusunan konteks dilakukan oleh fungsi pembentuk konteks pada modul \textit{generation}, sebagaimana ditunjukkan pada \textit{Listing}~\ref{lst:context-format}.
 
 \begin{lstlisting}[language=Python,caption={Fungsi pembentuk \texttt{\{context\}} untuk diteruskan ke \textit{prompt}},label={lst:context-format}]
-def generate_answer(query, retrieved):
+def generate_answer(kueri, retrieved):
     context = "\n\n".join(
         f"[{i}] ({r.document.section_label}): {r.document.text}"
         for i, r in enumerate(retrieved, 1)
     )
     return openai_generate(
-        GENERATION_PROMPT.format(context=context, question=query),
+        GENERATION_PROMPT.format(context=context, question=kueri),
         max_tokens=300, temperature=TEMPERATURE
     )
 \end{lstlisting}
@@ -72,26 +72,26 @@ Rules:
 3. Preserve the original yes/no/maybe answerable intent.
 4. Output ONLY the rewritten question, no explanations.
 
-Original question: {query}
+Original question: {kueri}
 
 Rewritten question:
 \end{lstlisting}
 
 Keluaran LLM langsung dipakai sebagai kueri baru pada tahap \textit{retrieval}, baik BM25 maupun \textit{dense}. Apabila pertanyaan hasil tulis-ulang terlalu pendek (kurang dari 10 karakter) atau pemanggilan LLM gagal, sistem akan memakai pertanyaan asli sebagai \textit{fallback} agar \textit{pipeline} tetap berjalan tanpa harus menghentikan proses. \textit{Listing}~\ref{lst:qr-function} memperlihatkan implementasi fungsi yang menjalankan pendekatan ini.
 
-\begin{lstlisting}[language=Python,caption={Fungsi \textit{rewriter} \textit{single-query} (\texttt{rewrite\_query})},label={lst:qr-function}]
-def rewrite_query(query: str) -> str:
-    """Reformulasi query menjadi satu pertanyaan baru yang
+\begin{lstlisting}[language=Python,caption={Fungsi \textit{rewriter} \textit{single-kueri} (\texttt{rewrite\_query})},label={lst:qr-function}]
+def rewrite_query(kueri: str) -> str:
+    """Reformulasi kueri menjadi satu pertanyaan baru yang
     lebih spesifik dan kaya istilah biomedis."""
-    prompt = QUERY_REWRITE_PROMPT.format(query=query)
+    prompt = QUERY_REWRITE_PROMPT.format(kueri=kueri)
     try:
         rewritten = openai_generate(
             prompt, max_tokens=150, temperature=0.3
         )
         rewritten = rewritten.strip().replace('\n', ' ')
-        return rewritten if len(rewritten) >= 10 else query
+        return rewritten if len(rewritten) >= 10 else kueri
     except Exception:
-        return query  # fallback ke pertanyaan asli
+        return kueri  # fallback ke pertanyaan asli
 \end{lstlisting}
 
 \section{Parameter Pemanggilan Model Bahasa}

@@ -1,0 +1,249 @@
+\cleardoublepage
+\chapter{CONTOH KELUARAN SISTEM PER KONFIGURASI}
+\label{lamp:contoh-keluaran}
+
+Lampiran ini memuat contoh keluaran sistem untuk lima pertanyaan yang sama pada seluruh dua belas konfigurasi. Kelima pertanyaan dipilih dari pertanyaan yang relatif dekat dengan kehidupan sehari-hari dan mencakup ketiga label jawaban, yaitu \textit{yes}, \textit{no}, dan \textit{maybe}. Daftar kelima pertanyaan beserta label sebenarnya (\textit{ground truth}) disajikan pada Tabel~\ref{tbl:contoh-pertanyaan}, sedangkan keluaran tiap konfigurasi disajikan pada tabel-tabel berikutnya.
+
+\begin{table}[H]
+\centering\footnotesize\setlength{\tabcolsep}{5pt}
+\caption{Lima Pertanyaan Contoh beserta Label Sebenarnya}
+\label{tbl:contoh-pertanyaan}
+\begin{tabular}{c >{\raggedright\arraybackslash}p{10.5cm} c}
+\toprule
+\textbf{Kode} & \textbf{Pertanyaan} & \textbf{Label Sebenarnya} \\
+\midrule
+Q1 & \textit{Does blood pressure change in treated hypertensive patients depending on whether it is measured by a physician or a nurse?} & \textit{yes} \\
+\addlinespace
+Q2 & \textit{Secondhand smoke risk in infants discharged from an NICU: potential for significant health disparities?} & \textit{yes} \\
+\addlinespace
+Q3 & \textit{Does music influence stress in mechanically ventilated patients?} & \textit{no} \\
+\addlinespace
+Q4 & \textit{Major depression and alcohol use disorder in adolescence: Does comorbidity lead to poorer outcomes of depression?} & \textit{no} \\
+\addlinespace
+Q5 & \textit{Does obstructive sleep apnea affect aerobic fitness?} & \textit{maybe} \\
+\addlinespace
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Kelompok 1: BM25 tanpa Ekspansi Akronim}
+
+\subsection*{Konfigurasi Baseline}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The first abstract specifically addresses differences in blood pressure measurements between nurses, physicians, and self-measurement in treated hypertensive patients. It aims to determine whether such differences exist and their clinical importance, implying that differences in BP readings depending on the measurer are being investigated. This suggests that blood pressure may indeed change depending on whether it is measured by a physician or a nurse. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The first abstract indicates that secondhand smoke exposure (SHSe) is a threat to fragile infants discharged from a NICU and that factors such as socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans. The third abstract further supports the presence of significant racial disparities in health outcomes, often linked to poverty, which suggests potential disparities in SHSe risk among infants. Together, these findings support the potential for significant health disparities related to secondhand smoke risk in NICU-discharged infants. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a study where mechanically ventilated patients were randomized to patient-directed music, headphones only, or usual care, with stress measured via urinary cortisol. This suggests an investigation into whether music influences stress in these patients. Although the results are not explicitly stated, the study's objective and methodology imply that music was considered as an intervention to reduce stress. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract states that comorbid major depression (MD) and alcohol use disorder (AUD), particularly in adolescents, have been shown to be associated with poorer subsequent MD outcomes. This directly supports the idea that the comorbidity leads to worse depression outcomes. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & Abstract [1] specifically investigates whether patients with obstructive sleep apnea (OSA) have an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population, implying a focus on the relationship between OSA and aerobic fitness. Abstract [3] notes that concomitant sleep apnea is associated with a significantly higher staple line leak rate, which suggests that OSA may have systemic effects, but does not directly address aerobic fitness. No other abstracts provide direct evidence on aerobic fitness in OSA patients. Therefore, based on the focus of abstract [1], there is support that OSA affects aerobic fitness. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The first abstract specifically aims to determine whether there are differences between blood pressure measured by a nurse and by a physician in treated hypertensive patients, implying that such differences are being investigated. Although the results are not detailed here, the focus on evaluating differences suggests that blood pressure readings may vary depending on who measures it. Therefore, the context supports the idea that blood pressure can change depending on whether it is measured by a physician or a nurse. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The first abstract indicates that secondhand smoke exposure (SHSe) is a threat to fragile infants discharged from a NICU and that factors such as socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans. This suggests a potential for significant health disparities related to secondhand smoke risk in this population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The first abstract specifically explores the influence of music on stress in mechanically ventilated patients, indicating that this intervention was studied to ameliorate stress without adverse effects. Although the results are not detailed here, the fact that the study was conducted with this purpose suggests that music does influence stress in this patient population. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract explicitly states that comorbid major depression and alcohol use disorder in adolescents are associated with poorer subsequent major depression outcomes. This directly supports the hypothesis that comorbidity leads to worse depression outcomes in this population. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The first abstract specifically investigates whether patients with obstructive sleep apnea (OSA) have an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population, implying a focus on the impact of OSA on aerobic fitness. Although the results are not explicitly stated, the objective suggests that OSA is considered to potentially affect aerobic fitness. Additionally, the third abstract notes that concomitant sleep apnea is associated with higher complication rates in surgery, indirectly supporting that OSA has physiological impacts. Therefore, the evidence leans toward OSA affecting aerobic fitness. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & Abstract [1] specifically aims to determine whether there are differences between blood pressure measured by the nurse (NBP), by the physician (PBP), and self-measured BP in treated hypertensive patients. This implies that differences in BP measurements depending on the measurer are being investigated, suggesting that such differences may exist. However, the abstract does not provide the results explicitly, but the objective itself indicates that BP may change depending on who measures it. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The provided abstracts indicate that secondhand smoke exposure (SHSe) is a concern for infants discharged from the NICU, particularly those at high respiratory risk. The study in Houston, Texas, examined smoking practices in families with very low birth weight infants and hypothesized that socioeconomic status, race, and mental health status are related to SHSe and household smoking bans, suggesting potential health disparities linked to SHSe in this population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a study exploring the influence of music on stress in mechanically ventilated patients, including a randomized controlled trial where patient-directed music was compared to headphones only and usual care. The study collected urinary cortisol samples, a biomarker of stress, suggesting an investigation into whether music reduces stress. This indicates that music is considered to have an influence on stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract explicitly states that comorbid major depression and alcohol use disorder in adolescents are associated with poorer subsequent major depression outcomes. This directly supports the hypothesis that comorbidity leads to worse depression outcomes in this population. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The first abstract specifically investigates whether patients with obstructive sleep apnea (OSA) have an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population, implying a relationship between OSA and aerobic fitness. Although the results are not detailed here, the focus on this comparison suggests that OSA does affect aerobic fitness. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & Abstract [1] specifically addresses differences in blood pressure measurements between nurses, physicians, and self-measurement in treated hypertensive patients. It implies that such differences exist and aims to evaluate their clinical importance, suggesting that blood pressure readings do change depending on who measures them. No other abstracts provide contradictory information. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The first abstract indicates that secondhand smoke exposure (SHSe) is a threat to fragile infants discharged from a NICU, and that factors such as socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans. This suggests there is potential for significant health disparities related to SHSe in this vulnerable population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The first abstract indicates that mechanically ventilated patients experience profound stress and that interventions are needed to reduce this stress. The fifth abstract shows significant improvements in psychophysiological parameters related to stress regulation in an experimental group, which, given the context, likely involved music as the intervention. This suggests that music can influence stress in mechanically ventilated patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract explicitly states that comorbid major depression (MD) and alcohol use disorder (AUD), particularly in adolescents, have been shown to be associated with poorer subsequent MD outcomes. This directly supports the idea that comorbidity leads to worse depression outcomes in adolescence. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{maybe} & Abstract [1] specifically investigates whether patients with obstructive sleep apnea (OSA) have an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population, implying a focus on the relationship between OSA and aerobic fitness. However, the abstract does not provide the results or conclusions of this investigation. None of the other abstracts provide direct evidence about the effect of OSA on aerobic fitness. Therefore, based on the provided information, there is no conclusive evidence to confirm or refute that OSA affects aerobic fitness. maybe \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\section{Kelompok 2: Hybrid Retrieval tanpa Ekspansi Akronim}
+
+\subsection*{Konfigurasi Baseline}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided results indicate a statistically significant difference in systolic blood pressure measurements between physicians and nurses, with physician-measured systolic BP being on average 5.16 mmHg higher than nurse-measured systolic BP. No significant differences were found in diastolic BP measurements. This supports that blood pressure readings can vary depending on whether a physician or nurse measures it in treated hypertensive patients. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The provided abstracts indicate that secondhand smoke exposure (SHSe) is a concern for fragile infants discharged from NICUs, particularly those born at very low birth weight or with high respiratory risk. Factors such as socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans, suggesting potential health disparities in this population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a randomized controlled trial where mechanically ventilated patients who listened to patient-directed music showed better control of psychophysiological stress parameters compared to controls. Significant improvements in stress regulation measures such as galvanic skin response and heart rate coherence were observed, indicating that music positively influences stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract states that comorbid major depression and alcohol use disorder in adolescents are associated with poorer subsequent major depression outcomes. This directly supports the idea that comorbidity leads to worse depression outcomes in this population. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The evidence indicates that obstructive sleep apnea (OSA) does affect aerobic fitness, as individuals with OSA had increased VO2max compared to normalized data, but those with more severe OSA (apnea-hypopnea index >20) showed decreased VO2max. This suggests that OSA severity influences aerobic fitness levels. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The first abstract specifically aims to determine whether there are differences between blood pressure measured by the nurse and by the physician in treated hypertensive patients, implying that such differences are being investigated. Although the results are not explicitly stated, the focus on evaluating differences suggests that blood pressure readings may vary depending on who measures it. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The first abstract indicates that secondhand smoke exposure (SHSe) is a threat to fragile infants discharged from a NICU and that factors such as socioeconomic status, race, and mental health may influence SHSe and household smoking bans. This suggests potential health disparities related to secondhand smoke risk in this vulnerable population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The first abstract indicates that mechanically ventilated patients experience profound stress and that interventions are needed to reduce this stress. Although the full results are not detailed, the study's purpose was to explore the influence of music on stress in these patients, implying that music was considered as a potential stress-reducing intervention. Additionally, the third abstract shows that participants in an experimental group could better regulate psychophysiological stress parameters, which may relate to interventions like music. Together, these suggest that music can influence stress in mechanically ventilated patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The abstracts indicate that comorbid major depression (MD) and alcohol use disorder (AUD) in adolescence are associated with higher rates of adult MD compared to those with no disorder or AUD alone. Although after adjusting for confounders the difference between MD-only and MD/AUD groups was not statistically significant, the initial findings and background suggest poorer depression outcomes with comorbidity. Therefore, the evidence supports that comorbidity leads to poorer depression outcomes. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The first abstract indicates that the study aimed to determine whether patients with obstructive sleep apnea (OSA) had an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population. This implies that OSA may affect aerobic fitness, as the study was designed to assess this relationship. No abstracts provide evidence refuting this, so the context supports that OSA affects aerobic fitness. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided data shows a statistically significant difference between physician-measured systolic blood pressure (PBP) and nurse-measured systolic blood pressure (NBP), with a mean difference of 5.16 mmHg (p<0.001). This indicates that blood pressure readings do change depending on whether they are measured by a physician or a nurse in treated hypertensive patients. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The data indicate that 26\% of families with high-risk infants in the NICU have a household smoker, with lower-income families and certain racial groups (African American and Caucasian) less likely to have smoking bans, suggesting disparities in secondhand smoke exposure risk. Additionally, maternal depression is higher in families without smoking bans, further highlighting potential health disparities related to socioeconomic and racial factors. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{no} & The study described randomized mechanically ventilated patients to patient-directed music, headphones only, or usual care and measured stress via urinary cortisol levels. The results showed no significant differences in cortisol among the groups, indicating that music did not influence stress as measured by this biomarker during ventilatory support. no \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The provided context [1] explicitly states that comorbid major depression (MD) and alcohol use disorder (AUD), particularly in adolescents, are associated with poorer subsequent MD outcomes. This directly supports the hypothesis that comorbidity leads to poorer depression outcomes in adolescence. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The first abstract specifically investigates whether patients with obstructive sleep apnea (OSA) have an objective change in aerobic fitness measured by VO2max during cycle ergometry compared to a normal population. This implies that OSA is considered to potentially affect aerobic fitness, and the study aims to determine this effect. Although the results are not detailed here, the context suggests a recognized relationship between OSA and aerobic fitness. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The data show a statistically significant difference between physician-measured systolic blood pressure and nurse-measured systolic blood pressure, with physician measurements being higher by about 5.16 mmHg (p<0.001). No significant differences were found for diastolic blood pressure. This indicates that blood pressure readings do change depending on whether they are measured by a physician or a nurse in treated hypertensive patients. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The data indicate that secondhand smoke exposure (SHSe) is present in families with high-risk infants discharged from NICUs, with disparities linked to socioeconomic status, race, and maternal mental health. Lower-income families and certain racial groups (African American and Caucasian) are less likely to have smoking bans, suggesting significant health disparities in SHSe risk among these infants. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a randomized controlled trial where mechanically ventilated patients who listened to patient-directed music showed better regulation of psychophysiological stress parameters such as galvanic skin response and heart rate compared to controls. This suggests that music has a positive influence on stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The first abstract states that comorbid major depression and alcohol use disorder in adolescents have been shown to be associated with poorer subsequent major depression outcomes. This directly supports the idea that comorbidity leads to worse depression outcomes in this population. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{maybe} & The provided abstracts do not directly address whether obstructive sleep apnea (OSA) affects aerobic fitness. Abstract [1] mentions a study aiming to determine if patients with OSA have an objective change in aerobic fitness measured by VO2max, but no results or conclusions are provided. Therefore, there is no direct evidence in the given context to support or refute the effect of OSA on aerobic fitness. maybe \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\section{Kelompok 3: Hybrid Retrieval dengan Ekspansi Akronim}
+
+\subsection*{Konfigurasi Baseline}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided data shows a statistically significant difference between physician-measured systolic blood pressure (PBP) and nurse-measured systolic blood pressure (NBP), with physician measurements being on average 5.16 mmHg higher. This indicates that blood pressure readings do change depending on whether they are measured by a physician or a nurse in treated hypertensive patients. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The provided abstracts indicate that secondhand smoke exposure (SHSe) is a concern for infants discharged from NICUs, particularly those at high respiratory risk. Factors such as socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans, suggesting potential health disparities in this population. Therefore, the evidence supports the potential for significant health disparities related to secondhand smoke risk in these infants. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts indicate that music interventions were studied in mechanically ventilated patients, with one study showing that patient-directed music helped regulate psychophysiological stress parameters such as galvanic skin response and heart rate under stress conditions. This suggests that music can positively influence stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The provided abstracts indicate that adolescents with comorbid major depression (MD) and alcohol use disorder (AUD) have higher rates of adult major depression compared to those with neither disorder or AUD alone. However, after adjusting for confounding factors such as gender, childhood behavior problems, and abuse exposure, the difference between comorbid and MD-only groups was no longer statistically significant. This suggests that while comorbidity is initially associated with poorer depression outcomes, this effect may be explained by other factors. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The data indicate that individuals with obstructive sleep apnea (OSA) generally have increased VO2max compared to a normal population, suggesting better aerobic fitness. However, patients with more severe OSA (apnea-hypopnea index >20) show decreased VO2max, indicating reduced aerobic fitness. Therefore, OSA does affect aerobic fitness, with severity influencing the direction of the effect. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided data shows a statistically significant difference between physician-measured systolic blood pressure and nurse-measured systolic blood pressure in treated hypertensive patients, with physician measurements being on average about 5.16 mmHg higher. This indicates that blood pressure readings do change depending on whether they are measured by a physician or a nurse. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The provided abstracts indicate that secondhand smoke exposure (SHSe) is a concern for fragile infants discharged from the NICU, particularly those born at very low birth weight and with prolonged ventilation. The studies also suggest that socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans, implying potential health disparities in this population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a study where mechanically ventilated patients were randomized to patient-directed music, headphones only, or usual care, with stress measured by urinary cortisol and psychophysiological parameters. Results indicated that participants exposed to music were better able to control stress-related physiological responses compared to controls, suggesting that music has a beneficial influence on stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The provided abstracts indicate that adolescents with comorbid major depression (MD) and alcohol use disorder (AUD) have higher rates of adult MD compared to those with AUD only, and marginally higher rates compared to those with MD only. Although after adjusting for confounders the difference between MD-only and comorbid groups was not statistically significant, the overall evidence suggests that comorbidity is associated with poorer depression outcomes. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The provided abstracts indicate that individuals with obstructive sleep apnea (OSA) generally have increased VO2max compared to a normal population, suggesting better aerobic fitness. However, patients with more severe OSA (apnea-hypopnea index > 20) show decreased VO2max, indicating reduced aerobic fitness. Therefore, OSA does affect aerobic fitness, with severity playing a key role. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided data show a statistically significant difference between physician-measured systolic blood pressure and nurse-measured systolic blood pressure in treated hypertensive patients, with physician measurements being higher by about 5.16 mmHg. No significant difference was found between nurse and self-measured systolic BP, and no significant differences were found for diastolic BP between measurement methods. This indicates that blood pressure readings do change depending on whether a physician or nurse measures it. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The data indicate that secondhand smoke exposure (SHSe) in families with high-risk infants discharged from the NICU is associated with socioeconomic status and race, with lower-income families and certain racial groups less likely to have household smoking bans. This suggests significant health disparities in SHSe risk among these infants. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{no} & The study described randomized mechanically ventilated patients to patient-directed music, headphones only, or usual care and measured urinary cortisol as a stress marker. The results showed no significant differences in urinary cortisol levels among the groups during ventilatory support, suggesting that music did not influence physiological stress as measured by cortisol in this setting. no \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The provided abstracts indicate that adolescents with comorbid major depression (MD) and alcohol use disorder (AUD) have higher rates of adult MD compared to those with neither disorder or AUD alone, suggesting poorer depression outcomes. However, after adjusting for confounding factors such as gender, childhood behavior problems, and abuse exposure, the difference between MD-only and comorbid groups was no longer statistically significant. This implies that while comorbidity is initially associated with poorer outcomes, this effect may be explained by other factors. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The evidence indicates that obstructive sleep apnea (OSA) can affect aerobic fitness, as patients with OSA overall had increased VO2max compared to a normal population, but those with more severe OSA (apnea-hypopnea index >20) showed decreased VO2max. This suggests that OSA severity influences aerobic fitness levels. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\subsection*{Konfigurasi + Query Rewriting + Context Reranking}
+\begin{longtable}{@{}c c c >{\raggedright\arraybackslash}p{8.8cm}@{}}
+\toprule
+\textbf{Kode} & \textbf{GT} & \textbf{Prediksi} & \textbf{Jawaban LLM} \\
+\midrule\endhead
+Q1 & \textit{yes} & \textit{yes} & The provided data shows a statistically significant difference between physician-measured systolic blood pressure and nurse-measured systolic blood pressure in treated hypertensive patients, with physician measurements being on average about 5.16 mmHg higher. This indicates that blood pressure readings do change depending on whether they are measured by a physician or a nurse. yes \\
+\addlinespace
+Q2 & \textit{yes} & \textit{yes} & The provided abstracts indicate that secondhand smoke exposure (SHSe) is a concern for fragile infants discharged from the NICU, particularly those born at very low birth weight and with prolonged ventilation. The studies also suggest that socioeconomic status, race, and mental health status are hypothesized to be related to SHSe and household smoking bans, implying potential health disparities in this population. yes \\
+\addlinespace
+Q3 & \textit{no} & \textit{yes} & The provided abstracts describe a study where mechanically ventilated patients were randomized to patient-directed music, headphones only, or usual care, with stress measured by urinary cortisol and psychophysiological parameters. Results indicated that participants exposed to music were better able to control stress-related physiological responses compared to controls, suggesting that music has a beneficial influence on stress in these patients. yes \\
+\addlinespace
+Q4 & \textit{no} & \textit{yes} & The provided abstracts indicate that adolescents with comorbid major depression (MD) and alcohol use disorder (AUD) have higher rates of adult MD compared to those with AUD only, and marginally higher rates compared to those with MD only. Although after adjusting for confounders the difference between MD-only and comorbid groups was not statistically significant, the overall evidence suggests that comorbidity is associated with poorer depression outcomes. yes \\
+\addlinespace
+Q5 & \textit{maybe} & \textit{yes} & The provided abstracts indicate that individuals with obstructive sleep apnea (OSA) generally have increased VO2max compared to a normal population, suggesting better aerobic fitness. However, patients with more severe OSA (apnea-hypopnea index > 20) show decreased VO2max, indicating reduced aerobic fitness. Therefore, OSA does affect aerobic fitness, with severity playing a key role. yes \\
+\addlinespace
+\bottomrule
+\end{longtable}
