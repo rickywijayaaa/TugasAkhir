@@ -14,67 +14,51 @@
 \endhead
 
 % ===== Notasi Umum =====
-$D$ & Dokumen atau \textit{chunk} pada korpus & 20 \\
-$Q$ & \textit{Query} atau pertanyaan pengguna & 20 \\
-$q_i$ & Istilah ke-$i$ pada \textit{query} & 20 \\
-$N$ & Jumlah total dokumen pada korpus & 20 \\
-$k$ & Parameter \textit{top-k retrieval} (jumlah dokumen teratas yang diambil) & 20 \\
-$|D|$ & Panjang dokumen (jumlah \textit{token}) & 20 \\
-$\text{avgdl}$ & Panjang dokumen rata-rata pada korpus & 20 \\[1ex]
+$D$ & Dokumen atau \textit{chunk} pada korpus & 21 \\
+$Q$ & \textit{Query} atau pertanyaan pengguna & 21 \\
+$q_i$ & Istilah ke-$i$ pada \textit{query} & 21 \\
+$N$ & Jumlah total dokumen pada korpus & 21 \\
+$k$ & Parameter \textit{top-k retrieval} (jumlah dokumen teratas yang diambil) & 21 \\
+$|D|$ & Panjang dokumen (jumlah \textit{token}) & 21 \\
+$\text{avgdl}$ & Panjang dokumen rata-rata pada korpus & 21 \\[1ex]
 
 % ===== BM25 =====
-$\text{TF}(q_i, D)$ & \textit{Term frequency} istilah $q_i$ pada dokumen $D$ & 20 \\
-$\text{IDF}(q_i)$ & \textit{Inverse document frequency} istilah $q_i$ & 20 \\
-$k_1$ & \textit{Hyperparameter} BM25 untuk skala saturasi \textit{term frequency} & 20 \\
-$b$ & \textit{Hyperparameter} BM25 untuk normalisasi panjang dokumen & 20 \\
-$\text{score}_{\text{BM25}}(Q,D)$ & Skor relevansi BM25 antara \textit{query} $Q$ dan dokumen $D$ & 20 \\[1ex]
+$\text{TF}(q_i, D)$ & \textit{Term frequency} istilah $q_i$ pada dokumen $D$ & 21 \\
+$\text{IDF}(q_i)$ & \textit{Inverse document frequency} istilah $q_i$ & 21 \\
+$k_1$ & \textit{Hyperparameter} BM25 untuk skala saturasi \textit{term frequency} & 21 \\
+$b$ & \textit{Hyperparameter} BM25 untuk normalisasi panjang dokumen & 21 \\
+$\text{score}_{\text{BM25}}(Q,D)$ & Skor relevansi BM25 antara \textit{query} $Q$ dan dokumen $D$ & 21 \\[1ex]
 
 % ===== Embedding & Dense Retrieval =====
-$\vec{q}$ & Vektor representasi (\textit{embedding}) \textit{query} & 21 \\
-$\vec{d}$ & Vektor representasi (\textit{embedding}) dokumen & 21 \\
-$\cos(\vec{q},\vec{d})$ & \textit{Cosine similarity} antara vektor \textit{query} dan dokumen & 21 \\
-$\langle \vec{q}, \vec{d}\rangle$ & \textit{Dot product} antara dua vektor & 21 \\
-$\|\vec{v}\|$ & Norma Euclidean (L2) dari vektor $\vec{v}$ & 21 \\
-$d$ & Dimensi vektor \textit{embedding} & 21 \\[1ex]
-
-% ===== RRF =====
-$r_i$ & Peringkat dokumen ke-$i$ pada daftar hasil pencarian & 24 \\
-$\text{rank}(D,L)$ & Posisi peringkat dokumen $D$ pada daftar $L$ & 24 \\
-$\text{score}_{\text{RRF}}(D)$ & Skor \textit{Reciprocal Rank Fusion} untuk dokumen $D$ & 24 \\
-$k_{\text{RRF}}$ & Konstanta pelembut pada RRF (umumnya 60) & 24 \\[1ex]
+$\vec{q}$ & Vektor representasi (\textit{embedding}) \textit{query} & 22 \\
+$\vec{d}$ & Vektor representasi (\textit{embedding}) dokumen & 22 \\
+$\cos(\vec{q},\vec{d})$ & \textit{Cosine similarity} antara vektor \textit{query} dan dokumen & 22 \\
+$\langle \vec{q}, \vec{d}\rangle$ & \textit{Dot product} antara dua vektor & 22 \\
+$\|\vec{v}\|$ & Norma Euclidean (L2) dari vektor $\vec{v}$ & 22 \\
+$d$ & Dimensi vektor \textit{embedding} & 22 \\[1ex]
 
 % ===== Metrik Retrieval =====
-$\text{Recall@}k$ & Proporsi dokumen relevan yang berhasil di-\textit{retrieve} dalam $k$ teratas & 30 \\
-$\text{Precision@}k$ & Proporsi dokumen relevan pada $k$ teratas hasil \textit{retrieval} & 30 \\
-$\text{MAP@}k$ & \textit{Mean Average Precision} pada $k$ teratas & 30 \\
-$\text{Hit@}k$ & Indikator apakah minimal satu dokumen relevan ada pada $k$ teratas & 30 \\
-$\text{DCG@}k$ & \textit{Discounted Cumulative Gain} pada $k$ teratas & 30 \\
-$\text{IDCG@}k$ & \textit{Ideal Discounted Cumulative Gain} pada $k$ teratas & 30 \\
-$\text{nDCG@}k$ & \textit{Normalized Discounted Cumulative Gain} pada $k$ teratas & 30 \\
-$\text{rel}_i$ & Skor relevansi dokumen pada peringkat ke-$i$ & 30 \\[1ex]
-
-% ===== Klasifikasi =====
-$\text{TP}$ & \textit{True Positive} & 30 \\
-$\text{FP}$ & \textit{False Positive} & 30 \\
-$\text{TN}$ & \textit{True Negative} & 30 \\
-$\text{FN}$ & \textit{False Negative} & 30 \\
-$\text{Accuracy}$ & Proporsi prediksi yang benar terhadap seluruh prediksi & 30 \\
-$\text{Precision}$ & Proporsi prediksi positif yang benar & 30 \\
-$\text{Recall}$ & Proporsi positif aktual yang berhasil diprediksi & 30 \\
+$\text{Recall@}k$ & Proporsi dokumen relevan yang berhasil di-\textit{retrieve} dalam $k$ teratas & 31 \\
+$\text{Precision@}k$ & Proporsi dokumen relevan pada $k$ teratas hasil \textit{retrieval} & 32 \\
+$\text{MAP@}k$ & \textit{Mean Average Precision} pada $k$ teratas & 32 \\
+$\text{DCG@}k$ & \textit{Discounted Cumulative Gain} pada $k$ teratas & 32 \\
+$\text{IDCG@}k$ & \textit{Ideal Discounted Cumulative Gain} pada $k$ teratas & 33 \\
+$\text{nDCG@}k$ & \textit{Normalized Discounted Cumulative Gain} pada $k$ teratas & 33 \\
+$\text{rel}_i$ & Skor relevansi dokumen pada peringkat ke-$i$ & 32 \\[1ex]
 
 % ===== RAGAS =====
-$F$ & Skor \textit{Faithfulness} pada metrik RAGAS & 32 \\
-$\text{CR}_{\text{RAGAS}}$ & Skor \textit{Context Recall} pada metrik RAGAS & 32 \\
-$S$ & Himpunan kalimat pada jawaban yang dievaluasi & 32 \\
-$|S|$ & Jumlah kalimat pada jawaban & 32 \\[1ex]
+$F$ & Skor \textit{Faithfulness} pada metrik RAGAS & 34 \\
+$\text{CR}_{\text{RAGAS}}$ & Skor \textit{Context Recall} pada metrik RAGAS & 35 \\
+$S$ & Himpunan kalimat pada jawaban yang dievaluasi & 34 \\
+$|S|$ & Jumlah kalimat pada jawaban & 34 \\[1ex]
 
 % ===== Operator Statistik & Matematis =====
-$\sum$ & Operator penjumlahan & 20 \\
-$\prod$ & Operator perkalian & 20 \\
-$\log$ & Logaritma natural & 20 \\
-$\max$ & Nilai maksimum & 20 \\
-$\text{argmax}$ & Argumen yang memaksimalkan fungsi & 20 \\
-$\mathbb{1}[\cdot]$ & Fungsi indikator (bernilai 1 jika kondisi benar, 0 jika salah) & 20 \\
-$p$ & \textit{P-value} statistik & 20 \\
+$\sum$ & Operator penjumlahan & 21 \\
+$\prod$ & Operator perkalian & 21 \\
+$\log$ & Logaritma natural & 21 \\
+$\max$ & Nilai maksimum & 21 \\
+$\text{argmax}$ & Argumen yang memaksimalkan fungsi & 21 \\
+$\mathbb{1}[\cdot]$ & Fungsi indikator (bernilai 1 jika kondisi benar, 0 jika salah) & 32 \\
+$p$ & \textit{P-value} statistik & 21 \\
 
 \end{longtable}
