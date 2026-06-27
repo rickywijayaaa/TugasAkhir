@@ -20,7 +20,7 @@ Walaupun kemampuannya terus meningkat, LLM masih memiliki keterbatasan mendasar 
 
 \item \textbf{Halusinasi (\textit{hallucination}).} Ketika dipaksa menjawab di luar batas pengetahuannya, LLM cenderung menghasilkan keluaran yang tampak meyakinkan tetapi bertentangan dengan fakta atau tidak dapat diverifikasi oleh sumber yang tersedia \parencite{zhao2023survey}. Halusinasi dapat menurunkan keandalan sistem dan menimbulkan risiko serius pada penerapan di domain sensitif seperti biomedis, sehingga menjadi masalah utama yang ingin dimitigasi pada tugas akhir ini.
 
-\item \textbf{Ketergantungan pada \textit{retrieval} (\textit{retrieval dependency}).} Untuk mengatasi dua keterbatasan di atas tanpa melatih ulang model, pendekatan yang banyak diadopsi adalah memberi LLM akses ke sumber pengetahuan eksternal pada saat inferensi melalui mekanisme \textit{retrieval}. Dengan menambatkan (\textit{grounding}) jawaban pada bukti yang diambil, kualitas jawaban menjadi sangat bergantung pada kualitas \textit{retrieval}: konteks yang relevan dapat menekan halusinasi, sedangkan \textit{retrieval} yang gagal menyediakan dokumen tepat justru dapat tetap memicu halusinasi. Ketergantungan inilah yang menjadi dasar pendekatan \textit{Retrieval-Augmented Generation} (RAG) yang dibahas pada subbab berikutnya.
+\item \textbf{Ketergantungan pada \textit{retrieval} (\textit{retrieval dependency}).} Untuk mengatasi dua keterbatasan di atas tanpa melatih ulang model, pendekatan yang banyak diadopsi adalah memberi LLM akses ke sumber pengetahuan eksternal pada saat inferensi melalui mekanisme \textit{retrieval}. Dengan menambatkan (\textit{grounding}) jawaban pada bukti yang diambil, kualitas jawaban menjadi sangat bergantung pada kualitas \textit{retrieval}. Konteks yang relevan dapat menekan halusinasi, sedangkan \textit{retrieval} yang gagal menyediakan dokumen tepat justru dapat tetap memicu halusinasi. Ketergantungan inilah yang menjadi dasar pendekatan \textit{Retrieval-Augmented Generation} (RAG) yang dibahas pada subbab berikutnya.
 \end{enumerate}
 
 % ==========================================
@@ -369,8 +369,8 @@ Berbagai teknik \textit{prompting} digunakan untuk memandu model agar lebih berh
 
 \begin{enumerate}[a.]
   \item \textbf{\textit{Chain-of-thought}} dan penalaran bertahap yang mendorong model menjelaskan langkah berpikirnya.
-  \item \textbf{\textit{Vigilant prompting}} yang secara eksplisit menginstruksikan model untuk hanya menggunakan informasi dari konteks dan menyatakan ``tidak tahu'' jika bukti tidak memadai.
-  \item \textbf{Teknik lanjutan} seperti \textit{ReAct}, CoVe, CoN, dan CoK yang memadukan penalaran, aksi, verifikasi, dan pengelolaan dokumen untuk menekan halusinasi.
+  \item \textbf{\textit{Chain-of-Note} (CoN)} yang meminta model menyusun catatan ringkas untuk setiap dokumen hasil \textit{retrieval} guna menilai relevansi dan keandalannya sebelum menyusun jawaban akhir, sehingga model lebih tahan terhadap dokumen yang tidak relevan dan dapat menyatakan ``tidak tahu'' ketika konteks tidak memuat bukti yang memadai \parencite{yu2024con}.
+  \item \textbf{Teknik lanjutan} seperti \textit{ReAct}, CoVe, dan CoK yang memadukan penalaran, aksi, verifikasi, dan pengelolaan dokumen untuk menekan halusinasi.
 \end{enumerate}
 
 Teknik-teknik ini tidak mengubah parameter model, tetapi mengatur perilaku generasi melalui desain \textit{prompt} yang cermat.
@@ -398,7 +398,7 @@ Pendekatan-pendekatan verifikasi tersebut menggambarkan bahwa keluaran model mas
 
 Salah satu sumber utama kegagalan pada sistem RAG adalah ketidakcocokan kosakata (\textit{vocabulary mismatch}) antara kueri pengguna dan dokumen pada korpus, yaitu kondisi ketika makna semantik antara keduanya sebenarnya sama namun bentuk istilahnya berbeda. Untuk mengatasi hal ini, salah satu strategi yang banyak diadopsi adalah memperkaya isi setiap dokumen sebelum diindeks, sehingga setiap \textit{chunk} mengandung istilah yang lebih beragam dan lebih dekat dengan gaya kueri pengguna. Strategi ini dikenal sebagai \textit{document expansion} atau \textit{document enrichment}.
 
-Strategi pengayaan dokumen telah terbukti efektif pada berbagai domain. Pada domain finansial, \textcite{fintechrag2025} dan \textcite{financialmeta2025} menyuntik akronim domain-spesifik, sinonim, serta metadata terstruktur ke dokumen sebelum diindeks, dan melaporkan peningkatan akurasi \textit{retrieval} yang konsisten dibandingkan \textit{baseline} BM25 maupun \textit{dense retrieval} tunggal. Pada domain enterprise yang lebih umum, \textcite{enterprisekg2025} mengusulkan kerangka sistematis yang memanfaatkan model bahasa besar untuk membangkitkan metadata terenrichi (kata kunci, entitas, akronim, sinonim) pada tiap \textit{chunk}, dengan hasil peningkatan retrieval hingga sepuluh poin persentase pada korpus internal perusahaan. Pendekatan serupa pada level enrichment per-chunk juga diusulkan oleh \textcite{mdkeychunker2025} yang menggabungkan ekstraksi kata kunci, ringkasan, dan pertanyaan hipotetis melalui satu pemanggilan LLM. Pola yang konsisten lintas-domain ini menegaskan bahwa pengayaan dokumen pada tahap \textit{indexing} merupakan strategi yang dapat digeneralisasi dan menjadi salah satu fondasi penting pada sistem RAG modern.
+Strategi pengayaan dokumen telah terbukti efektif pada berbagai domain. Pada domain finansial, \textcite{fintechrag2025} dan \textcite{financialmeta2025} menyuntik akronim domain-spesifik, sinonim, serta metadata terstruktur ke dokumen sebelum diindeks, dan melaporkan peningkatan akurasi \textit{retrieval} yang konsisten dibandingkan \textit{baseline} BM25 maupun \textit{dense retrieval} tunggal. Pada domain enterprise yang lebih umum, \textcite{enterprisekg2025} mengusulkan kerangka sistematis yang memanfaatkan model bahasa besar untuk membangkitkan metadata yang diperkaya (kata kunci, entitas, akronim, sinonim) pada tiap \textit{chunk}, dengan hasil peningkatan \textit{retrieval} hingga sepuluh poin persentase pada korpus internal perusahaan. Pendekatan serupa pada level \textit{enrichment} per \textit{chunk} juga diusulkan oleh \textcite{mdkeychunker2025} yang menggabungkan ekstraksi kata kunci, ringkasan, dan pertanyaan hipotetis melalui satu pemanggilan LLM. Pola yang konsisten lintas-domain ini menegaskan bahwa pengayaan dokumen pada tahap \textit{indexing} merupakan strategi yang dapat digeneralisasi dan menjadi salah satu fondasi penting pada sistem RAG modern.
 
 % ==========================================
 % 2.4 BM25 sebagai Algoritma Retrieval Klasik
@@ -472,7 +472,7 @@ Pendekatan ini bekerja dengan memanfaatkan kemampuan \textit{Large Language Mode
 
 
 
-Ma dkk.\ menunjukkan bahwa \textit{retriever} tradisional seperti BM25 atau Dense Passage Retrieval sering kali gagal menemukan dokumen yang benar ketika kueri terlalu pendek atau tidak selaras dengan distribusi bahasa pada korpus. Dengan memperbaiki bentuk kueri melalui proses \textit{rewriting}, sistem RAG dapat meningkatkan \textbf{recall} dokumen relevan secara signifikan, sehingga mengurangi risiko halusinasi pada tahap generasi karena model tidak perlu "mengarang" informasi untuk mengisi kekosongan konteks.
+Ma dkk.\ menunjukkan bahwa \textit{retriever} tradisional seperti BM25 atau \textit{Dense Passage Retrieval} sering kali gagal menemukan dokumen yang benar ketika kueri terlalu pendek atau tidak selaras dengan distribusi bahasa pada korpus. Dengan memperbaiki bentuk kueri melalui proses \textit{rewriting}, sistem RAG dapat meningkatkan \textbf{recall} dokumen relevan secara signifikan, sehingga mengurangi risiko halusinasi pada tahap generasi karena model tidak perlu "mengarang" informasi untuk mengisi kekosongan konteks.
 
 Secara teknis, pendekatan ini membingkai \textit{query rewriting} sebagai fungsi:
 \[
@@ -882,7 +882,7 @@ F = \frac{|V|}{|S|}
 \end{equation}
 \eqcaption{\textit{Faithfulness}}
 
-dengan $|V|$ menyatakan jumlah pernyataan yang didukung oleh konteks (berdasarkan hasil evaluasi LLM), sedangkan $|S|$ adalah jumlah total pernyataan yang dihasilkan sistem RAG. Nilai \textit{faithfulness} yang tinggi menandakan jawaban yang lebih konsisten dengan dokumen sumber, sehingga metrik ini menjadi indikator langsung berkurangnya halusinasi intrinsik.
+dengan $|V|$ menyatakan jumlah pernyataan yang didukung oleh konteks (berdasarkan hasil evaluasi LLM), sedangkan $|S|$ adalah jumlah total pernyataan yang dihasilkan sistem RAG. Nilai \textit{faithfulness} yang tinggi menandakan jawaban yang lebih konsisten dengan dokumen sumber, sehingga metrik ini menjadi indikator langsung berkurangnya halusinasi intrinsik dan ekstrinsik.
 
 \subsubsection{Context Recall}
 

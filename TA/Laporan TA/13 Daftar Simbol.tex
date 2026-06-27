@@ -14,51 +14,51 @@
 \endhead
 
 % ===== Notasi Umum =====
-$D$ & Dokumen atau \textit{chunk} pada korpus & 21 \\
-$Q$ & \textit{Query} atau pertanyaan pengguna & 21 \\
-$q_i$ & Istilah ke-$i$ pada \textit{query} & 21 \\
-$N$ & Jumlah total dokumen pada korpus & 21 \\
-$k$ & Parameter \textit{top-k retrieval} (jumlah dokumen teratas yang diambil) & 21 \\
-$|D|$ & Panjang dokumen (jumlah \textit{token}) & 21 \\
-$\text{avgdl}$ & Panjang dokumen rata-rata pada korpus & 21 \\[1ex]
+$D$ & Dokumen atau \textit{chunk} pada korpus & 23 \\
+$Q$ & \textit{Query} atau pertanyaan pengguna & 23 \\
+$q_i$ & Istilah ke-$i$ pada \textit{query} & 23 \\
+$N$ & Jumlah total dokumen pada korpus & 23 \\
+$k$ & Parameter \textit{top-k retrieval} (jumlah dokumen teratas yang diambil) & 23 \\
+$|D|$ & Panjang dokumen (jumlah \textit{token}) & 23 \\
+$\text{avgdl}$ & Panjang dokumen rata-rata pada korpus & 23 \\[1ex]
 
 % ===== BM25 =====
-$\text{TF}(q_i, D)$ & \textit{Term frequency} istilah $q_i$ pada dokumen $D$ & 21 \\
-$\text{IDF}(q_i)$ & \textit{Inverse document frequency} istilah $q_i$ & 21 \\
-$k_1$ & \textit{Hyperparameter} BM25 untuk skala saturasi \textit{term frequency} & 21 \\
-$b$ & \textit{Hyperparameter} BM25 untuk normalisasi panjang dokumen & 21 \\
-$\text{score}_{\text{BM25}}(Q,D)$ & Skor relevansi BM25 antara \textit{query} $Q$ dan dokumen $D$ & 21 \\[1ex]
+$\text{TF}(q_i, D)$ & \textit{Term frequency} istilah $q_i$ pada dokumen $D$ & 23 \\
+$\text{IDF}(q_i)$ & \textit{Inverse document frequency} istilah $q_i$ & 23 \\
+$k_1$ & \textit{Hyperparameter} BM25 untuk skala saturasi \textit{term frequency} & 23 \\
+$b$ & \textit{Hyperparameter} BM25 untuk normalisasi panjang dokumen & 23 \\
+$\text{score}_{\text{BM25}}(Q,D)$ & Skor relevansi BM25 antara \textit{query} $Q$ dan dokumen $D$ & 23 \\[1ex]
 
 % ===== Embedding & Dense Retrieval =====
-$\vec{q}$ & Vektor representasi (\textit{embedding}) \textit{query} & 22 \\
-$\vec{d}$ & Vektor representasi (\textit{embedding}) dokumen & 22 \\
-$\cos(\vec{q},\vec{d})$ & \textit{Cosine similarity} antara vektor \textit{query} dan dokumen & 22 \\
-$\langle \vec{q}, \vec{d}\rangle$ & \textit{Dot product} antara dua vektor & 22 \\
-$\|\vec{v}\|$ & Norma Euclidean (L2) dari vektor $\vec{v}$ & 22 \\
-$d$ & Dimensi vektor \textit{embedding} & 22 \\[1ex]
+$\vec{q}$ & Vektor representasi (\textit{embedding}) \textit{query} & 24 \\
+$\vec{d}$ & Vektor representasi (\textit{embedding}) dokumen & 24 \\
+$\cos(\vec{q},\vec{d})$ & \textit{Cosine similarity} antara vektor \textit{query} dan dokumen & 24 \\
+$\langle \vec{q}, \vec{d}\rangle$ & \textit{Dot product} antara dua vektor & 24 \\
+$\|\vec{v}\|$ & Norma Euclidean (L2) dari vektor $\vec{v}$ & 24 \\
+$d$ & Dimensi vektor \textit{embedding} & 24 \\[1ex]
 
 % ===== Metrik Retrieval =====
-$\text{Recall@}k$ & Proporsi dokumen relevan yang berhasil di-\textit{retrieve} dalam $k$ teratas & 31 \\
-$\text{Precision@}k$ & Proporsi dokumen relevan pada $k$ teratas hasil \textit{retrieval} & 32 \\
-$\text{MAP@}k$ & \textit{Mean Average Precision} pada $k$ teratas & 32 \\
-$\text{DCG@}k$ & \textit{Discounted Cumulative Gain} pada $k$ teratas & 32 \\
-$\text{IDCG@}k$ & \textit{Ideal Discounted Cumulative Gain} pada $k$ teratas & 33 \\
-$\text{nDCG@}k$ & \textit{Normalized Discounted Cumulative Gain} pada $k$ teratas & 33 \\
-$\text{rel}_i$ & Skor relevansi dokumen pada peringkat ke-$i$ & 32 \\[1ex]
+$\text{Recall@}k$ & Proporsi dokumen relevan yang berhasil di-\textit{retrieve} dalam $k$ teratas & 33 \\
+$\text{Precision@}k$ & Proporsi dokumen relevan pada $k$ teratas hasil \textit{retrieval} & 34 \\
+$\text{MAP@}k$ & \textit{Mean Average Precision} pada $k$ teratas & 34 \\
+$\text{DCG@}k$ & \textit{Discounted Cumulative Gain} pada $k$ teratas & 34 \\
+$\text{IDCG@}k$ & \textit{Ideal Discounted Cumulative Gain} pada $k$ teratas & 35 \\
+$\text{nDCG@}k$ & \textit{Normalized Discounted Cumulative Gain} pada $k$ teratas & 35 \\
+$\text{rel}_i$ & Skor relevansi dokumen pada peringkat ke-$i$ & 34 \\[1ex]
 
 % ===== RAGAS =====
-$F$ & Skor \textit{Faithfulness} pada metrik RAGAS & 34 \\
-$\text{CR}_{\text{RAGAS}}$ & Skor \textit{Context Recall} pada metrik RAGAS & 35 \\
-$S$ & Himpunan kalimat pada jawaban yang dievaluasi & 34 \\
-$|S|$ & Jumlah kalimat pada jawaban & 34 \\[1ex]
+$F$ & Skor \textit{Faithfulness} pada metrik RAGAS & 36 \\
+$\text{CR}_{\text{RAGAS}}$ & Skor \textit{Context Recall} pada metrik RAGAS & 37 \\
+$S$ & Himpunan kalimat pada jawaban yang dievaluasi & 36 \\
+$|S|$ & Jumlah kalimat pada jawaban & 36 \\[1ex]
 
 % ===== Operator Statistik & Matematis =====
-$\sum$ & Operator penjumlahan & 21 \\
-$\prod$ & Operator perkalian & 21 \\
-$\log$ & Logaritma natural & 21 \\
-$\max$ & Nilai maksimum & 21 \\
-$\text{argmax}$ & Argumen yang memaksimalkan fungsi & 21 \\
-$\mathbb{1}[\cdot]$ & Fungsi indikator (bernilai 1 jika kondisi benar, 0 jika salah) & 32 \\
-$p$ & \textit{P-value} statistik & 21 \\
+$\sum$ & Operator penjumlahan & 23 \\
+$\prod$ & Operator perkalian & 23 \\
+$\log$ & Logaritma natural & 23 \\
+$\max$ & Nilai maksimum & 23 \\
+$\text{argmax}$ & Argumen yang memaksimalkan fungsi & 23 \\
+$\mathbb{1}[\cdot]$ & Fungsi indikator (bernilai 1 jika kondisi benar, 0 jika salah) & 34 \\
+$p$ & \textit{P-value} statistik & 23 \\
 
 \end{longtable}
