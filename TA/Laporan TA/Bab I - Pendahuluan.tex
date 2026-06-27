@@ -37,7 +37,7 @@ Berdasarkan latar belakang tersebut, tugas akhir ini berfokus untuk menjawab beb
 
 Tujuan dari tugas akhir ini adalah sebagai berikut:
 \begin{enumerate}
-    \item Merancang dan mengimplementasikan arsitektur sistem RAG-LLM untuk mitigasi halusinasi pada sistem tanya jawab biomedis dengan mengintegrasikan ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking} sehingga dapat memproses pertanyaan biomedis secara otomatis.
+    \item Merancang dan mengimplementasikan arsitektur sistem RAG-LLM untuk mitigasi halusinasi pada sistem tanya jawab biomedis dengan mengintegrasikan ekspansi akronim, \textit{query rewriting}, dan \textit{context reranking} sehingga dapat memproses pertanyaan biomedis.
     \item Menyusun analisis komparatif kontribusi setiap teknik mitigasi terhadap penurunan halusinasi dan peningkatan kualitas jawaban sistem.
 \end{enumerate}
 
@@ -60,11 +60,17 @@ pengerjaan tugas akhir. Berikut adalah batasan masalah yang ditetapkan:
           API LLM.
 
     \item Halusinasi yang dianalisis dibatasi
-          pada dua kategori yang paling relevan dengan proses
+          pada tiga kategori yang paling relevan dengan proses
           \textit{retrieval} dan \textit{generation}, yaitu halusinasi
           intrinsik (keluaran yang bertentangan dengan konteks yang
-          diberikan) dan halusinasi faktual (keluaran yang mengandung
-          informasi keliru meskipun tampak meyakinkan). Jenis halusinasi
+          diberikan), halusinasi ekstrinsik (keluaran yang tidak dapat
+          diverifikasi dari konteks yang diberikan meskipun mungkin
+          benar), dan halusinasi faktual (keluaran yang mengandung
+          klaim faktual yang keliru). Halusinasi intrinsik dan
+          ekstrinsik diukur melalui metrik \textit{faithfulness},
+          sedangkan halusinasi faktual tecermin pada \textit{label
+          accuracy} dan \textit{hallucination rate} terhadap
+          \textit{ground truth}. Jenis halusinasi
           lain seperti \textit{reasoning}, \textit{linguistic}, dan
           \textit{bias-related halusinasi} tidak termasuk dalam
           cakupan.
@@ -109,16 +115,14 @@ pengerjaan tugas akhir. Berikut adalah batasan masalah yang ditetapkan:
 % ==========================================
 \section{Metodologi Tugas Akhir}
 
-Tugas akhir ini menggunakan pendekatan metodologi \textit{Cross-Industry Standard Process for Data Mining} atau disingkat \textbf{CRISP-DM}. Metodologi ini merupakan kerangka kerja industri yang banyak digunakan dalam proyek berbasis \textit{data mining} dan \textit{machine learning} karena bersifat fleksibel, iteratif, serta berorientasi pada kebutuhan bisnis dan teknis \parencite{crispdm_datasciencepm}.
+Tugas akhir ini menggunakan \textbf{CRISP-DM} (\textit{Cross-Industry Standard Process for Data Mining}) sebagai kerangka kerja metodologi penelitian \parencite{crispdm_datasciencepm}. CRISP-DM dipilih karena karakteristiknya selaras dengan sifat penelitian ini yang berbasis data dan eksperimen. Pertama, CRISP-DM bersifat iteratif, sehingga memungkinkan perbaikan berulang ketika hasil evaluasi belum memenuhi sasaran. Hal ini sesuai dengan penelitian yang menguji dan membandingkan banyak konfigurasi secara bertahap. Kedua, CRISP-DM memisahkan secara eksplisit tahap pemahaman masalah dan data dari tahap pemodelan dan evaluasi, sehingga setiap keputusan desain dapat ditelusuri kembali pada karakteristik data yang sebenarnya. Ketiga, kerangka ini berorientasi pada evaluasi yang terukur, yang sejalan dengan kebutuhan penelitian untuk menilai kinerja secara objektif dan dapat dibandingkan. Keempat, sifatnya yang terstruktur dan terdokumentasi mendukung reproduktibilitas, yaitu kemampuan penelitian untuk diuji ulang dan diverifikasi oleh pihak lain.
 
-CRISP-DM menyediakan tahapan sistematis untuk memahami permasalahan, menyiapkan data, membangun model, hingga mengevaluasi serta mengimplementasikannya. Metodologi ini terdiri atas enam fase utama, yaitu: \textit{business understanding}, \textit{data understanding}, \textit{data preparation}, \textit{modeling}, \textit{evaluation}, serta \textit{deployment}.
-
-Visualisasi tahapan metodologi \textit{CRISP-DM} dapat dilihat pada Gambar~\ref{gambar:crispdm}.
+CRISP-DM terdiri atas enam fase utama, yaitu \textit{business understanding}, \textit{data understanding}, \textit{data preparation}, \textit{modeling}, \textit{evaluation}, serta \textit{deployment}. Visualisasi tahapan metodologi ini dapat dilihat pada Gambar~\ref{gambar:crispdm}.
 
 \begin{figure}[H]
   \centering
   \captionsetup{justification=centering}
-  \includegraphics[width=0.85\textwidth]{image/crispdm.png}
+  \includegraphics[width=0.66\textwidth]{image/crispdm.png}
   \caption[Tahapan Metodologi CRISP-DM]{Tahapan Metodologi CRISP-DM \parencite{crispdm_datasciencepm}}
   \label{gambar:crispdm}
 \end{figure}
@@ -130,7 +134,7 @@ Tahap pertama bertujuan memahami kebutuhan dan tujuan sistem dari sudut pandang 
 Tahap ini berfokus pada eksplorasi data awal, termasuk identifikasi sumber data, penilaian kualitas, serta analisis karakteristik yang relevan dengan permasalahan. Tujuannya adalah memperoleh wawasan mengenai struktur, konten, serta permasalahan yang mungkin muncul pada tahap pemrosesan.
 
 \subsection{\textit{Data Preparation}}
-Tahap ini mencakup pembersihan data, seleksi variabel, penggabungan data, transformasi format, serta penanganan \textit{missing values}. Hasil akhir tahap ini adalah dataset terstruktur dengan kualitas memadai untuk digunakan pada proses pemodelan.
+Tahap ini mencakup pembersihan, penyaringan, transformasi, serta penyiapan data sehingga siap digunakan pada tahap berikutnya. Hasil akhir tahap ini adalah data yang terstruktur dan berkualitas memadai untuk proses pemodelan.
 
 \subsection{\textit{Modeling}}
 Pada tahap ini ditentukan teknik pemodelan, pemilihan algoritma, serta konfigurasi parameter (\textit{hyperparameter}) yang sesuai. Data yang telah dipersiapkan kemudian digunakan untuk membangun model, termasuk pengujian alternatif parameter untuk mendapatkan kinerja yang optimal.
